@@ -176,6 +176,8 @@ AC_ARG_WITH([petsc-options],
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
 
+AC_PROG_LIBTOOL
+
 # GCC
 if test "$install_gcc" = "yes" ; then
   # Must have a C compiler to build gcc
@@ -246,6 +248,7 @@ fi
 if test "$install_hdf5" = "yes" ; then
   echo "do nothing" >& /dev/null
 else
+  echo "do nothing" >& /dev/null
   # Need to account for PETSc option --download-hdf5=1.
   #CIT_HDF5_PETSC_HEADER
   #CIT_HDF5_PETSC_LIB
