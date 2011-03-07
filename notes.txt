@@ -1,0 +1,79 @@
+--install-gcc
+          python
+          mpi==[openmpi,mpich]
+          cppunit
+          swig
+          numpy
+          proj
+          netcdf
+          hdf5
+          petsc
+          spatialdata
+          nemesis
+          fiat
+
+--enable-testing
+         swig - spatialdata, pylith
+         netcdf - pylith
+         SCECVMH - spatialdata
+         hdf5 - petsc, pylith
+         svn (requires swig) - nemesis, spatialdata, pylith
+
+--petsc-options=[]
+
+
+CONFIGURE
+
+1. if not install gcc
+  check for CC, CXX
+
+2. if not install python
+  check for python
+
+3. if testing and not install cppunit
+  check for cppunit
+
+4. if svn and not install swig
+  check for swig
+
+5. if not install numpy
+  check for numpy
+
+6. if not install proj
+  check for proj
+
+7. if netcdf enabled and not install netcdf
+  check for netcdf
+
+8. if hdf5 enabled and not install hdf5
+  check for hdf5
+
+9. if not install petsc
+  check for petsc
+
+10. if not install spatialdata
+  check for spatialdata
+
+11. if not install nemesis
+  check for nemesis
+
+12. if not install fiat
+  check for fiat
+
+
+INSTALL
+
+gcc
+python
+mpi
+cppunit
+swig
+numpy
+proj
+netcdf
+hdf5
+petsc
+spatialdata
+nemesis
+fiat
+pylith
