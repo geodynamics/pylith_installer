@@ -33,7 +33,7 @@ AC_ARG_ENABLE([gcc],
         [install GNU compilers) @<:@default=no@:>@])],
 	[install_gcc=yes],
 	[install_gcc=no])
-AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
+AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" == "yes"])
 
 # PYTHON
 AC_ARG_ENABLE([python],
@@ -41,7 +41,7 @@ AC_ARG_ENABLE([python],
         [install Python) @<:@default=no@:>@])],
 	[install_python=yes],
 	[install_python=no])
-AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
+AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" == "yes"])
 
 # MPI
 AC_ARG_ENABLE([mpi],
@@ -50,6 +50,8 @@ AC_ARG_ENABLE([mpi],
 	[install_mpi=$enableval],
 	[install_mpi=no])
 AM_CONDITIONAL([INSTALL_MPI], [test "$install_mpi" != no])
+AM_CONDITIONAL([INSTALL_OPENMPI], [test "$install_mpi" = "openmpi"])
+AM_CONDITIONAL([INSTALL_MPICH], [test "$install_mpi" = "mpich"])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -57,7 +59,7 @@ AC_ARG_ENABLE([cppunit],
         [install GNU compilers) @<:@default=yes@:>@])],
 	[install_cppunit=yes],
 	[install_cppunit=no])
-AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
+AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = "yes"])
 
 # SWIG
 AC_ARG_ENABLE([swig],
@@ -65,7 +67,7 @@ AC_ARG_ENABLE([swig],
         [install SWIG) @<:@default=yes@:>@])],
 	[install_swig=yes],
 	[install_swig=no])
-AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
+AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = "yes"])
 
 # NUMPY
 AC_ARG_ENABLE([numpy],
@@ -73,7 +75,7 @@ AC_ARG_ENABLE([numpy],
         [install numpy) @<:@default=yes@:>@])],
 	[install_numpy=yes],
 	[install_numpy=no])
-AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
+AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = "yes"])
 
 # PROJ4
 AC_ARG_ENABLE([proj4],
@@ -81,7 +83,7 @@ AC_ARG_ENABLE([proj4],
         [install GNU compilers) @<:@default=yes@:>@])],
 	[install_proj4=yes],
 	[install_proj4=no])
-AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = yes])
+AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = "yes"])
 
 # NETCDF
 AC_ARG_ENABLE([netcdf],
@@ -89,7 +91,7 @@ AC_ARG_ENABLE([netcdf],
         [install NetCDF) @<:@default=yes@:>@])],
 	[install_netcdf=yes],
 	[install_netcdf=no])
-AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
+AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = "yes"])
 
 # HDF5
 AC_ARG_ENABLE([hdf5],
@@ -97,7 +99,7 @@ AC_ARG_ENABLE([hdf5],
         [install HDF5) @<:@default=yes@:>@])],
 	[install_hdf5=yes],
 	[install_hdf5=no])
-AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
+AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = "yes"])
 
 # PETSC
 AC_ARG_ENABLE([petsc],
@@ -105,7 +107,7 @@ AC_ARG_ENABLE([petsc],
         [install PETSc (development version)) @<:@default=yes@:>@])],
 	[install_petsc=yes],
 	[install_petsc=no])
-AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
+AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = "yes"])
 
 # SPATIALDATA
 AC_ARG_ENABLE([spatialdata],
@@ -113,7 +115,7 @@ AC_ARG_ENABLE([spatialdata],
         [install spatialdata (CIG)) @<:@default=yes@:>@])],
 	[install_spatialdata=yes],
 	[install_spatialdata=no])
-AM_CONDITIONAL([INSTALL_SPATIALDATA], [test "$install_spatialdata" = yes])
+AM_CONDITIONAL([INSTALL_SPATIALDATA], [test "$install_spatialdata" = "yes"])
 
 # NEMESIS
 AC_ARG_ENABLE([nemesis],
@@ -121,7 +123,7 @@ AC_ARG_ENABLE([nemesis],
         [install nemesis (CIG)) @<:@default=yes@:>@])],
 	[install_nemesis=yes],
 	[install_nemesis=no])
-AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
+AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = "yes"])
 
 # FIAT
 AC_ARG_ENABLE([fiat],
@@ -129,7 +131,7 @@ AC_ARG_ENABLE([fiat],
         [install GNU compilers) @<:@default=yes@:>@])],
 	[install_fiat=yes],
 	[install_fiat=no])
-AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
+AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = "yes"])
 
 # TESTING
 AC_ARG_ENABLE([fiat],
@@ -137,7 +139,7 @@ AC_ARG_ENABLE([fiat],
         [install GNU compilers) @<:@default=yes@:>@])],
 	[install_fiat=yes],
 	[install_fiat=no])
-AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
+AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = "yes"])
 
 
 # ----------------------------------------------------------------------
@@ -150,7 +152,7 @@ AC_ARG_ENABLE([testing],
         [enable testing (requires cppunit) @<:@default=yes@:>@])],
 	[enable_testing=yes],
 	[enable_testing=no])
-AM_CONDITIONAL([ENABLE_TESTING], [test "$enable_testing" = yes])
+AM_CONDITIONAL([ENABLE_TESTING], [test "$enable_testing" = "yes"])
 
 # FORTRAN
 AC_ARG_ENABLE([fortran],
@@ -158,7 +160,7 @@ AC_ARG_ENABLE([fortran],
         [enable Fortran options for packages @<:@default=yes@:>@])],
 	[enable_fortran=yes],
 	[enable_fortran=no])
-AM_CONDITIONAL([ENABLE_FORTRAN], [test "$enable_fortran" = yes])
+AM_CONDITIONAL([ENABLE_FORTRAN], [test "$enable_fortran" = "yes"])
 
 # PETSC options
 AC_ARG_WITH([petsc-options],
@@ -167,16 +169,51 @@ AC_ARG_WITH([petsc-options],
 	[petsc_options=$withval],
 	[petsc-options=none])
 
+# fetch tool
+AC_ARG_WITH([fetch],
+    [AC_HELP_STRING([--with-fetch],
+        [set tool for downloading tarballs @<:@default=wget@:>@])],
+	[with_fetch=$withval],
+	[with_fetch=wget])
+
+# parallel builds
+AC_ARG_WITH([make-threads],
+    [AC_HELP_STRING([--with-make-threads],
+        [set number of threads to use in parallel builds @<:@default=1@:>@])],
+	[make_threads=$withval],
+	[make_threads=1])
+
 # :TODO: Add option to use/not use NETCDF, HDF5
 
 # :TODO: Add option to use SVN for CIG code and PETSc. Use enableval
 # to switch between stable release and trunk for PyLith.
 
 # ----------------------------------------------------------------------
+# BASIC TOOLS
+# ----------------------------------------------------------------------
+AC_PROG_LIBTOOL
+
+# tar
+AC_PATH_PROG(TAR, tar)
+
+# wget/curl
+if test "$with_fetch" = "wget" ; then
+  AC_PATH_PROG(WGET, wget)
+  download="wget -r"
+elif test "$with_fetch" = "curl" ; then
+  AC_PATH_PROG(CURL, curl)
+  download="curl -O"
+else
+  AC_MSG_FAILURE([Error in configure logic for fetch tool])
+fi
+AC_SUBST(download)
+
+# build threads
+AC_SUBST(make_threads)
+
+# ----------------------------------------------------------------------
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
-
-AC_PROG_LIBTOOL
 
 # GCC
 if test "$install_gcc" = "yes" ; then
@@ -293,6 +330,10 @@ AC_CONFIG_FILES([Makefile
 		])
 
 AC_OUTPUT
+
+echo "Additional info:"
+echo "  Using $download to download tarballs."
+echo "  Using $make_thread(s) threads when running make in parallel."
 
 
 dnl end of configure.ac
