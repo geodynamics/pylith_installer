@@ -1,4 +1,4 @@
---install-gcc
+--enable-gcc
           python
           mpi==[openmpi,mpich]
           cppunit
@@ -60,6 +60,9 @@ CONFIGURE
 12. if not install fiat
   check for fiat
 
+13. Check for wget or curl
+
+14. Check for svn, hg
 
 INSTALL
 
