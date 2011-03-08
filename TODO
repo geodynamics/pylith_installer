@@ -1,0 +1,42 @@
+SVN configure checking
+
+PETSc
+  if building PyLith from SVN, build PETSc from repository
+  check for mercurial
+
+
+Makefile
+
+  gcc
+    test
+
+  python
+    test
+
+  mpich
+    set shared lib flag based on system
+    test
+
+  openmpi
+    setup
+
+  swig
+    test
+
+  netcdf
+    test
+
+  hdf5
+    test
+
+  petsc
+    build from source
+    build from repository
+  
+  spatialdata
+    build from source
+    build from repository
+
+  pylith
+    build from source
+    build from repository

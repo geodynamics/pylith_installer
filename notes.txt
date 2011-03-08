@@ -62,7 +62,6 @@ CONFIGURE
 
 13. Check for wget or curl
 
-14. Check for svn, hg
 
 INSTALL
 
