@@ -1,10 +1,3 @@
-SVN configure checking
-
-PETSc
-  if building PyLith from SVN, build PETSc from repository
-  check for mercurial
-
-
 Makefile
 
   gcc
@@ -40,3 +33,6 @@ Makefile
   pylith
     build from source
     build from repository
+
+
+Automatically set environment variables for make.

@@ -191,6 +191,7 @@ AC_ARG_WITH([spatialdata-svn],
         [use spatialdata from SVN repository @<:@default=no@:>@])],
 	[spatialdata_svn=yes],
 	[spatialdata_svn=no])
+AC_SUBST(spatialdata_svn)
 
 # pylith svn
 AC_ARG_WITH([pylith-svn],
@@ -198,6 +199,7 @@ AC_ARG_WITH([pylith-svn],
         [use PyLith from SVN repository (trunk, stable, BRANCH) @<:@default=no@:>@])],
 	[pylith_svn==$withval],
 	[pylith_svn=no])
+AC_SUBST(pylith_svn)
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -212,8 +214,7 @@ AC_ARG_WITH([make-threads],
         [set number of threads to use in parallel builds @<:@default=1@:>@])],
 	[make_threads=$withval],
 	[make_threads=1])
-
-# :TODO: Add option to use/not use NETCDF, HDF5
+AC_SUBST(make_threads)
 
 # ----------------------------------------------------------------------
 # BASIC TOOLS
@@ -250,16 +251,22 @@ else
 fi
 AC_SUBST(downloader)
 
-# svn
+# svn/mercurial
 if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
   AC_PATH_PROG(SVN, svn)
   if test -z "$SVN" ; then
-    AC_MSG_FAILURE([cannot find 'svn' program.'])
+    AC_MSG_FAILURE([cannot find 'svn' program.])
   fi
 fi
-
-# build threads
-AC_SUBST(make_threads)
+petsc_hg=no
+if test "$pylith_svn" != "no" ; then
+  AC_PATH_PROG(HG, hg)
+  if test -z "$HG" ; then
+    AC_MSG_FAILURE([cannot find 'hg' program.])
+  fi
+  petsc_hg=yes
+fi
+AC_SUBST(petsc_hg)
 
 # ----------------------------------------------------------------------
 # CHECK COMPATIBILITY OF OPTIONS
@@ -307,8 +314,9 @@ else
 fi
 
 # SWIG
+swig_ok=false
 if test "$install_swig" = "yes" ; then
-  echo "do nothing" >& /dev/null
+  swig_ok=true
 else
   if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
     AC_PROG_SWIG(1.3.33)
@@ -357,19 +365,9 @@ if test "$install_petsc" = "yes" ; then
   echo "do nothing" >& /dev/null
 else
   CIT_PATH_PETSC([3.1.0])
-  # TEMPORARY TO SPEED UP
-  #CIT_HEADER_PETSC
-  #CIT_CHECK_LIB_PETSC
-  #CIT_CHECK_LIB_PETSC_SIEVE
-fi
-
-
-# spatialdata
-if test "$install_spatialdata" = "yes" ; then
-  echo "do nothing" >& /dev/null
-else
-  CIT_SPATIALDATA_HEADER
-  CIT_SPATIALDATA_LIB
+  CIT_HEADER_PETSC
+  CIT_CHECK_LIB_PETSC
+  CIT_CHECK_LIB_PETSC_SIEVE
 fi
 
 # nemesis
@@ -390,6 +388,14 @@ else
   CIT_PYTHON_MODULE([FIAT],[0.9.9])
 fi
 
+# spatialdata
+if test "$install_spatialdata" = "yes" ; then
+  echo "do nothing" >& /dev/null
+else
+  CIT_SPATIALDATA_HEADER
+  CIT_SPATIALDATA_LIB
+fi
+
 
 # ----------------------------------------------------------------------
 AC_CONFIG_FILES([Makefile
@@ -398,10 +404,24 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
+echo "#!/bin/bash" > setup.sh
+echo "PATH=$prefix/bin:\${PATH}" >> setup.sh
+echo "LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
+echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
+
 echo ""
 echo "Additional info:"
 echo "  Using $downloader to download tarballs."
 echo "  Using $make_threads thread(s) when running make in parallel."
+echo ""
+echo "IMPORTANT"
+echo ""
+echo "Runing "make" will install PyLith and its dependencies to $prefix."
+echo ""
+echo "Before attempting to use PyLith you may need to update your environment "
+echo "variables. See setup.sh for how to set your environment variables for the "
+echo "bash shell. You can either run "source setup.sh" in the shell where you will"
+echo "run PyLith or add these settings to your .bashrc or equivalent file."
 
 
 dnl end of configure.ac

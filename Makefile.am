@@ -326,8 +326,8 @@ if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
 else
 	@echo "netcdf option not requested. To enable NetCDF option, "
-#	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
-#	@echo "--with-netcdf (to use an existing installation)."
+	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
+	@echo "--with-netcdf (to use an existing installation)."
 endif
 endif
 
@@ -354,8 +354,8 @@ if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
 else
 	@echo "hdf5 option not requested. To enable HDF5 option, "
-#	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
-#	@echo "--with-hdf5 (to use an existing installation)."
+	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
+	@echo "--with-hdf5 (to use an existing installation)."
 endif
 endif
 
