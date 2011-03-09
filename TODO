@@ -27,7 +27,6 @@ Makefile
     build from repository
   
   spatialdata
-    build from source
     build from repository
 
   pylith

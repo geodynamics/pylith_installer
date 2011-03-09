@@ -56,7 +56,7 @@ SUBDIRS = \
 	bin
 
 noinst_tmp = \
-	installed_gcc \
+	installed_compilers \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
@@ -107,7 +107,7 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 default: installed_pylith
 
-all: gcc python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat
+all: compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -119,9 +119,9 @@ all: gcc python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialda
 # make install.
 
 # ----------------------------------------------------------------------
-# gcc
+# compilers
 # ----------------------------------------------------------------------
-gcc:
+compilers:
 if INSTALL_GCC
 	LANGUAGES = "c,c++"
 if WITH_FORTRAN
@@ -149,15 +149,15 @@ else
 	@echo "$@ already installed. Skipping installation."
 endif
 
-installed_gcc:
-	$(MAKE) $(AM_MAKEFLAGS) gcc
+installed_compilers:
+	$(MAKE) $(AM_MAKEFLAGS) compilers
 	touch $@
 
 
 # ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_gcc
+python: installed_compilers
 if INSTALL_PYTHON
 	$(FETCH_SCRIPT) $(downloader) Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf Python-$(PYTHON_VER).tgz
@@ -200,13 +200,22 @@ installed_mpi:
 # ----------------------------------------------------------------------
 # openmpi
 # ----------------------------------------------------------------------
-openmpi: installed_gcc
+openmpi: installed_compilers
+	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf openmpi-$(MPICH2_VER).tar.gz
+	$(MKDIR_P) openmpi-build
+	cd openmpi-build && \
+		../openmpi-$(MPICH2_VER)/configure \
+			--prefix=$(prefix) ; \
+		make && \
+		make install
+	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
 # mpich
 # ----------------------------------------------------------------------
-mpich: installed_gcc
+mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich2-$(MPICH2_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf mpich2-$(MPICH2_VER).tar.gz
 	$(MKDIR_P) mpich-build
@@ -214,8 +223,7 @@ mpich: installed_gcc
 		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
 			--enable-shared --enable-sharedlibs=gcc \
 			--disable-static --disable-mpe \
-			--prefix=$(HOME)/install/$(BUILDBOT) \
-			CC=gcc CXX=g++ FC=gfortran ; \
+			--prefix=$(prefix) ; \
 		make && \
 		make install
 	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
@@ -224,7 +232,7 @@ mpich: installed_gcc
 # ----------------------------------------------------------------------
 # cppunit
 # ----------------------------------------------------------------------
-cppunit: installed_gcc
+cppunit: installed_compilers
 if INSTALL_CPPUNIT
 	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
@@ -246,7 +254,7 @@ installed_cppunit:
 # ----------------------------------------------------------------------
 # swig
 # ----------------------------------------------------------------------
-swig: installed_gcc
+swig: installed_compilers
 if INSTALL_SWIG
 	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
@@ -256,7 +264,11 @@ if INSTALL_SWIG
 		make -j 4 && \
 		make install
 else
+if WITH_SWIG
 	@echo "$@ already installed. Skipping installation."
+else
+	@echo "$@ not required. Skipping installation."
+endif
 endif
 
 installed_swig:
@@ -285,7 +297,7 @@ installed_numpy:
 # ----------------------------------------------------------------------
 # proj4
 # ----------------------------------------------------------------------
-proj4: installed_gcc
+proj4: installed_compilers
 if INSTALL_PROJ4
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip http://geodynamics.org/~buildbot/deps
@@ -310,7 +322,7 @@ installed_proj4:
 # ----------------------------------------------------------------------
 # netcdf
 # ----------------------------------------------------------------------
-netcdf: installed_gcc
+netcdf: installed_compilers
 if INSTALL_NETCDF
 	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
@@ -386,16 +398,23 @@ installed_petsc:
 # ----------------------------------------------------------------------
 spatialdata: installed_numpy installed_proj4 installed_swig installed_cppunit
 if INSTALL_SPATIALDATA
-	spatialdata_options =
+spatialdata_options =
 if WITH_TESTING
-	spatialdata_options += --enable-testing
+spatialdata_options += --enable-testing
 endif
-# :TODO: Add switch for using SVN repository (add --enable-swig)
-	$(FETCH_DIR) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
+if USE_SPATIALDATA_SVN
+	spatialdata_options += --enable-swig
+	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/$(spatialdata_svn) spatialdata-$(SPATIALDATA_VER)
+	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
+else
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
-		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options)
+		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) ; \
+		make -j $(make_threads) && \
+		make install
 else
 	@echo "$@ already installed. Skipping installation."
 endif

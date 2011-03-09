@@ -192,6 +192,7 @@ AC_ARG_WITH([spatialdata-svn],
 	[spatialdata_svn=yes],
 	[spatialdata_svn=no])
 AC_SUBST(spatialdata_svn)
+AM_CONDITIONAL([USE_SPATIALDATA_SVN], [test "$spatialdata_svn" != no])
 
 # pylith svn
 AC_ARG_WITH([pylith-svn],
@@ -200,6 +201,7 @@ AC_ARG_WITH([pylith-svn],
 	[pylith_svn==$withval],
 	[pylith_svn=no])
 AC_SUBST(pylith_svn)
+AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -251,15 +253,24 @@ else
 fi
 AC_SUBST(downloader)
 
-# svn/mercurial
+# svn/mercurial/autoreconf
 if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
+  # SVN
   AC_PATH_PROG(SVN, svn)
   if test -z "$SVN" ; then
     AC_MSG_FAILURE([cannot find 'svn' program.])
   fi
+  # autoreconf 
+  AC_PATH_PROG(AUTORECONF, autoreconf)
+  if test -z "$AUTORECONF" ; then
+    AC_MSG_FAILURE([cannot find 'autoreconf' program.])
+  fi
 fi
+AM_CONDITIONAL([WITH_SWIG], 
+  [test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no"])
 petsc_hg=no
 if test "$pylith_svn" != "no" ; then
+  # HG
   AC_PATH_PROG(HG, hg)
   if test -z "$HG" ; then
     AC_MSG_FAILURE([cannot find 'hg' program.])
@@ -314,13 +325,11 @@ else
 fi
 
 # SWIG
-swig_ok=false
 if test "$install_swig" = "yes" ; then
-  swig_ok=true
+  echo "do nothing" >& /dev/null
 else
   if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
     AC_PROG_SWIG(1.3.33)
-    swig_ok=true
   fi
 fi
 
@@ -416,12 +425,14 @@ echo "  Using $make_threads thread(s) when running make in parallel."
 echo ""
 echo "IMPORTANT"
 echo ""
-echo "Runing "make" will install PyLith and its dependencies to $prefix."
+echo "  Runing "make" will install PyLith and its dependencies to $prefix."
 echo ""
-echo "Before attempting to use PyLith you may need to update your environment "
-echo "variables. See setup.sh for how to set your environment variables for the "
-echo "bash shell. You can either run "source setup.sh" in the shell where you will"
-echo "run PyLith or add these settings to your .bashrc or equivalent file."
+echo "  Before attempting to use PyLith you may need to update your environment "
+echo "  variables. See the file setup.sh in this directory for how to set your "
+echo "  environment variables for the bash shell. You can either run "
+echo "  \"source setup.sh\" in the terminal (i.e., shell) where you will "
+echo "  run PyLith or add these settings to your .bashrc or equivalent file."
+echo ""
 
 
 dnl end of configure.ac
