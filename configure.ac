@@ -350,7 +350,7 @@ else
 fi
 
 # NETCDF
-if test "$install_proj4" = "yes" ; then
+if test "$install_netcdf" = "yes" ; then
   echo "do nothing" >& /dev/null
 else
   if test "$with_netcdf" = "yes" ; then

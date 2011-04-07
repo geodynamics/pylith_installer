@@ -334,7 +334,7 @@ if INSTALL_NETCDF
 		make install
 
 else
-if WITH_HDF5
+if WITH_NETCDF
 	@echo "$@ already installed. Skipping installation."
 else
 	@echo "netcdf option not requested. To enable NetCDF option, "
@@ -383,7 +383,7 @@ petsc: installed_mpi
 if INSTALL_PETSC
 # :TODO: Use nightly tarball if PyLith is coming from SVN repository
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
-	$(TAR) -zxf petsc-dev-$(PYLITH_VER).tar.gz
+	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
 else
 	@echo "$@ already installed. Skipping installation."
 endif

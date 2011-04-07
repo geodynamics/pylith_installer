@@ -35,3 +35,9 @@ Makefile
 
 
 Automatically set environment variables for make.
+
+
+AC_PROG_MKDIR_P not available with autoconf 2.59.
+Need to add fetch.sh to distribution "install" fetch.sh script.
+
+Need to add CPPFLAGS, LDFLAGS of prefix to spatialdata, pylith.
