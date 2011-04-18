@@ -103,6 +103,11 @@ noinst_srcdirs = \
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 
 # ----------------------------------------------------------------------
+# Environment settings for configure for "installed" packages.
+# ----------------------------------------------------------------------
+env_flags="CPPFLAGS=-I$(prefix)/include LDFLAGS=-L$(prefix)/lib"
+
+# ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
 default: installed_pylith
@@ -163,7 +168,7 @@ if INSTALL_PYTHON
 	$(TAR) -zxf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
-		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) && \
+		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) $(env_flags) && \
 		make -j $(make_threads) && \
 		make install
 else
@@ -206,7 +211,7 @@ openmpi: installed_compilers
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(MPICH2_VER)/configure \
-			--prefix=$(prefix) ; \
+			--prefix=$(prefix)  $(env_flags) ; \
 		make && \
 		make install
 	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
@@ -223,7 +228,7 @@ mpich: installed_compilers
 		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
 			--enable-shared --enable-sharedlibs=gcc \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix) ; \
+			--prefix=$(prefix)  $(env_flags) ; \
 		make && \
 		make install
 	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
@@ -238,7 +243,7 @@ if INSTALL_CPPUNIT
 	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
-		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) ; \
+		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install
 
@@ -260,8 +265,8 @@ if INSTALL_SWIG
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
-		../swig-$(SWIG_VER)/configure --prefix=$(HOME)/pylith_deps ; \
-		make -j 4 && \
+		../swig-$(SWIG_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		make -j $(make_threads) && \
 		make install
 else
 if WITH_SWIG
@@ -306,7 +311,7 @@ if INSTALL_PROJ4
 	cd proj4-build/nad && \
 		unzip ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
-		../proj-$(PROJ4_VER)/configure --prefix=$(prefix) ; \
+		../proj-$(PROJ4_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install
 
@@ -328,7 +333,7 @@ if INSTALL_NETCDF
 	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
-		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix) \
+		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix)  $(env_flags) \
 			--enable-shared --disable-static --disable-netcdf-4 ; \
 		make -j $(make_threads) && \
 		make install
@@ -357,7 +362,7 @@ if INSTALL_HDF5
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
-		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) CC=mpicc CXX=mpicxx FC=mpif90 ; \
+		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) CC=mpicc CXX=mpicxx FC=mpif90  $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install
 
@@ -384,6 +389,7 @@ if INSTALL_PETSC
 # :TODO: Use nightly tarball if PyLith is coming from SVN repository
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
+	@echo "ADD PETSC STUFF "
 else
 	@echo "$@ already installed. Skipping installation."
 endif
@@ -398,7 +404,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 spatialdata: installed_numpy installed_proj4 installed_swig installed_cppunit
 if INSTALL_SPATIALDATA
-spatialdata_options =
+spatialdata_options = 
 if WITH_TESTING
 spatialdata_options += --enable-testing
 endif
@@ -412,7 +418,7 @@ else
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
-		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) ; \
+		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install
 else
@@ -433,7 +439,7 @@ if INSTALL_NEMESIS
 	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
-		../nemesis-$(NEMESIS_VER)/configure --prefix=$(prefix) ; \
+		../nemesis-$(NEMESIS_VER)/configure --prefix=$(prefix) $(env_flags) ; \
 		make && \
 		make install
 

@@ -45,7 +45,7 @@ AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
 # MPI
 AC_ARG_ENABLE([mpi],
     [AC_HELP_STRING([--enable-mpi],
-        [install MPI (no, openmpi, mpich) @<:@default=no@:>@])],
+        [install MPI (no | openmpi | mpich) @<:@default=no@:>@])],
 	[if test "$enableval" != no ; then install_mpi=$enableval; else install_mpi=no; fi],
 	[install_mpi=no])
 AM_CONDITIONAL([INSTALL_MPI], [test "$install_mpi" != no])
@@ -56,7 +56,7 @@ AM_CONDITIONAL([INSTALL_MPICH], [test "$install_mpi" = mpich])
 AC_ARG_ENABLE([cppunit],
     [AC_HELP_STRING([--enable-cppunit],
         [install CppUnit @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_cppunit=yes; else install_cppunit=no; fi],
+	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
 	[install_cppunit=yes])
 AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
 
@@ -72,7 +72,7 @@ AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
 AC_ARG_ENABLE([numpy],
     [AC_HELP_STRING([--enable-numpy],
         [install numpy @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_numpy=yes; else install_numpy=no; fi],
+	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
 	[install_numpy=yes])
 AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
 
@@ -88,7 +88,7 @@ AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = yes])
 AC_ARG_ENABLE([netcdf],
     [AC_HELP_STRING([--enable-netcdf],
         [install NetCDF @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_netcdf=yes; else install_netcdf=no; fi],
+	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
 	[install_netcdf=yes])
 AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
 
@@ -96,7 +96,7 @@ AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
 AC_ARG_ENABLE([hdf5],
     [AC_HELP_STRING([--enable-hdf5],
         [install HDF5 @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_hdf5=yes; else install_hdf5=no; fi],
+	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
 	[install_hdf5=no])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
@@ -112,7 +112,7 @@ AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
 AC_ARG_ENABLE([spatialdata],
     [AC_HELP_STRING([--enable-spatialdata],
         [install spatialdata (CIG) @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_spatialdata=yes; else install_spatialdata=no; fi],
+	[if test "$enableval" = yes ; then install_spatialdata=yes; else install_spatialdata=no; fi],
 	[install_spatialdata=yes])
 AM_CONDITIONAL([INSTALL_SPATIALDATA], [test "$install_spatialdata" = yes])
 
@@ -120,7 +120,7 @@ AM_CONDITIONAL([INSTALL_SPATIALDATA], [test "$install_spatialdata" = yes])
 AC_ARG_ENABLE([nemesis],
     [AC_HELP_STRING([--enable-nemesis],
         [install nemesis (CIG) @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_nemesis=yes; else install_nemesis=no; fi],
+	[if test "$enableval" = yes ; then install_nemesis=yes; else install_nemesis=no; fi],
 	[install_nemesis=yes])
 AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
 
@@ -128,7 +128,7 @@ AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
 AC_ARG_ENABLE([fiat],
     [AC_HELP_STRING([--enable-fiat],
         [install FIAT @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_fiat=yes; else install_fiat=no; fi],
+	[if test "$enableval" = yes ; then install_fiat=yes; else install_fiat=no; fi],
 	[install_fiat=yes])
 AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 
@@ -138,7 +138,7 @@ AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 # ----------------------------------------------------------------------
 
 # TESTING
-if test "$install_cppunit" = "yes" ; then
+if test "$install_cppunit" = yes ; then
   with_testing=yes
 fi
 AC_ARG_WITH([testing],
@@ -157,8 +157,10 @@ AC_ARG_WITH([fortran],
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
 # NetCDF
-if test "$install_netcdf" = "yes"; then
+if test "$install_netcdf" = yes ; then
   with_netcdf=yes
+else
+  with_netcdf=no
 fi
 AC_ARG_WITH([netcdf],
     [AC_HELP_STRING([--with-netcdf],
@@ -170,6 +172,8 @@ AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
 # HDF5
 if test "$install_hdf5" = "yes"; then
   with_hdf5=yes
+else
+  with_hdf5=no
 fi
 AC_ARG_WITH([hdf5],
     [AC_HELP_STRING([--with-hdf5],
@@ -181,7 +185,7 @@ AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
 # PETSC options
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1@:>@])],
 	[petsc_options=$withval],
 	[petsc_options="--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1"])
 
@@ -254,7 +258,7 @@ fi
 AC_SUBST(downloader)
 
 # svn/mercurial/autoreconf
-if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
+if test "$spatialdata_svn" != no || test "$pylith_svn" != no ; then
   # SVN
   AC_PATH_PROG(SVN, svn)
   if test -z "$SVN" ; then
@@ -267,9 +271,9 @@ if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
   fi
 fi
 AM_CONDITIONAL([WITH_SWIG], 
-  [test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no"])
+  [test "$spatialdata_svn" != no || test "$pylith_svn" != no])
 petsc_hg=no
-if test "$pylith_svn" != "no" ; then
+if test "$pylith_svn" != no ; then
   # HG
   AC_PATH_PROG(HG, hg)
   if test -z "$HG" ; then
@@ -284,27 +288,27 @@ AC_SUBST(petsc_hg)
 # ----------------------------------------------------------------------
 
 # GCC
-if test "$install_gcc" = "yes" ; then
+if test "$install_gcc" = yes ; then
   # Must have a C compiler to build gcc
   AC_PROG_CC
 else
   # Must have a C++ compiler
   AC_PROG_CXX  
-  if test "$with_fortran" = "yes" ; then
+  if test "$with_fortran" = yes ; then
     AC_PROG_FC
   fi
 fi
 
 # Python
-if test "$install_python" = "yes" ; then
+if test "$install_python" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  AM_PATH_PYTHON([2.3])
+  AM_PATH_PYTHON([2.4])
   CIT_PYTHON_SYSCONFIG
 fi
 
 # MPI
-if test "$install_mpi" = "yes" ; then
+if test "$install_mpi" = yes ; then
   echo "do nothing" >& /dev/null
 else
   AC_PATH_PROG(MPICXX, mpicxx)
@@ -315,26 +319,26 @@ else
 fi
 
 # cppunit
-if test "$install_cppunit" = "yes" ; then
+if test "$install_cppunit" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  if test "$with_testing" = "yes" ; then
+  if test "$with_testing" = yes ; then
     CIT_CPPUNIT_HEADER
     CIT_CPPUNIT_LIB
   fi
 fi
 
 # SWIG
-if test "$install_swig" = "yes" ; then
+if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  if test "$spatialdata_svn" != "no" || test "$pylith_svn" != "no" ; then
+  if test "$spatialdata_svn" != no || test "$pylith_svn" != no ; then
     AC_PROG_SWIG(1.3.33)
   fi
 fi
 
 # numpy
-if test "$install_numpy" = "yes" ; then
+if test "$install_numpy" = yes ; then
   echo "do nothing" >& /dev/null
 else
   CIT_NUMPY_PYTHON_MODULE
@@ -342,7 +346,7 @@ else
 fi
 
 # proj4
-if test "$install_proj4" = "yes" ; then
+if test "$install_proj4" = yes ; then
   echo "do nothing" >& /dev/null
 else
   CIT_PROJ4_HEADER
@@ -350,27 +354,27 @@ else
 fi
 
 # NETCDF
-if test "$install_netcdf" = "yes" ; then
+if test "$install_netcdf" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  if test "$with_netcdf" = "yes" ; then
+  if test "$with_netcdf" = yes ; then
     CIT_NETCDF_HEADER
     CIT_NETCDF_LIB
   fi
 fi
 
 # HDF5
-if test "$install_hdf5" = "yes" ; then
+if test "$install_hdf5" = yes ; then
   # Need to account for PETSc option --download-hdf5=1.
   echo "do nothing" >& /dev/null
 else
-  if test "$with_hdf5" = "yes" ; then
-    echo "ADD TEST FOR HDF5"
+  if test "$with_hdf5" = yes ; then
+    echo "*****TODO***** ADD TEST FOR HDF5"
   fi
 fi
 
 # PETSC
-if test "$install_petsc" = "yes" ; then
+if test "$install_petsc" = yes ; then
   echo "do nothing" >& /dev/null
 else
   CIT_PATH_PETSC([3.1.0])
@@ -380,7 +384,7 @@ else
 fi
 
 # nemesis
-if test "$install_nemesis" = "yes" ; then
+if test "$install_nemesis" = yes ; then
   echo "do nothing" >& /dev/null
 else
   AC_PATH_PROG(NEMESIS, nemesis)
@@ -391,18 +395,19 @@ else
 fi
 
 # fiat
-if test "$install_fiat" = "yes" ; then
+if test "$install_fiat" = yes ; then
   echo "do nothing" >& /dev/null
 else
   CIT_PYTHON_MODULE([FIAT],[0.9.9])
 fi
 
 # spatialdata
-if test "$install_spatialdata" = "yes" ; then
+if test "$install_spatialdata" = yes ; then
   echo "do nothing" >& /dev/null
 else
   CIT_SPATIALDATA_HEADER
   CIT_SPATIALDATA_LIB
+  CIT_PYTHON_MODULE([spatialdata])
 fi
 
 
