@@ -105,7 +105,7 @@ AC_ARG_ENABLE([hdf5],
     [AC_HELP_STRING([--enable-hdf5],
         [install HDF5 @<:@default=yes@:>@])],
 	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
-	[install_hdf5=no])
+	[install_hdf5=yes])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
 # PETSC
@@ -288,11 +288,13 @@ AC_SUBST(petsc_hg)
 
 # GCC
 if test "$install_gcc" = yes ; then
-  # Must have a C compiler to build gcc
+  # Must have a C/C++ compiler to build gcc and run C++ configure checks.
   AC_PROG_CC
+  AC_PROG_CXX
 else
   # Must have a C++ compiler
-  AC_PROG_CXX  
+  AC_PROG_CC
+  AC_PROG_CXX
   if test "$with_fortran" = yes ; then
     AC_PROG_FC
   fi
@@ -307,7 +309,7 @@ else
 fi
 
 # MPI
-if test "$install_mpi" = yes ; then
+if test "$install_mpi" != no ; then
   echo "do nothing" >& /dev/null
 else
   AC_PATH_PROG(MPICXX, mpicxx)
@@ -464,6 +466,31 @@ echo ""
 echo "Additional info:"
 echo "  Using $downloader to download tarballs."
 echo "  Using $make_threads thread(s) when running make in parallel."
+echo ""
+echo "PyLith dependencies to be installed:"
+echo ""
+echo "  gcc: $install_gcc"
+echo "  Python: $install_python"
+echo "  mpi: $install_mpi"
+echo "  cppunit: $install_cppunit"
+echo "  pcre: $install_pcre"
+echo "  swig: $install_swig"
+echo "  numpy: $install_numpy"
+echo "  proj4: $install_proj4"
+echo "  netcdf: $install_netcdf"
+echo "  hdf5: $install_hdf5"
+echo "  petsc: $install_petsc"
+echo "  spatialdata: $install_spatialdata"
+echo "  nemesis: $install_nemesis"
+echo "  fiat: $install_fiat"
+echo ""
+if test "$pylith_svn" != no ; then
+  echo "  Installing development version of PETSc from repository."
+  echo "  Installing spatialdata from CIG SVN repository."
+  echo "  Building PyLith from SVN repository '$pylith_svn'."
+else
+  echo "  Building PETSc, spatialdata, and PyLith from source tarballs."
+fi
 echo ""
 echo "IMPORTANT"
 echo ""
