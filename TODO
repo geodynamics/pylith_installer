@@ -13,14 +13,12 @@ Makefile
     setup
 
   petsc
-    build from source
     build from repository
   
   spatialdata
     build from repository
 
   pylith
-    build from source
     build from repository
 
 
