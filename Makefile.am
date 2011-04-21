@@ -47,7 +47,7 @@ FIAT_VER=0.9.9
 
 NEMESIS_VER=1.0.1
 SPATIALDATA_VER=0.6.0
-PYLITH_VER=1.5.1
+PYLITH_VER=1.5.2
 
 
 # ----------------------------------------------------------------------
@@ -107,13 +107,16 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # Environment settings for configure for "installed" packages.
 # ----------------------------------------------------------------------
 env_flags=CPPFLAGS=-I$(prefix)/include LDFLAGS=-L$(prefix)/lib PATH=$(prefix)/bin:$(PATH)
+if INSTALL_PETSC
+env_flags += PETSC_DIR=$(prefix) PETSC_ARCH=pylith_petsc_opt
+endif
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-default: installed_pylith
+all: installed_pylith
 
-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat pylith
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -131,17 +134,16 @@ mkdest:
 	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
 
 finished_mkdest:
-	$(MAKE) $(AM_MAKEFLAGS) mkdest
-	touch $@
+	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
 
 # ----------------------------------------------------------------------
 # compilers
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-	LANGUAGES = "c,c++"
+LANGUAGES = "c,c++"
 if WITH_FORTRAN
-	$(LANGUAGES) += ",fortran"
+LANGUAGES += ",fortran"
 endif
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
@@ -159,7 +161,8 @@ endif
 	cd gcc-build && \
 		../gcc-4.5.2/configure --prefix=$(prefix) $(LANGUAGES)
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_compilers
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -181,7 +184,8 @@ if INSTALL_PYTHON
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) $(env_flags) && \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_python
 else
 	@echo "$@ already installed. Skipping installation."
 endif
@@ -224,7 +228,8 @@ openmpi: installed_compilers
 		../openmpi-$(OPENMPI_VER)/configure \
 			--prefix=$(prefix)  $(env_flags) ; \
 		make && \
-		make install
+		make install && \
+		touch ../installed_mpi
 	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
@@ -241,7 +246,8 @@ mpich: installed_compilers
 			--disable-static --disable-mpe \
 			--prefix=$(prefix)  $(env_flags) ; \
 		make && \
-		make install
+		make install && \
+		touch ../installed_mpi
 	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
@@ -256,7 +262,8 @@ if INSTALL_CPPUNIT
 	cd cppunit-build && \
 		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_cppunit
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -278,7 +285,8 @@ if INSTALL_PCRE
 	cd pcre-build && \
 		../pcre-$(PCRE_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_pcre
 else
 	@echo "$@ already installed. Skipping installation."
 endif
@@ -299,7 +307,8 @@ if INSTALL_SWIG
 	cd swig-build && \
 		../swig-$(SWIG_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_swig
 else
 if WITH_SWIG
 	@echo "$@ already installed. Skipping installation."
@@ -320,7 +329,9 @@ numpy: installed_python
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf numpy-1.5.1.tar.gz
-	cd numpy-1.5.1 && $(PYTHON) setup.py install --prefix=$(prefix)
+	cd numpy-1.5.1 && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
+		touch ../installed_numpy
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -345,7 +356,8 @@ if INSTALL_PROJ4
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_proj4
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -368,7 +380,8 @@ if INSTALL_NETCDF
 		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix) \
 			--enable-shared --disable-static --disable-netcdf-4 $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_netcdf
 
 else
 if WITH_NETCDF
@@ -396,7 +409,8 @@ if INSTALL_HDF5
 	cd hdf5-build && \
 		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) CC=mpicc CXX=mpicxx FC=mpif90  $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_hdf5
 
 else
 if WITH_HDF5
@@ -418,10 +432,29 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 petsc: installed_mpi
 if INSTALL_PETSC
-# :TODO: Use nightly tarball if PyLith is coming from SVN repository
+if USE_PYLITH_SVN
+	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
+	cd petsc-dev/config
+	hg clone http://petsc.cs.iit.edu/petsc/BuildSystem BuildSystem
+else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
-	@echo "ADD PETSC STUFF "
+endif
+	cd petsc-dev && \
+		./configure --prefix=$(prefix) \
+			--with-c2html=0 --with-x=0 \
+			--CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
+			--with-clanguage=C++ \
+			--with-mpicompilers=1 \
+			--with-debugging=0 \
+			--with-shared-libraries=1 \
+			--with-sieve=1 \
+			--download-boost=1 \
+			$(petsc_options); \
+		make && \
+		make install && \
+		make test && \
+		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
 endif
@@ -440,9 +473,10 @@ spatialdata_options =
 if WITH_TESTING
 spatialdata_options += --enable-testing
 endif
-if USE_SPATIALDATA_SVN
+if USE_PYLITH_SVN
+	SPATIALDATA_VER=dev
 	spatialdata_options += --enable-swig
-	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/$(spatialdata_svn) spatialdata-$(SPATIALDATA_VER)
+	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
@@ -452,7 +486,11 @@ endif
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) $(env_flags) ; \
 		make -j $(make_threads) && \
-		make install
+		make install && \
+		touch ../installed_spatialdata
+if WITH_TESTING
+	cd spatialdata-build && make -j $(make_threads) check
+endif
 else
 	@echo "$@ already installed. Skipping installation."
 endif
@@ -509,6 +547,31 @@ installed_fiat:
 # pylith
 # ----------------------------------------------------------------------
 pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_petsc installed_nemesis installed_spatialdata installed_fiat
+pylith_options = 
+if WITH_NETCDF
+pylith_options += --enable-cubit
+endif
+if WITH_TESTING
+pylith_options += --enable-testing
+endif
+if USE_PYLITH_SVN
+	PYLITH_VER=dev
+	spatialdata_options += --enable-swig
+	$(SVN) co http://geodynamics.org/svn/cig/short/3D/PyLith/$(pylith_svn) pylith-$(PYLITH_VER)
+	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
+else
+	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
+endif
+	$(MKDIR_P) pylith-build
+	cd pylith-build && \
+		../pylith-$(PYLITH_VER)/configure --prefix=$(prefix) $(pylith_options) $(env_flags) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_pylith
+if WITH_TESTING
+	cd pylith-build && make -j $(make_threads) check
+endif
 
 installed_pylith:
 	$(MAKE) $(AM_MAKEFLAGS) pylith

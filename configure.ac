@@ -196,22 +196,16 @@ AC_ARG_WITH([petsc-options],
         [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1@:>@])],
 	[petsc_options=$withval],
 	[petsc_options="--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1"])
-
-# spatialdata svn
-AC_ARG_WITH([spatialdata-svn],
-    [AC_HELP_STRING([--with-spatialdata-svn],
-        [use spatialdata from SVN repository @<:@default=no@:>@])],
-	[spatialdata_svn=yes],
-	[spatialdata_svn=no])
-AC_SUBST(spatialdata_svn)
-AM_CONDITIONAL([USE_SPATIALDATA_SVN], [test "$spatialdata_svn" != no])
+AC_SUBST(petsc_options)
 
 # pylith svn
 AC_ARG_WITH([pylith-svn],
     [AC_HELP_STRING([--with-pylith-svn],
         [use PyLith from SVN repository (trunk, stable, BRANCH) @<:@default=no@:>@])],
-	[pylith_svn==$withval],
+	[pylith_svn=$withval],
 	[pylith_svn=no])
+if test "$pylith_svn" = yes ; then pylith_svn="trunk"; fi
+if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.5-stable"; fi
 AC_SUBST(pylith_svn)
 AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
 
@@ -266,7 +260,8 @@ fi
 AC_SUBST(downloader)
 
 # svn/mercurial/autoreconf
-if test "$spatialdata_svn" != no || test "$pylith_svn" != no ; then
+petsc_hg=no
+if test "$pylith_svn" != no ; then
   # SVN
   AC_PATH_PROG(SVN, svn)
   if test -z "$SVN" ; then
@@ -277,11 +272,6 @@ if test "$spatialdata_svn" != no || test "$pylith_svn" != no ; then
   if test -z "$AUTORECONF" ; then
     AC_MSG_FAILURE([cannot find 'autoreconf' program.])
   fi
-fi
-AM_CONDITIONAL([WITH_SWIG], 
-  [test "$spatialdata_svn" != no || test "$pylith_svn" != no])
-petsc_hg=no
-if test "$pylith_svn" != no ; then
   # HG
   AC_PATH_PROG(HG, hg)
   if test -z "$HG" ; then
@@ -289,6 +279,7 @@ if test "$pylith_svn" != no ; then
   fi
   petsc_hg=yes
 fi
+AM_CONDITIONAL([WITH_SWIG], [test "$pylith_svn" != no])
 AC_SUBST(petsc_hg)
 
 # ----------------------------------------------------------------------
@@ -363,7 +354,7 @@ fi
 if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  if test "$spatialdata_svn" != no || test "$pylith_svn" != no ; then
+  if test "$pylith_svn" != no ; then
     AC_PROG_SWIG(1.3.33)
   fi
 fi
@@ -450,9 +441,24 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 echo "#!/bin/bash" > setup.sh
-echo "PATH=$prefix/bin:\${PATH}" >> setup.sh
-echo "LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
-echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
+
+if test "X${PATH}" = X ; then
+  echo "PATH=$prefix/bin" >> setup.sh
+else
+  echo "PATH=$prefix/bin:\${PATH}" >> setup.sh
+fi
+
+if test "X${LD_LIBRARY_PATH}" = X ; then
+  echo "LD_LIBRARY_PATH=$prefix/lib" >> setup.sh
+else
+  echo "LD_LIBRARY_PATH=$prefix/lib:\${LD_LIBRARY_PATH}" >> setup.sh
+fi
+
+if test "X${PYTHONPATH}" = X ; then
+  echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages" >> setup.sh
+else
+  echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
+fi
 
 echo ""
 echo "Additional info:"

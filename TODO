@@ -1,5 +1,3 @@
-create prefix/include and prefix/lib directories
-
 Makefile
 
   gcc
@@ -14,15 +12,6 @@ Makefile
   openmpi
     setup
 
-  swig
-    test
-
-  netcdf
-    test
-
-  hdf5
-    test
-
   petsc
     build from source
     build from repository
@@ -35,10 +24,5 @@ Makefile
     build from repository
 
 
-Automatically set environment variables for make.
-
-
 AC_PROG_MKDIR_P not available with autoconf 2.59.
 Need to add fetch.sh to distribution "install" fetch.sh script.
-
-Need to add CPPFLAGS, LDFLAGS of prefix to spatialdata, pylith.
