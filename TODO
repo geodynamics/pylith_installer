@@ -1,3 +1,5 @@
+create prefix/include and prefix/lib directories
+
 Makefile
 
   gcc
@@ -7,7 +9,6 @@ Makefile
     test
 
   mpich
-    set shared lib flag based on system
     test
 
   openmpi

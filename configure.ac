@@ -60,6 +60,14 @@ AC_ARG_ENABLE([cppunit],
 	[install_cppunit=yes])
 AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
 
+# PCRE
+AC_ARG_ENABLE([pcre],
+    [AC_HELP_STRING([--enable-pcre],
+        [install PCRE @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
+	[install_pcre=no])
+AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
+
 # SWIG
 AC_ARG_ENABLE([swig],
     [AC_HELP_STRING([--enable-swig],
@@ -325,6 +333,29 @@ else
   if test "$with_testing" = yes ; then
     CIT_CPPUNIT_HEADER
     CIT_CPPUNIT_LIB
+  fi
+fi
+
+# PCRE
+if test "$install_pcre" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  if test "$install_swig" = yes ; then
+    AC_LANG(C++)
+    AC_CHECK_HEADER([pcre.h], [], [
+      AC_MSG_ERROR([pcre header not found; try CPPFLAGS="-I<pcre include dir>"])
+    ])dnl
+    AC_LANG(C++)
+    AC_MSG_CHECKING([for real_pcre in -lpcre])
+    AC_REQUIRE_CPP
+    AC_COMPILE_IFELSE(
+      [AC_LANG_PROGRAM([[#include <pcre.h>]],
+                       [[real_pcre value;]])],
+      [AC_MSG_RESULT(yes)],
+      [AC_MSG_RESULT(no)
+      AC_MSG_ERROR([pcre library not found; try LDFLAGS="-L<pcre lib dir>"])
+    ])dnl
+    AC_PATH_PROG(PCRETEST, pcretest)
   fi
 fi
 

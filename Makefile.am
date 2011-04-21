@@ -32,6 +32,7 @@ OPENMPI_VER=1.4.3
 
 CPPUNIT_VER=1.12.1
 
+PCRE_VER=8.12
 SWIG_VER=2.0.2
 
 NUMPY_VER=1.5.1
@@ -105,14 +106,14 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 # Environment settings for configure for "installed" packages.
 # ----------------------------------------------------------------------
-env_flags="CPPFLAGS=-I$(prefix)/include LDFLAGS=-L$(prefix)/lib"
+env_flags=CPPFLAGS=-I$(prefix)/include LDFLAGS=-L$(prefix)/lib PATH=$(prefix)/bin:$(PATH)
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
 default: installed_pylith
 
-all: compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat
+all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -124,9 +125,19 @@ all: compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spa
 # make install.
 
 # ----------------------------------------------------------------------
+# setup
+# ----------------------------------------------------------------------
+mkdest:
+	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
+
+finished_mkdest:
+	$(MAKE) $(AM_MAKEFLAGS) mkdest
+	touch $@
+
+# ----------------------------------------------------------------------
 # compilers
 # ----------------------------------------------------------------------
-compilers:
+compilers: finished_mkdest
 if INSTALL_GCC
 	LANGUAGES = "c,c++"
 if WITH_FORTRAN
@@ -207,10 +218,10 @@ installed_mpi:
 # ----------------------------------------------------------------------
 openmpi: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf openmpi-$(MPICH2_VER).tar.gz
+	$(TAR) -zxf openmpi-$(OPENMPI_VER).tar.gz
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
-		../openmpi-$(MPICH2_VER)/configure \
+		../openmpi-$(OPENMPI_VER)/configure \
 			--prefix=$(prefix)  $(env_flags) ; \
 		make && \
 		make install
@@ -257,9 +268,30 @@ installed_cppunit:
 
 
 # ----------------------------------------------------------------------
+# pcre
+# ----------------------------------------------------------------------
+pcre: installed_compilers
+if INSTALL_PCRE
+	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
+	$(MKDIR_P) pcre-build
+	cd pcre-build && \
+		../pcre-$(PCRE_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		make -j $(make_threads) && \
+		make install
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_pcre:
+	$(MAKE) $(AM_MAKEFLAGS) pcre
+	touch $@
+
+
+# ----------------------------------------------------------------------
 # swig
 # ----------------------------------------------------------------------
-swig: installed_compilers
+swig: installed_pcre installed_compilers
 if INSTALL_SWIG
 	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
@@ -333,8 +365,8 @@ if INSTALL_NETCDF
 	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
-		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix)  $(env_flags) \
-			--enable-shared --disable-static --disable-netcdf-4 ; \
+		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix) \
+			--enable-shared --disable-static --disable-netcdf-4 $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install
 
