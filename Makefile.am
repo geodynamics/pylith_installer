@@ -141,9 +141,9 @@ finished_mkdest:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-LANGUAGES = "c,c++"
+LANGUAGES = c,c++
 if WITH_FORTRAN
-LANGUAGES += ",fortran"
+LANGUAGES = c,c++,fortran
 endif
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
@@ -159,7 +159,8 @@ endif
 		ln -sf mpfr-2.4.2/ mpfr
 	$(MKDIR_P) gcc-build
 	cd gcc-build && \
-		../gcc-4.5.2/configure --prefix=$(prefix) $(LANGUAGES)
+		../gcc-4.5.2/configure --prefix=$(prefix) \
+			--enable-languages=$(LANGUAGES) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_compilers

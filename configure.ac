@@ -159,7 +159,7 @@ AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
 # FORTRAN
 AC_ARG_WITH([fortran],
     [AC_HELP_STRING([--with-fortran],
-        [enable Fortran options for packages @<:@default=yes@:>@])],
+        [enable Fortran options for packages @<:@default=no@:>@])],
 	[with_fortran=yes],
 	[with_fortran=no])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
@@ -463,9 +463,15 @@ else
 fi
 
 echo ""
-echo "Additional info:"
+echo "Build info:"
 echo "  Using $downloader to download tarballs."
 echo "  Using $make_threads thread(s) when running make in parallel."
+echo -n "  Languages enabled: "
+if test "$with_fortran" = yes ; then
+  echo "C,C++,Fortran"
+else
+  echo "C,C++"
+fi
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
