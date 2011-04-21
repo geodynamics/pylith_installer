@@ -290,7 +290,7 @@ AC_SUBST(petsc_hg)
 if test "$install_gcc" = yes ; then
   # Must have a C/C++ compiler to build gcc and run C++ configure checks.
   AC_PROG_CC
-  #AC_PROG_CXX
+  AC_PROG_CXX
 else
   # Must have a C++ compiler
   AC_PROG_CC
