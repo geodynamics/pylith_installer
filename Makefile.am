@@ -155,8 +155,9 @@ if INSTALL_GCC
 		ln -sf mpfr-$(MPFR_VER)/ mpfr
 	$(MKDIR_P) gcc-build
 	cd gcc-build && \
-		../gcc-$(GCC_VER)/configure --prefix=$(prefix) \
-			--enable-languages=$(gcc_languages) && \
+		../gcc-4.5.2/configure --prefix=$(prefix) \
+			--disable-multilib \
+			--enable-languages=$(LANGUAGES) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_compilers
