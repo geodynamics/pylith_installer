@@ -141,29 +141,29 @@ finished_mkdest:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-LANGUAGES = c,c++
-if WITH_FORTRAN
-LANGUAGES = c,c++,fortran
-endif
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
-	$(TAR) -jxf gcc-4.5.2.tar.bz2
-	cd gcc-4.5.2; \
-		tar -zxf ../gmp-4.3.2.tar.gz; \
-		ln -sf gmp-4.3.2/ gmp; \
-		tar -zxf ../mpc-0.8.2.tar.gz; \
-		ln -sf mpc-0.8.2/ mpc; \
-		tar -jxf ../mpfr-2.4.2.tar.bz2; \
-		ln -sf mpfr-2.4.2/ mpfr
+	$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
+	cd gcc-$(GCC_VER) ; \
+		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
+		ln -sf gmp-$(GMP_VER)/ gmp; \
+		tar -zxf ../mpc-$(MPC_VER).tar.gz; \
+		ln -sf mpc-$(MPC_VER)/ mpc; \
+		tar -jxf ../mpfr-$(MPFR_VER).tar.bz2; \
+		ln -sf mpfr-$(MPFR_VER)/ mpfr
 	$(MKDIR_P) gcc-build
 	cd gcc-build && \
-		../gcc-4.5.2/configure --prefix=$(prefix) \
-			--enable-languages=$(LANGUAGES) && \
+		../gcc-$(GCC_VER)/configure --prefix=$(prefix) \
+			--enable-languages=$(gcc_languages) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_compilers
+
+if GCC_FORTRAN_ONLY
+	$(MV) $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
+endif
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -245,7 +245,7 @@ mpich: installed_compilers
 		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
 			--enable-shared --enable-sharedlibs=gcc \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix)  $(env_flags) ; \
+			--prefix=$(prefix)  $(env_flags) $(env_compilers) ; \
 		make && \
 		make install && \
 		touch ../installed_mpi
@@ -404,11 +404,16 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 hdf5: installed_mpi
 if INSTALL_HDF5
+if WITH_FORTRAN
+env_compilers = CC=mpicc CXX=mpicxx FC=mpif90
+else
+env_compilers = CC=mpicc CXX=mpicxx
+endif
 	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
-		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) CC=mpicc CXX=mpicxx FC=mpif90  $(env_flags) ; \
+		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_hdf5
@@ -433,6 +438,12 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 petsc: installed_mpi
 if INSTALL_PETSC
+if WITH_HDF5
+petsc_options += --with-hdf5=1
+endif
+if INSTALL_HDF5
+petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib
+endif
 if USE_PYLITH_SVN
 	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
 	cd petsc-dev/config

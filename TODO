@@ -8,6 +8,7 @@ Makefile
 
   mpich
     test
+    shared arch for darwin
 
   openmpi
     setup
@@ -20,6 +21,3 @@ Makefile
 
   pylith
     build from repository
-
-
-AC_PROG_MKDIR_P not available with autoconf 2.59.

@@ -29,10 +29,12 @@ AM_INIT_AUTOMAKE([foreign])
 # GCC
 AC_ARG_ENABLE([gcc],
     [AC_HELP_STRING([--enable-gcc],
-        [install GNU compilers @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_gcc=yes; else install_gcc=no; fi],
+        [install GNU compilers (no, c,c++,fortran)@<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_gcc=yes; gcc_languages=$enableval; else install_gcc=no; fi],
 	[install_gcc=no])
+AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
+AM_CONDITIONAL([GCC_FORTRAN_ONLY], [test "$gcc_languages" = fortran])
 
 # PYTHON
 AC_ARG_ENABLE([python],
@@ -475,7 +477,7 @@ fi
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
-echo "  gcc: $install_gcc"
+echo "  gcc: $install_gcc, languages: $gcc_languages"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  cppunit: $install_cppunit"
