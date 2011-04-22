@@ -104,11 +104,12 @@ noinst_srcdirs = \
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 
 # ----------------------------------------------------------------------
-# Environment settings for configure for "installed" packages.
+# Environment settings.
 # ----------------------------------------------------------------------
-env_flags=CPPFLAGS=-I$(prefix)/include LDFLAGS=-L$(prefix)/lib PATH=$(prefix)/bin:$(PATH)
-if INSTALL_PETSC
-env_flags += PETSC_DIR=$(prefix) PETSC_ARCH=pylith_petsc_opt
+if WITH_FORTRAN
+env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
+else
+env_mpicompilers = CC=mpicc CXX=mpicxx
 endif
 
 # ----------------------------------------------------------------------
@@ -180,11 +181,12 @@ installed_compilers:
 # ----------------------------------------------------------------------
 python: installed_compilers
 if INSTALL_PYTHON
-	$(FETCH_SCRIPT) $(downloader) Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
-		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) $(env_flags) && \
+		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
+		--enable-shared && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_python
@@ -228,11 +230,11 @@ openmpi: installed_compilers
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(OPENMPI_VER)/configure \
-			--prefix=$(prefix)  $(env_flags) ; \
+			--prefix=$(prefix) ; \
 		make && \
 		make install && \
 		touch ../installed_mpi
-	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -246,11 +248,11 @@ mpich: installed_compilers
 		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
 			--enable-shared --enable-sharedlibs=gcc \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix)  $(env_flags) $(env_compilers) ; \
+			--prefix=$(prefix) ; \
 		make && \
 		make install && \
 		touch ../installed_mpi
-	if [ ! -x $(prefix)/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -262,7 +264,7 @@ if INSTALL_CPPUNIT
 	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
-		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_cppunit
@@ -285,7 +287,7 @@ if INSTALL_PCRE
 	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
-		../pcre-$(PCRE_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		../pcre-$(PCRE_VER)/configure --prefix=$(prefix) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_pcre
@@ -307,7 +309,7 @@ if INSTALL_SWIG
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
-		../swig-$(SWIG_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		../swig-$(SWIG_VER)/configure --prefix=$(prefix) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_swig
@@ -356,7 +358,7 @@ if INSTALL_PROJ4
 	cd proj4-build/nad && \
 		unzip ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
-		../proj-$(PROJ4_VER)/configure --prefix=$(prefix)  $(env_flags) ; \
+		../proj-$(PROJ4_VER)/configure --prefix=$(prefix) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_proj4
@@ -380,7 +382,7 @@ if INSTALL_NETCDF
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
 		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix) \
-			--enable-shared --disable-static --disable-netcdf-4 $(env_flags) ; \
+			--enable-shared --disable-static --disable-netcdf-4 ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_netcdf
@@ -405,16 +407,11 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 hdf5: installed_mpi
 if INSTALL_HDF5
-if WITH_FORTRAN
-env_compilers = CC=mpicc CXX=mpicxx FC=mpif90
-else
-env_compilers = CC=mpicc CXX=mpicxx
-endif
 	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
-		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) $(env_flags) $(env_compilers) ; \
+		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_hdf5
@@ -463,7 +460,7 @@ endif
 			--with-shared-libraries=1 \
 			--with-sieve=1 \
 			--download-boost=1 \
-			$(petsc_options); \
+			$(petsc_options) ; \
 		make && \
 		make install && \
 		make test && \
@@ -497,7 +494,7 @@ else
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
-		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) $(env_flags) ; \
+		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_spatialdata
@@ -522,7 +519,7 @@ if INSTALL_NEMESIS
 	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
-		../nemesis-$(NEMESIS_VER)/configure --prefix=$(prefix) $(env_flags) ; \
+		../nemesis-$(NEMESIS_VER)/configure --prefix=$(prefix) ; \
 		make && \
 		make install
 
@@ -578,7 +575,7 @@ else
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
-		../pylith-$(PYLITH_VER)/configure --prefix=$(prefix) $(pylith_options) $(env_flags) ; \
+		../pylith-$(PYLITH_VER)/configure --prefix=$(prefix) $(pylith_options) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_pylith

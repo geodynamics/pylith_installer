@@ -32,6 +32,9 @@ AC_ARG_ENABLE([gcc],
         [install GNU compilers (no, c,c++,fortran)@<:@default=no@:>@])],
 	[if test "$enableval" != no ; then install_gcc=yes; gcc_languages=$enableval; else install_gcc=no; fi],
 	[install_gcc=no])
+if test "$gcc_languages" = yes ; then
+  gcc_languages=c,c++,fortran
+fi
 AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
 AM_CONDITIONAL([GCC_FORTRAN_ONLY], [test "$gcc_languages" = fortran])
@@ -438,12 +441,35 @@ fi
 
 
 # ----------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile
-		bin/Makefile
-		])
+# Setup environment so dependencies are used in build
 
-AC_OUTPUT
+CPPFLAGS="-I$prefix/include $CPPFLAGS"
+LDFLAGS="-L$prefix/lib $LDFLAGS"
+PATH="$prefix/bin:$PATH"
 
+if test "X$LD_LIBRARY_PATH" == "X" ; then
+  LD_LIBRARY_PATH="$prefix/lib:$prefix/lib64"
+else
+  LD_LIBRARY_PATH="$prefix/lib:$prefix/lib64:$LD_LIBRARY_PATH"
+fi
+
+if test "X$PYTHONPATH" == "X" ; then
+  PYTHONPATH="$prefix/lib/python$PYTHON_VERSION/site-packages"
+else
+  PYTHONPATH="$prefix/lib/python$PYTHON_VERSION/site-packages:$PYTHON_PATH"
+fi
+if test "$install_petsc" = yes ; then
+  PETSC_DIR="$prefix"
+  PETSC_ARCH=pylith_petsc_opt
+fi
+AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(PATH)
+AC_SUBST(LD_LIBRARY_PATH)
+AC_SUBST(PYTHONPATH)
+
+
+# Create setup.sh
 echo "#!/bin/bash" > setup.sh
 
 if test "X${PATH}" = X ; then
@@ -455,7 +481,7 @@ fi
 if test "X${LD_LIBRARY_PATH}" = X ; then
   echo "LD_LIBRARY_PATH=$prefix/lib" >> setup.sh
 else
-  echo "LD_LIBRARY_PATH=$prefix/lib:\${LD_LIBRARY_PATH}" >> setup.sh
+  echo "LD_LIBRARY_PATH=$prefix/lib\:$prefix/lib64:${LD_LIBRARY_PATH}" >> setup.sh
 fi
 
 if test "X${PYTHONPATH}" = X ; then
@@ -464,6 +490,15 @@ else
   echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
 fi
 
+# ----------------------------------------------------------------------
+AC_CONFIG_FILES([Makefile
+		bin/Makefile
+		])
+
+AC_OUTPUT
+
+# ----------------------------------------------------------------------
+# Write summary.
 echo ""
 echo "Build info:"
 echo "  Using $downloader to download tarballs."
