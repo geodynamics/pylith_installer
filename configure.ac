@@ -308,6 +308,8 @@ fi
 # Python
 if test "$install_python" = yes ; then
   echo "do nothing" >& /dev/null
+  PYTHON=$prefix/bin/python
+  AC_SUBST(PYTHON)
 else
   AM_PATH_PYTHON([2.4])
   CIT_PYTHON_SYSCONFIG
@@ -404,7 +406,10 @@ fi
 
 # PETSC
 if test "$install_petsc" = yes ; then
-  echo "do nothing" >& /dev/null
+  PETSC_DIR=$prefix
+  AC_SUBST(PETSC_DIR)
+  PETSC_ARCH=pylith_petsc_opt
+  AC_SUBST(PETSC_ARCH)
 else
   CIT_PATH_PETSC([3.1.0])
   CIT_HEADER_PETSC
@@ -445,49 +450,29 @@ fi
 
 CPPFLAGS="-I$prefix/include $CPPFLAGS"
 LDFLAGS="-L$prefix/lib $LDFLAGS"
-PATH="$prefix/bin:$PATH"
-
-if test "X$LD_LIBRARY_PATH" == "X" ; then
-  LD_LIBRARY_PATH="$prefix/lib:$prefix/lib64"
-else
-  LD_LIBRARY_PATH="$prefix/lib:$prefix/lib64:$LD_LIBRARY_PATH"
-fi
-
-if test "X$PYTHONPATH" == "X" ; then
-  PYTHONPATH="$prefix/lib/python$PYTHON_VERSION/site-packages"
-else
-  PYTHONPATH="$prefix/lib/python$PYTHON_VERSION/site-packages:$PYTHON_PATH"
-fi
-if test "$install_petsc" = yes ; then
-  PETSC_DIR="$prefix"
-  PETSC_ARCH=pylith_petsc_opt
-fi
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
-AC_SUBST(PATH)
-AC_SUBST(LD_LIBRARY_PATH)
-AC_SUBST(PYTHONPATH)
 
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
 
 if test "X${PATH}" = X ; then
-  echo "PATH=$prefix/bin" >> setup.sh
+  echo "export PATH=$prefix/bin" >> setup.sh
 else
-  echo "PATH=$prefix/bin:\${PATH}" >> setup.sh
+  echo "export PATH=$prefix/bin:\${PATH}" >> setup.sh
 fi
 
 if test "X${LD_LIBRARY_PATH}" = X ; then
-  echo "LD_LIBRARY_PATH=$prefix/lib" >> setup.sh
+  echo "export LD_LIBRARY_PATH=$prefix/lib" >> setup.sh
 else
-  echo "LD_LIBRARY_PATH=$prefix/lib\:$prefix/lib64:${LD_LIBRARY_PATH}" >> setup.sh
+  echo "export LD_LIBRARY_PATH=$prefix/lib\:$prefix/lib64:${LD_LIBRARY_PATH}" >> setup.sh
 fi
 
 if test "X${PYTHONPATH}" = X ; then
-  echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages" >> setup.sh
+  echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages" >> setup.sh
 else
-  echo "PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
+  echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
 fi
 
 # ----------------------------------------------------------------------
@@ -537,13 +522,18 @@ fi
 echo ""
 echo "IMPORTANT"
 echo ""
-echo "  Runing "make" will install PyLith and its dependencies to $prefix."
+echo "  BEFORE running \"make\", setup your environment so that all of the "
+echo "  dependencies are consistent. See the file setup.sh in this directory "
+echo "  for how to set your variables for the bash shell. You can either run "
+echo "  \"source setup.sh\" in this terminal (i.e., shell) where you will "
+echo "  build PyLith and it dependencies or add these settings to your "
+echo "  .bashrc or equivalent file and open a new terminal (i.e., shell)."
 echo ""
-echo "  Before attempting to use PyLith you may need to update your environment "
-echo "  variables. See the file setup.sh in this directory for how to set your "
-echo "  environment variables for the bash shell. You can either run "
-echo "  \"source setup.sh\" in the terminal (i.e., shell) where you will "
-echo "  run PyLith or add these settings to your .bashrc or equivalent file."
+echo "  Runing \"make\" will install PyLith and its dependencies to $prefix."
+echo ""
+echo "  AFTER running make, if you did not setup your .bashrc with the "
+echo "  environment variables, be sure to run \"source setup.sh\" in the "
+echo "  terminal (i.e., shell) BEFORE running PyLith."
 echo ""
 
 

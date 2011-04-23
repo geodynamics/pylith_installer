@@ -45,7 +45,7 @@ HDF5_VER=1.8.6
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
-NEMESIS_VER=1.0.1
+NEMESIS_VER=1.0.2
 SPATIALDATA_VER=0.6.0
 PYLITH_VER=1.5.2
 
@@ -66,10 +66,10 @@ noinst_tmp = \
 	installed_proj \
 	installed_netcdf \
 	installed_hdf5 \
-	installed_petsc \
-	installed_spatialdata \
-	installed_nemesis \
 	installed_fiat \
+	installed_nemesis \
+	installed_spatialdata \
+	installed_petsc \
 	installed_pylith
 
 noinst_builddirs = \
@@ -82,8 +82,8 @@ noinst_builddirs = \
 	proj4-build \
 	netcdf-build \
 	hdf5-build \
-	spatialdata-build \
 	nemesis-build \
+	spatialdata-build \
 	pylith-build
 
 noinst_srcdirs = \
@@ -106,6 +106,8 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 # Environment settings.
 # ----------------------------------------------------------------------
+env_flags = CPPFLAGS=$(CPPFLAGS) LDFLAGS=$(LDFLAGS)
+
 if WITH_FORTRAN
 env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
 else
@@ -117,7 +119,7 @@ endif
 # ----------------------------------------------------------------------
 all: installed_pylith
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 petsc nemesis spatialdata fiat pylith
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 fiat nemesis spatialdata petsc pylith
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -158,8 +160,9 @@ if INSTALL_GCC
 	cd gcc-build && \
 		../gcc-4.5.2/configure --prefix=$(prefix) \
 			--disable-multilib \
-			--enable-languages=$(LANGUAGES) && \
-		make -j $(make_threads) && \
+			--enable-languages=$(gcc_languages) \
+			$(env_flags) && \
+		make -j $(make_threads) $(env_flags) && \
 		make install && \
 		touch ../installed_compilers
 
@@ -186,7 +189,7 @@ if INSTALL_PYTHON
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
-		--enable-shared && \
+		--enable-shared $(env_flags) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_python
@@ -230,8 +233,8 @@ openmpi: installed_compilers
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(OPENMPI_VER)/configure \
-			--prefix=$(prefix) ; \
-		make && \
+			--prefix=$(prefix) $(env_flags) ; \
+		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_mpi
 	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
@@ -248,8 +251,8 @@ mpich: installed_compilers
 		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
 			--enable-shared --enable-sharedlibs=gcc \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix) ; \
-		make && \
+			--prefix=$(prefix) $(env_flags) ; \
+		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_mpi
 	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
@@ -264,7 +267,8 @@ if INSTALL_CPPUNIT
 	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
-		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) ; \
+		../cppunit-$(CPPUNIT_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_cppunit
@@ -287,7 +291,8 @@ if INSTALL_PCRE
 	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
-		../pcre-$(PCRE_VER)/configure --prefix=$(prefix) ; \
+		../pcre-$(PCRE_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_pcre
@@ -309,7 +314,8 @@ if INSTALL_SWIG
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
-		../swig-$(SWIG_VER)/configure --prefix=$(prefix) ; \
+		../swig-$(SWIG_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_swig
@@ -358,7 +364,8 @@ if INSTALL_PROJ4
 	cd proj4-build/nad && \
 		unzip ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
-		../proj-$(PROJ4_VER)/configure --prefix=$(prefix) ; \
+		../proj-$(PROJ4_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_proj4
@@ -381,7 +388,8 @@ if INSTALL_NETCDF
 	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
-		../netcdf-$(NETCDF_VER)/configure --prefix=$(prefix) \
+		../netcdf-$(NETCDF_VER)/configure \
+			--prefix=$(prefix) $(env_flags) \
 			--enable-shared --disable-static --disable-netcdf-4 ; \
 		make -j $(make_threads) && \
 		make install && \
@@ -411,7 +419,10 @@ if INSTALL_HDF5
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
-		../hdf5-$(HDF5_VER)/configure --enable-parallel --enable-shared --disable-static --prefix=$(prefix) $(env_mpicompilers) ; \
+		../hdf5-$(HDF5_VER)/configure \
+			--enable-parallel --enable-shared \
+			--disable-static --prefix=$(prefix) \
+			$(env_flags) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_hdf5
@@ -428,6 +439,88 @@ endif
 
 installed_hdf5:
 	$(MAKE) $(AM_MAKEFLAGS) hdf5
+	touch $@
+
+
+# ----------------------------------------------------------------------
+# fiat
+# ----------------------------------------------------------------------
+fiat: installed_numpy
+if INSTALL_FIAT
+	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
+	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
+	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_fiat:
+	$(MAKE) $(AM_MAKEFLAGS) fiat
+	touch $@
+
+
+# ----------------------------------------------------------------------
+# nemesis
+# ----------------------------------------------------------------------
+nemesis: installed_mpi installed_python
+if INSTALL_NEMESIS
+	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
+	$(MKDIR_P) nemesis-build
+	cd nemesis-build && \
+		../nemesis-$(NEMESIS_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
+		make && \
+		make install
+
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_nemesis:
+	$(MAKE) $(AM_MAKEFLAGS) nemesis
+	touch $@
+
+
+# ----------------------------------------------------------------------
+# spatialdata
+# ----------------------------------------------------------------------
+spatialdata: installed_numpy installed_proj4 installed_swig installed_cppunit
+if INSTALL_SPATIALDATA
+spatialdata_options = 
+if WITH_TESTING
+spatialdata_options += --enable-testing
+endif
+if USE_PYLITH_SVN
+	SPATIALDATA_VER=dev
+	spatialdata_options += --enable-swig
+	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
+	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
+else
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+endif
+	$(MKDIR_P) spatialdata-build
+	cd spatialdata-build && \
+		../spatialdata-$(SPATIALDATA_VER)/configure \
+			--prefix=$(prefix) $(env_flags) \
+			$(spatialdata_options) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_spatialdata
+if WITH_TESTING
+	cd spatialdata-build && make -j $(make_threads) check
+endif
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_spatialdata:
+	$(MAKE) $(AM_MAKEFLAGS) spatialdata
 	touch $@
 
 
@@ -460,10 +553,10 @@ endif
 			--with-shared-libraries=1 \
 			--with-sieve=1 \
 			--download-boost=1 \
-			$(petsc_options) ; \
-		make && \
-		make install && \
-		make test && \
+			$(petsc_options) $(env_flags) ; \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev && \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev install && \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev test && \
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
@@ -475,88 +568,9 @@ installed_petsc:
 
 
 # ----------------------------------------------------------------------
-# spatialdata
-# ----------------------------------------------------------------------
-spatialdata: installed_numpy installed_proj4 installed_swig installed_cppunit
-if INSTALL_SPATIALDATA
-spatialdata_options = 
-if WITH_TESTING
-spatialdata_options += --enable-testing
-endif
-if USE_PYLITH_SVN
-	SPATIALDATA_VER=dev
-	spatialdata_options += --enable-swig
-	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
-	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
-else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
-endif
-	$(MKDIR_P) spatialdata-build
-	cd spatialdata-build && \
-		../spatialdata-$(SPATIALDATA_VER)/configure --prefix=$(prefix) $(spatialdata_options) ; \
-		make -j $(make_threads) && \
-		make install && \
-		touch ../installed_spatialdata
-if WITH_TESTING
-	cd spatialdata-build && make -j $(make_threads) check
-endif
-else
-	@echo "$@ already installed. Skipping installation."
-endif
-
-installed_spatialdata:
-	$(MAKE) $(AM_MAKEFLAGS) spatialdata
-	touch $@
-
-
-# ----------------------------------------------------------------------
-# nemesis
-# ----------------------------------------------------------------------
-nemesis: installed_mpi installed_python
-if INSTALL_NEMESIS
-	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
-	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
-	$(MKDIR_P) nemesis-build
-	cd nemesis-build && \
-		../nemesis-$(NEMESIS_VER)/configure --prefix=$(prefix) ; \
-		make && \
-		make install
-
-else
-	@echo "$@ already installed. Skipping installation."
-endif
-
-installed_nemesis:
-	$(MAKE) $(AM_MAKEFLAGS) nemesis
-	touch $@
-
-
-# ----------------------------------------------------------------------
-# fiat
-# ----------------------------------------------------------------------
-fiat: installed_numpy
-if INSTALL_FIAT
-	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
-	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && python setup.py install --prefix=$(prefix)
-	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
-	cd fiat-$(FIAT_VER) && python setup.py install --prefix=$(prefix)
-
-else
-	@echo "$@ already installed. Skipping installation."
-endif
-
-installed_fiat:
-	$(MAKE) $(AM_MAKEFLAGS) fiat
-	touch $@
-
-
-# ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_petsc installed_nemesis installed_spatialdata installed_fiat
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_fiat installed_nemesis installed_spatialdata installed_petsc
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit
@@ -575,7 +589,9 @@ else
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
-		../pylith-$(PYLITH_VER)/configure --prefix=$(prefix) $(pylith_options) ; \
+		../pylith-$(PYLITH_VER)/configure \
+			--prefix=$(prefix) $(pylith_options) $(env_flags) \
+			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_pylith
