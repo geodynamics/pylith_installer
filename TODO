@@ -1,23 +1,14 @@
+configure
+  add ability to use cmake for building PETSc
+
 Makefile
-
-  gcc
-    test
-
-  python
-    test
 
   mpich
     test
     shared arch for darwin
 
-  openmpi
-    setup
-
   petsc
     build from repository
   
-  spatialdata
-    build from repository
-
   pylith
     build from repository
