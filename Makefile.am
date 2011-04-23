@@ -46,8 +46,14 @@ SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
 NEMESIS_VER=1.0.2
+
+if USE_PYLITH_SVN
+SPATIALDATA_VER=dev
+PYLITH_VER=dev
+else
 SPATIALDATA_VER=0.6.0
 PYLITH_VER=1.5.2
+endif
 
 
 # ----------------------------------------------------------------------
@@ -496,8 +502,7 @@ if WITH_TESTING
 spatialdata_options += --enable-testing
 endif
 if USE_PYLITH_SVN
-	SPATIALDATA_VER=dev
-	spatialdata_options += --enable-swig
+spatialdata_options += --enable-swig
 	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
@@ -537,8 +542,8 @@ petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)
 endif
 if USE_PYLITH_SVN
 	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
-	cd petsc-dev/config
-	hg clone http://petsc.cs.iit.edu/petsc/BuildSystem BuildSystem
+	cd petsc-dev/config && \
+		hg clone http://petsc.cs.iit.edu/petsc/BuildSystem BuildSystem
 else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
@@ -579,8 +584,7 @@ if WITH_TESTING
 pylith_options += --enable-testing
 endif
 if USE_PYLITH_SVN
-	PYLITH_VER=dev
-	spatialdata_options += --enable-swig
+pylith_options += --enable-swig
 	$(SVN) co http://geodynamics.org/svn/cig/short/3D/PyLith/$(pylith_svn) pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
