@@ -245,6 +245,8 @@ DEVELOPER
     * C/C++ compiler
     * Python 2.4 or later
     * MPI
+    * Subversion
+    * Mercurial
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.0.0/configure \
@@ -283,7 +285,7 @@ NOTE
 
   If you get error messages while running make with multiple threads,
   then try running make again as not all packages fully support
-  parallel builds. You can also go to the build directory of tha
+  parallel builds. You can also go to the build directory of the
   package and run "make" before running make in $HOME/build/pylith
   again to resume the build process. For example,
 
