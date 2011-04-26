@@ -1,0 +1,20 @@
+We are pleased to announce release of PyLith Installer version 1.0.0.
+
+Please submit bug reports via the World Wide Web at:
+    http://geodynamics.org/roundup    
+
+Please send all questions by electronic mail to:
+    cig-short@geodynamics.org
+
+PyLith Installer is free software.  See the file COPYING for copying
+conditions.
+
+PyLith Installer is a utility for building PyLith and its dependencies
+from source on Unix flavored operating systems.
+
+You can download the source code from
+
+    http://geodynamics.org/cig/software/packages/short/pylith
+
+Instructions are in the bundled INSTALL file, as well as in the PyLith
+User Manual on the web page listed above.

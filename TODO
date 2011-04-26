@@ -1,14 +1,4 @@
 configure
+
   add ability to use cmake for building PETSc
 
-Makefile
-
-  mpich
-    test
-    shared arch for darwin
-
-  petsc
-    build from repository
-  
-  pylith
-    build from repository

@@ -56,6 +56,14 @@ AC_ARG_ENABLE([mpi],
 AM_CONDITIONAL([INSTALL_MPI], [test "$install_mpi" != no])
 AM_CONDITIONAL([INSTALL_OPENMPI], [test "$install_mpi" = openmpi])
 AM_CONDITIONAL([INSTALL_MPICH], [test "$install_mpi" = mpich])
+if test "$install_mpi" = mpich ; then
+  mpich_sharedarch=gcc
+  case $host_os in
+    darwin*)
+      mpich_sharedarch=osx-gcc ;;
+  esac
+fi
+AC_SUBST(mpich_sharedarch)  
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -507,7 +515,7 @@ echo "  numpy: $install_numpy"
 echo "  proj4: $install_proj4"
 echo "  netcdf: $install_netcdf"
 echo "  hdf5: $install_hdf5"
-echo "  petsc: $install_petsc"
+echo "  petsc: $install_petsc, options: $petsc_options"
 echo "  spatialdata: $install_spatialdata"
 echo "  nemesis: $install_nemesis"
 echo "  fiat: $install_fiat"

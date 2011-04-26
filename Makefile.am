@@ -62,6 +62,15 @@ endif
 SUBDIRS = \
 	bin
 
+EXTRA_DIST = \
+	AUTHORS \
+	CHANGES \
+	COPYING \
+	INSTALL \
+	NEWS \
+	README
+
+
 noinst_tmp = \
 	installed_compilers \
 	installed_python \
@@ -78,6 +87,7 @@ noinst_tmp = \
 	installed_petsc \
 	installed_pylith
 
+
 noinst_builddirs = \
 	gcc-build \
 	python-build \
@@ -91,6 +101,7 @@ noinst_builddirs = \
 	nemesis-build \
 	spatialdata-build \
 	pylith-build
+
 
 noinst_srcdirs = \
 	gcc-$(GCC_VER) \
@@ -115,8 +126,10 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 env_flags = CPPFLAGS=$(CPPFLAGS) LDFLAGS=$(LDFLAGS)
 
 if WITH_FORTRAN
+env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
 env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
 else
+env_compilers = CC=$(CC) CXX=$(CXX)
 env_mpicompilers = CC=mpicc CXX=mpicxx
 endif
 
@@ -249,15 +262,23 @@ openmpi: installed_compilers
 # ----------------------------------------------------------------------
 # mpich
 # ----------------------------------------------------------------------
+if WITH_FORTRAN
+mpich_options = --enable-fc
+else
+mpich_options = --disable-fc
+endif
 mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich2-$(MPICH2_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf mpich2-$(MPICH2_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
-		../mpich2-$(MPICH2_VER)/configure --with-pm=gforker \
-			--enable-shared --enable-sharedlibs=gcc \
+		../mpich2-$(MPICH2_VER)/configure \
+			--with-pm=gforker \
+			--enable-shared \
+			--enable-sharedlibs=$(mpich_sharedarch) \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) \
+			$(env_flags) $(env_compilers) $(mpich_options) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_mpi
