@@ -186,7 +186,7 @@ if INSTALL_GCC
 		touch ../installed_compilers
 
 if GCC_FORTRAN_ONLY
-	$(MV) $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
+	mv $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
 endif
 
 else
@@ -579,7 +579,8 @@ endif
 			--with-shared-libraries=1 \
 			--with-sieve=1 \
 			--download-boost=1 \
-			$(petsc_options) $(env_flags) ; \
+			$(petsc_options) $(env_flags) \
+			PETSC_DIR=$(abs_builddir)/petsc-dev ; \
 		make PETSC_DIR=$(abs_builddir)/petsc-dev && \
 		make PETSC_DIR=$(abs_builddir)/petsc-dev install && \
 		make PETSC_DIR=$(abs_builddir)/petsc-dev test && \
