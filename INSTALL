@@ -130,13 +130,29 @@ DEFAULT
 -------
 
   The default installation assumes you have
-    * C/C++ compiler
+    * C, C++, and Fortran compilers
     * Python 2.4 or later
     * MPI
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.0.0/configure \
     --with-make-threads=2 \
+    --prefix=$HOME/pylith
+
+---------------
+WITHOUT FORTRAN
+---------------
+
+  The default installation assumes you have
+    * C, C++, and Fortran compilers
+    * Python 2.4 or later
+    * MPI
+
+  mkdir -p $HOME/build/pylith
+  $HOME/src/pylith/pylith-installer-1.0.0/configure \
+    --with-fortran=no \
+    --with-make-threads=2 \
+    --petsc_options="--download-chaco=1 --download-c-blas-lapack=1" \
     --prefix=$HOME/pylith
 
 ---------------------
@@ -148,7 +164,7 @@ DESKTOP-LINUX-MINIMAL
   with the MPI used by PETSc and PyLith.
 
   We assume you have
-    * C/C++/Fortran compilers
+    * C, C++, Fortran compilers
     * Python 2.4 or later
     * MPI
     * NetCDF 3.6.2 or 4.1.1
@@ -162,7 +178,6 @@ DESKTOP-LINUX-MINIMAL
     --disable-numpy \
     --disable-proj4 \
     --disable-netcdf \
-    --with-fortran \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -174,13 +189,12 @@ DESKTOP-LINUX-OPENMPI
   want to use the OpenMPI implementation.
   
   We assume you have
-    * C/C++/Fortran compilers
+    * C, C++, Fortran compilers
     * Python 2.4 or later
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.0.0/configure \
     --enable-mpi=openmpi \
-    --with-fortran \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -205,7 +219,6 @@ DESKTOP-DARWIN
   $HOME/src/pylith/pylith-installer-1.0.0/configure \
     --enable-gcc=fortran \
     --enable-mpi=openmpi \
-    --with-fortran \
     --with-fetch=curl \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -218,13 +231,12 @@ CLUSTER
   appropriate for the hardware. We assume that Python has not been
   installed or was not built with the selected compiler suite. So we
   assume you have
-    * C/C++/Fortran compilers
+    * C, C++, Fortran compilers
     * MPI
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.0.0/configure \
     --enable-python \
-    --with-fortran \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -242,7 +254,7 @@ DEVELOPER
   (e.g., branches/v1.5-stable) in the SVN repository.
 
   We assume you have
-    * C/C++ compiler
+    * C, C++, Fortran compilers
     * Python 2.4 or later
     * MPI
     * Subversion
@@ -262,6 +274,7 @@ STEP 3 - Setup your environment
 Setup your environment variables (as indicated in the output of the
 configure script).
 
+  cd $HOME/build/pylith
   source setup.sh
 
 
@@ -308,3 +321,33 @@ to your .bashrc (or other appropriate file) or manually add the
 environment variables from setup.sh to your .bashrc (or other
 appropriate file) so that the environment is setup properly
 automatically every time you open a shell.
+
+
+======================================================================
+TROUBLESHOOTING
+======================================================================
+
+----------------------------------------------------------------------
+numpy fails to build due to a blas/lapack problem
+----------------------------------------------------------------------
+
+If a bad version of blas/lapack if found while installing numpy,
+resulting in an error, follow the steps below to force numpy to build
+blas/lapack itself.
+
+  1. cd numpy-1.5.1
+  2. cp site.cfg.example site.cfg
+  3. Change
+
+     #[DEFAULT]
+     #library_dirs = /usr/local/lib
+     #include_dirs = /usr/local/include
+
+     to
+
+     [DEFAULT]
+     library_dirs = /dev/null
+     include_dirs = /dev/null
+
+  4. cd $HOME/build/pylith
+  5. make

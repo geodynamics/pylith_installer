@@ -73,22 +73,6 @@ AC_ARG_ENABLE([cppunit],
 	[install_cppunit=yes])
 AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
 
-# PCRE
-AC_ARG_ENABLE([pcre],
-    [AC_HELP_STRING([--enable-pcre],
-        [install PCRE @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
-	[install_pcre=no])
-AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
-
-# SWIG
-AC_ARG_ENABLE([swig],
-    [AC_HELP_STRING([--enable-swig],
-        [install SWIG @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
-	[install_swig=no])
-AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
-
 # NUMPY
 AC_ARG_ENABLE([numpy],
     [AC_HELP_STRING([--enable-numpy],
@@ -116,9 +100,9 @@ AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
 # HDF5
 AC_ARG_ENABLE([hdf5],
     [AC_HELP_STRING([--enable-hdf5],
-        [install HDF5 @<:@default=yes@:>@])],
+        [install HDF5 @<:@default=no@:>@])],
 	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
-	[install_hdf5=yes])
+	[install_hdf5=no])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
 # PETSC
@@ -153,6 +137,30 @@ AC_ARG_ENABLE([fiat],
 	[install_fiat=yes])
 AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 
+# PCRE
+AC_ARG_ENABLE([pcre],
+    [AC_HELP_STRING([--enable-pcre],
+        [install PCRE @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
+	[install_pcre=no])
+AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
+
+# SWIG
+AC_ARG_ENABLE([swig],
+    [AC_HELP_STRING([--enable-swig],
+        [install SWIG @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
+	[install_swig=no])
+AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
+
+# MERCURIAL
+AC_ARG_ENABLE([mercurial],
+    [AC_HELP_STRING([--enable-mercurial],
+        [install mercurial @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_mercurial=yes; else install_mercurial=no; fi],
+	[install_mercurial=no])
+AM_CONDITIONAL([INSTALL_MERCURIAL], [test "$install_mercurial" = yes])
+
 
 # ----------------------------------------------------------------------
 # OPTIONS
@@ -165,16 +173,16 @@ fi
 AC_ARG_WITH([testing],
     [AC_HELP_STRING([--with-testing],
         [enable testing (requires cppunit) @<:@default=yes@:>@])],
-	[with_testing=yes],
-	[])
+	[if test "$withval" = yes; then with_testing=yes; else with_testing=no; fi],
+	[with_testing=yes])
 AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
 
 # FORTRAN
 AC_ARG_WITH([fortran],
     [AC_HELP_STRING([--with-fortran],
-        [enable Fortran options for packages @<:@default=no@:>@])],
-	[with_fortran=yes],
-	[with_fortran=no])
+        [enable Fortran options for packages @<:@default=yes@:>@])],
+	[if test "$withval" = yes; then with_fortran=yes; else with_fortran=no; fi],
+	[with_fortran=yes])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
 # NetCDF
@@ -186,8 +194,8 @@ fi
 AC_ARG_WITH([netcdf],
     [AC_HELP_STRING([--with-netcdf],
         [enable NetCDF (CUBIT) options for PyLith @<:@default=yes@:>@])],
-	[with_netcdf=yes],
-	[])
+	[if test "$withval" = yes; then with_netcdf=yes; else with_netcdf=no; fi],
+	[with_netcdf=yes])
 AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
 
 # HDF5
@@ -198,9 +206,9 @@ else
 fi
 AC_ARG_WITH([hdf5],
     [AC_HELP_STRING([--with-hdf5],
-        [enable HDF5 options for PyLith @<:@default=yes@:>@])],
-	[with_hdf5=yes],
-	[])
+        [enable HDF5 options for PyLith @<:@default=no@:>@])],
+	[if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
+	[with_hdf5=no])
 AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
 
 # PETSC options
@@ -272,7 +280,7 @@ else
 fi
 AC_SUBST(downloader)
 
-# svn/mercurial/autoreconf
+# svn/autoreconf
 petsc_hg=no
 if test "$pylith_svn" != no ; then
   # SVN
@@ -286,9 +294,13 @@ if test "$pylith_svn" != no ; then
     AC_MSG_FAILURE([cannot find 'autoreconf' program.])
   fi
   # HG
-  AC_PATH_PROG(HG, hg)
-  if test -z "$HG" ; then
-    AC_MSG_FAILURE([cannot find 'hg' program.])
+  if test "$install_mercurial" = yes; then
+    echo "do nothing" >& /dev/null
+  else
+    AC_PATH_PROG(HG, hg)
+    if test -z "$HG" ; then
+      AC_MSG_FAILURE([cannot find 'hg' program.])
+    fi
   fi
   petsc_hg=yes
 fi
@@ -315,22 +327,38 @@ fi
 
 # Python
 if test "$install_python" = yes ; then
-  echo "do nothing" >& /dev/null
   PYTHON=$prefix/bin/python
   AC_SUBST(PYTHON)
+  AC_CHECK_HEADER([zlib.h], [], [
+                AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
+                ])
+
 else
   AM_PATH_PYTHON([2.4])
   CIT_PYTHON_SYSCONFIG
+  CIT_PYTHON_MODULE([zlib])
 fi
 
 # MPI
 if test "$install_mpi" != no ; then
   echo "do nothing" >& /dev/null
 else
+  AC_PATH_PROG(MPICC, mpicc)
+  if test -z "$MPICC"; then
+    AC_MSG_FAILURE([cannot find 'mpicc' program.])
+    MPICC=`echo "Error: MPI is not installed properly." ; false`
+  fi
   AC_PATH_PROG(MPICXX, mpicxx)
   if test -z "$MPICXX"; then
     AC_MSG_FAILURE([cannot find 'mpicxx' program.])
     MPICXX=`echo "Error: MPI is not installed properly." ; false`
+  fi
+  if test "$with_fortran" = yes ; then
+    AC_PATH_PROG(MPIF90, mpif90)
+    if test -z "$MPIF90"; then
+      AC_MSG_FAILURE([cannot find 'mpif90' program.])
+      MPIF90=`echo "Error: MPI is not installed properly." ; false`
+    fi
   fi
 fi
 
@@ -472,9 +500,9 @@ else
 fi
 
 if test "X${LD_LIBRARY_PATH}" = X ; then
-  echo "export LD_LIBRARY_PATH=$prefix/lib" >> setup.sh
+  echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64" >> setup.sh
 else
-  echo "export LD_LIBRARY_PATH=$prefix/lib\:$prefix/lib64:${LD_LIBRARY_PATH}" >> setup.sh
+  echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
 fi
 
 if test "X${PYTHONPATH}" = X ; then
@@ -509,16 +537,17 @@ echo "  gcc: $install_gcc, languages: $gcc_languages"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  cppunit: $install_cppunit"
-echo "  pcre: $install_pcre"
-echo "  swig: $install_swig"
-echo "  numpy: $install_numpy"
 echo "  proj4: $install_proj4"
 echo "  netcdf: $install_netcdf"
 echo "  hdf5: $install_hdf5"
-echo "  petsc: $install_petsc, options: $petsc_options"
-echo "  spatialdata: $install_spatialdata"
+echo "  pcre: $install_pcre"
+echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
+echo "  numpy: $install_numpy"
 echo "  fiat: $install_fiat"
+echo "  spatialdata: $install_spatialdata"
+echo "  mercurial: $install_mercurial"
+echo "  petsc: $install_petsc, options: $petsc_options"
 echo ""
 if test "$pylith_svn" != no ; then
   echo "  Installing development version of PETSc from repository."

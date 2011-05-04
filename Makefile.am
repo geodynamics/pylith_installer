@@ -34,6 +34,7 @@ CPPUNIT_VER=1.12.1
 
 PCRE_VER=8.12
 SWIG_VER=2.0.2
+MERCURIAL_VER=1.8
 
 NUMPY_VER=1.5.1
 
@@ -127,10 +128,10 @@ env_flags = CPPFLAGS=$(CPPFLAGS) LDFLAGS=$(LDFLAGS)
 
 if WITH_FORTRAN
 env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
-env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
+env_mpicompilers = CC=$(MPICC) CXX=$(MPICXX) FC=$(MPIF90)
 else
 env_compilers = CC=$(CC) CXX=$(CXX)
-env_mpicompilers = CC=mpicc CXX=mpicxx
+env_mpicompilers = CC=$(MPICC) CXX=$(MPICXX)
 endif
 
 # ----------------------------------------------------------------------
@@ -208,7 +209,7 @@ if INSTALL_PYTHON
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
-		--enable-shared $(env_flags) && \
+		--enable-shared $(env_flags) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_python
@@ -252,7 +253,7 @@ openmpi: installed_compilers
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(OPENMPI_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_mpi
@@ -295,7 +296,7 @@ if INSTALL_CPPUNIT
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
 		../cppunit-$(CPPUNIT_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_cppunit
@@ -319,7 +320,7 @@ if INSTALL_PCRE
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
 		../pcre-$(PCRE_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_pcre
@@ -342,7 +343,7 @@ if INSTALL_SWIG
 	$(MKDIR_P) swig-build
 	cd swig-build && \
 		../swig-$(SWIG_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_swig
@@ -365,8 +366,8 @@ installed_swig:
 numpy: installed_python
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf numpy-1.5.1.tar.gz
-	cd numpy-1.5.1 && \
+	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
+	cd numpy-$(NUMPY_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch ../installed_numpy
 
@@ -392,7 +393,7 @@ if INSTALL_PROJ4
 		unzip ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_proj4
@@ -416,7 +417,7 @@ if INSTALL_NETCDF
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
 		../netcdf-$(NETCDF_VER)/configure \
-			--prefix=$(prefix) $(env_flags) \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) \
 			--enable-shared --disable-static --disable-netcdf-4 ; \
 		make -j $(make_threads) && \
 		make install && \
@@ -533,7 +534,7 @@ endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
-			--prefix=$(prefix) $(env_flags) \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) \
 			$(spatialdata_options) ; \
 		make -j $(make_threads) && \
 		make install && \
@@ -551,9 +552,29 @@ installed_spatialdata:
 
 
 # ----------------------------------------------------------------------
+# mercurial
+# ----------------------------------------------------------------------
+mercurial: installed_python
+if INSTALL_MERCURIAL
+	$(FETCH_SCRIPT) "$(downloader)" mercurial-$(MERCURIAL_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf mercurial-$(MERCURIAL_VER).tar.gz
+	cd mercurial-$(MERCURIAL_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
+		touch ../installed_mercurial
+
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_mercurial:
+	$(MAKE) $(AM_MAKEFLAGS) mercurial
+	touch $@
+
+
+# ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi
+petsc: installed_mpi installed_hdf5 installed_mercurial
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
@@ -616,7 +637,8 @@ endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
 		../pylith-$(PYLITH_VER)/configure \
-			--prefix=$(prefix) $(pylith_options) $(env_flags) \
+			--prefix=$(prefix) $(pylith_options) \
+                        $(env_flags) $(env_compilers) \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install && \
