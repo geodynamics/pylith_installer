@@ -638,7 +638,7 @@ endif
 	cd pylith-build && \
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
-                        $(env_flags) $(env_compilers) \
+                        $(env_flags) $(env_mpicompilers) \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install && \
