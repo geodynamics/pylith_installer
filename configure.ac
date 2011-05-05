@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.0.1], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [1.0.3], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -316,6 +316,10 @@ if test "$install_gcc" = yes ; then
   # Must have a C/C++ compiler to build gcc and run C++ configure checks.
   AC_PROG_CC
   AC_PROG_CXX
+  if test "$with_fortran" = yes ; then
+    FC=gfortran
+    AC_SUBST(FC)
+  fi
 else
   # Must have a C++ compiler
   AC_PROG_CC
