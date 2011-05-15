@@ -124,6 +124,7 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 # Environment settings.
 # ----------------------------------------------------------------------
+abs_builddir=`pwd`
 env_flags = CPPFLAGS=$(CPPFLAGS) LDFLAGS=$(LDFLAGS)
 
 if WITH_FORTRAN
@@ -590,7 +591,6 @@ else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
 endif
-abs_builddir=`pwd`
 	cd petsc-dev && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
