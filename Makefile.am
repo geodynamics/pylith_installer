@@ -590,6 +590,7 @@ else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
 endif
+	abs_builddir=`pwd`
 	cd petsc-dev && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
@@ -601,10 +602,10 @@ endif
 			--with-sieve=1 \
 			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(top_builddir)/petsc-dev ; \
-		make PETSC_DIR=$(top_builddir)/petsc-dev && \
-		make PETSC_DIR=$(top_builddir)/petsc-dev install && \
-		make PETSC_DIR=$(top_builddir)/petsc-dev test && \
+			PETSC_DIR=$(abs_builddir)/petsc-dev ; \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev && \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev install && \
+		make PETSC_DIR=$(abs_builddir)/petsc-dev test && \
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
