@@ -601,10 +601,10 @@ endif
 			--with-sieve=1 \
 			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_builddir)/petsc-dev ; \
-		make PETSC_DIR=$(abs_builddir)/petsc-dev && \
-		make PETSC_DIR=$(abs_builddir)/petsc-dev install && \
-		make PETSC_DIR=$(abs_builddir)/petsc-dev test && \
+			PETSC_DIR=$(top_builddir)/petsc-dev ; \
+		make PETSC_DIR=$(top_builddir)/petsc-dev && \
+		make PETSC_DIR=$(top_builddir)/petsc-dev install && \
+		make PETSC_DIR=$(top_builddir)/petsc-dev test && \
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
