@@ -162,6 +162,17 @@ AC_ARG_ENABLE([mercurial],
 AM_CONDITIONAL([INSTALL_MERCURIAL], [test "$install_mercurial" = yes])
 
 
+# PYTHIA
+install_pythia=no
+if test "$install_nemesis" = yes; then
+  install_pythia=yes
+fi
+if test "$install_spatialdata" = yes; then
+  install_pythia=yes
+fi
+AM_CONDITIONAL([INSTALL_PYTHIA], [test "$install_pythia" = yes])
+
+
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------

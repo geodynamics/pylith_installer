@@ -46,14 +46,15 @@ HDF5_VER=1.8.6
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
+PYTHIA_VER=0.8.1.12
 NEMESIS_VER=1.0.2
 
 if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=0.6.0
-PYLITH_VER=1.5.2
+SPATIALDATA_VER=0.7.0
+PYLITH_VER=1.6.0
 endif
 
 
@@ -83,6 +84,7 @@ noinst_tmp = \
 	installed_netcdf \
 	installed_hdf5 \
 	installed_fiat \
+	installed_pythia \
 	installed_nemesis \
 	installed_spatialdata \
 	installed_petsc \
@@ -115,6 +117,7 @@ noinst_srcdirs = \
 	netcdf-$(NETCDF_VER) \
 	hdf5-$(HDF5_VER) \
 	spatialdata-$(SPATIALDATA_VER) \
+	pythia-$(PYTHIA_VER) \
 	nemesis-$(NEMESIS_VER) \
 	pylith-$(PYLITH_VER)
 
@@ -493,9 +496,27 @@ installed_fiat:
 
 
 # ----------------------------------------------------------------------
+# pythia
+# ----------------------------------------------------------------------
+pythia: installed_python
+if INSTALL_PYTHIA
+	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
+	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+
+else
+	@echo "$@ already installed. Skipping installation."
+endif
+
+installed_pythia:
+	$(MAKE) $(AM_MAKEFLAGS) pythia
+	touch $@
+
+
+# ----------------------------------------------------------------------
 # nemesis
 # ----------------------------------------------------------------------
-nemesis: installed_mpi installed_python
+nemesis: installed_mpi installed_python installed_pythia
 if INSTALL_NEMESIS
 	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
 	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
@@ -518,7 +539,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_numpy installed_proj4 installed_swig installed_cppunit
+spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
