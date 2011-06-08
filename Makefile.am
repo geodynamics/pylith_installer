@@ -648,6 +648,9 @@ pylith_options =
 if WITH_NETCDF
 pylith_options += --enable-cubit
 endif
+if WITH_HDF5
+pylith_options += --enable-hdf5
+endif
 if WITH_TESTING
 pylith_options += --enable-testing
 endif
