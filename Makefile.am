@@ -446,6 +446,9 @@ installed_netcdf:
 # hdf5
 # ----------------------------------------------------------------------
 hdf5: installed_mpi
+if WITH_FORTRAN
+hdf5_options = --enable-fortran
+endif
 if INSTALL_HDF5
 	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
@@ -453,7 +456,7 @@ if INSTALL_HDF5
 	cd hdf5-build && \
 		../hdf5-$(HDF5_VER)/configure \
 			--enable-parallel --enable-shared \
-			--disable-static --prefix=$(prefix) \
+			--disable-static --prefix=$(prefix) $(hdf5_options) \
 			$(env_flags) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
