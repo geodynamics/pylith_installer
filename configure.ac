@@ -100,9 +100,9 @@ AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
 # HDF5
 AC_ARG_ENABLE([hdf5],
     [AC_HELP_STRING([--enable-hdf5],
-        [install HDF5 @<:@default=no@:>@])],
+        [install HDF5 @<:@default=yes@:>@])],
 	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
-	[install_hdf5=no])
+	[install_hdf5=yes])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
 # PETSC
@@ -453,7 +453,9 @@ if test "$install_hdf5" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$with_hdf5" = yes ; then
-    echo "*****TODO***** ADD TEST FOR HDF5"
+    CIT_HDF5_HEADER
+    CIT_HDF5_LIB
+    CIT_HDF5_LIB_PARALLEL
   fi
 fi
 

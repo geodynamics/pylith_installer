@@ -88,6 +88,29 @@ off. You can trigger a package to be rebuilt by removing the
 corresponding PACKAGE-build directory and the installed_PACKAGE file
 before running make.
 
+--------------
+IMPORTANT NOTE
+--------------
+
+  The default settings do not install a compiler suite, Python, or
+  MPI. In order for PyLith to work properly, Python and MPI must be
+  built with the same compiler suite used by the PyLith installer to
+  build all of the other dependencies and PyLith itself. If you are
+  using the system Python and compiler suite (usually gcc), these are
+  guaranteed to be compatible. The configure tests are relatively
+  simple and detect only major incompatibilities; many small
+  incompatibilities slip through and only show up during the testing
+  phase of the build process.
+
+  You can see which compiler was used to build an installed version of
+  Python by starting the Python interpreter (run "python") and
+  examining the second line. Likewise you can often identify which
+  compiler an MPI version is using by running "mpicc -show".
+
+  To remedy incompatible compiler suite, MPI, and Python versions,
+  simply request the installer to build a new version of the
+  incompatible package (e.g., --enable-python, --enable-mpi=openmpi).
+
 
 ----------------------------------------------------------------------
 STEP 1 - Download and unpack the installer
