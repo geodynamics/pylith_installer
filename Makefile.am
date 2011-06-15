@@ -128,7 +128,7 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # Environment settings.
 # ----------------------------------------------------------------------
 abs_builddir=`pwd`
-env_flags = CPPFLAGS=$(CPPFLAGS) LDFLAGS=$(LDFLAGS)
+env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 if WITH_FORTRAN
 env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
