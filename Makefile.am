@@ -605,7 +605,7 @@ if WITH_HDF5
 petsc_options += --with-hdf5=1
 endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib
+petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib --LIBS=-lz
 endif
 if USE_PYLITH_SVN
 	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
