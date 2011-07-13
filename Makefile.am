@@ -53,8 +53,8 @@ if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=0.7.0
-PYLITH_VER=1.6.0
+SPATIALDATA_VER=1.7.1
+PYLITH_VER=1.6.1
 endif
 
 
@@ -457,6 +457,7 @@ if INSTALL_HDF5
 		../hdf5-$(HDF5_VER)/configure \
 			--enable-parallel --enable-shared \
 			--disable-static --prefix=$(prefix) $(hdf5_options) \
+                        CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
 			$(env_flags) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
