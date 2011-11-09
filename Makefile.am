@@ -53,8 +53,8 @@ if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=1.7.1
-PYLITH_VER=1.6.1
+SPATIALDATA_VER=1.8.0
+PYLITH_VER=1.6.2
 endif
 
 
@@ -644,7 +644,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_fiat installed_nemesis installed_spatialdata installed_petsc
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit
