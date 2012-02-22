@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010 University of California, Davis
+# Copyright (c) 2010-2012 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -46,7 +46,7 @@ HDF5_VER=1.8.6
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
-PYTHIA_VER=0.8.1.12
+PYTHIA_VER=0.8.1.13
 NEMESIS_VER=1.0.2
 
 if USE_PYLITH_SVN
