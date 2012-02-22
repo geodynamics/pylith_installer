@@ -196,11 +196,11 @@ endif
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_compilers
 endif
 
 installed_compilers:
 	$(MAKE) $(AM_MAKEFLAGS) compilers
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -219,11 +219,11 @@ if INSTALL_PYTHON
 		touch ../installed_python
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_python
 endif
 
 installed_python:
 	$(MAKE) $(AM_MAKEFLAGS) python
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -241,11 +241,11 @@ endif
 else
 mpi:
 	@echo "$@ already installed. Skipping installation."
+	touch installed_mpi
 endif
 
 installed_mpi:
 	$(MAKE) $(AM_MAKEFLAGS) mpi
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -307,11 +307,11 @@ if INSTALL_CPPUNIT
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_cppunit
 endif
 
 installed_cppunit:
 	$(MAKE) $(AM_MAKEFLAGS) cppunit
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -330,11 +330,11 @@ if INSTALL_PCRE
 		touch ../installed_pcre
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_pcre
 endif
 
 installed_pcre:
 	$(MAKE) $(AM_MAKEFLAGS) pcre
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -357,11 +357,11 @@ if WITH_SWIG
 else
 	@echo "$@ not required. Skipping installation."
 endif
+	touch installed_swig
 endif
 
 installed_swig:
 	$(MAKE) $(AM_MAKEFLAGS) swig
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -377,11 +377,11 @@ if INSTALL_NUMPY
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_numpy
 endif
 
 installed_numpy:
 	$(MAKE) $(AM_MAKEFLAGS) numpy
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -404,11 +404,11 @@ if INSTALL_PROJ4
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_proj4
 endif
 
 installed_proj4:
 	$(MAKE) $(AM_MAKEFLAGS) proj4
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -435,11 +435,11 @@ else
 	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
 	@echo "--with-netcdf (to use an existing installation)."
 endif
+	touch installed_netcdf
 endif
 
 installed_netcdf:
 	$(MAKE) $(AM_MAKEFLAGS) netcdf
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -471,11 +471,11 @@ else
 	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
 	@echo "--with-hdf5 (to use an existing installation)."
 endif
+	touch installed_hdf5
 endif
 
 installed_hdf5:
 	$(MAKE) $(AM_MAKEFLAGS) hdf5
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -488,15 +488,15 @@ if INSTALL_FIAT
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
 	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
-	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_fiat
 endif
 
 installed_fiat:
 	$(MAKE) $(AM_MAKEFLAGS) fiat
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -506,15 +506,15 @@ pythia: installed_python
 if INSTALL_PYTHIA
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
 	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
-	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_pythia
 endif
 
 installed_pythia:
 	$(MAKE) $(AM_MAKEFLAGS) pythia
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -529,15 +529,16 @@ if INSTALL_NEMESIS
 		../nemesis-$(NEMESIS_VER)/configure \
 			--prefix=$(prefix) $(env_flags) ; \
 		make && \
-		make install
+		make install && \
+		touch ../installed_nemesis
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_nemesis
 endif
 
 installed_nemesis:
 	$(MAKE) $(AM_MAKEFLAGS) nemesis
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -570,11 +571,11 @@ if WITH_TESTING
 endif
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_spatialdata
 endif
 
 installed_spatialdata:
 	$(MAKE) $(AM_MAKEFLAGS) spatialdata
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -590,11 +591,11 @@ if INSTALL_MERCURIAL
 
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_mercurial
 endif
 
 installed_mercurial:
 	$(MAKE) $(AM_MAKEFLAGS) mercurial
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -634,11 +635,11 @@ endif
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
+	touch installed_petsc
 endif
 
 installed_petsc:
 	$(MAKE) $(AM_MAKEFLAGS) petsc
-	touch $@
 
 
 # ----------------------------------------------------------------------
@@ -678,7 +679,6 @@ endif
 
 installed_pylith:
 	$(MAKE) $(AM_MAKEFLAGS) pylith
-	touch $@
 
 
 # ----------------------------------------------------------------------
