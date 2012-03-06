@@ -422,7 +422,7 @@ if INSTALL_NETCDF
 	cd netcdf-build && \
 		../netcdf-$(NETCDF_VER)/configure \
 			--prefix=$(prefix) $(env_flags) $(env_compilers) \
-			--enable-shared --disable-static --disable-netcdf-4 ; \
+			--enable-shared --disable-static --disable-netcdf-4 --disable-dap ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_netcdf
