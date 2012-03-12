@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.6.3-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [1.6.3-1], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -355,6 +355,10 @@ else
   CIT_CHECK_PYTHON_SHARED
   CIT_PYTHON_MODULE([zlib])
 fi
+AC_CHECK_LIB([z], [deflate], 
+  [],
+  [AC_MSG_ERROR([Compression library '-lz' not found; maybe you don't have the zlib development package, e.g., 'zlib-dev', installed])
+])dnl
 
 # MPI
 if test "$install_mpi" != no ; then
