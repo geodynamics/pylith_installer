@@ -362,7 +362,9 @@ AC_CHECK_LIB([z], [deflate],
 
 # MPI
 if test "$install_mpi" != no ; then
-  echo "do nothing" >& /dev/null
+  if test "$install_python" != yes ; then
+    AC_MSG_FAILURE([Incompatible configure options. Cannot use system python with installer-built MPI. Please use --enable-python or use system MPI.])
+  fi
 else
   AC_PATH_PROG(MPICC, mpicc)
   if test -z "$MPICC"; then
