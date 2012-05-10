@@ -20,28 +20,28 @@ ACLOCAL_AMFLAGS = -I m4
 # ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
-GCC_VER=4.5.2
+GCC_VER=4.6.3
 MPC_VER=0.8.2
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
-PYTHON_VER=2.6.6
+PYTHON_VER=2.7.3
 
-MPICH2_VER=1.3.2p1
-OPENMPI_VER=1.4.3
+MPICH2_VER=1.4.1p1
+OPENMPI_VER=1.4.5
 
 CPPUNIT_VER=1.12.1
 
 PCRE_VER=8.12
-SWIG_VER=2.0.2
+SWIG_VER=2.0.6
 MERCURIAL_VER=1.8
 
 NUMPY_VER=1.6.1-patched
 
-PROJ4_VER=4.7.0
+PROJ4_VER=4.8.0
 
 NETCDF_VER=4.1.1
-HDF5_VER=1.8.6
+HDF5_VER=1.8.8
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -49,12 +49,15 @@ FIAT_VER=0.9.9
 PYTHIA_VER=0.8.1.14
 NEMESIS_VER=1.0.2
 
+CMAKE_VER=2.8.8
+H5PY_VER=2.0.1
+
 if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
 SPATIALDATA_VER=1.8.1
-PYLITH_VER=1.6.3
+PYLITH_VER=1.7.0
 endif
 
 
@@ -83,10 +86,12 @@ noinst_tmp = \
 	installed_proj \
 	installed_netcdf \
 	installed_hdf5 \
+	installed_h5py \
 	installed_fiat \
 	installed_pythia \
 	installed_nemesis \
 	installed_spatialdata \
+	installed_cmake \
 	installed_petsc \
 	installed_pylith
 
@@ -116,9 +121,11 @@ noinst_srcdirs = \
 	proj-$(PROJ4_VER) \
 	netcdf-$(NETCDF_VER) \
 	hdf5-$(HDF5_VER) \
+	h5py-$(H5PY_VER) \
 	spatialdata-$(SPATIALDATA_VER) \
 	pythia-$(PYTHIA_VER) \
 	nemesis-$(NEMESIS_VER) \
+	cmake-$(CMAKE_VER) \
 	pylith-$(PYLITH_VER)
 
 
@@ -141,9 +148,9 @@ endif
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: installed_pylith
+all: installed_pylith installed_h5py
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 fiat nemesis spatialdata petsc pylith
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -462,7 +469,6 @@ if INSTALL_HDF5
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_hdf5
-
 else
 if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
@@ -476,6 +482,31 @@ endif
 
 installed_hdf5:
 	$(MAKE) $(AM_MAKEFLAGS) hdf5
+
+
+# ----------------------------------------------------------------------
+# h5py
+# ----------------------------------------------------------------------
+h5py: installed_hdf5
+if INSTALL_H5PY
+	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
+	cd h5py-$(H5PY_VER) && \
+		CC=mpicc python setup.py build --hdf5=$(prefix) && \
+		python setup.py install --prefix=$(prefix)
+		touch ../installed_h5py
+else
+if WITH_H5PY
+	@echo "$@ already installed. Skipping installation."
+else
+	@echo "h5py option not requested. To enable h5py option, "
+	@echo "reconfigure with --enable-h5py (to install H5PY)."
+endif
+	touch installed_h5py
+endif
+
+installed_h5py:
+	$(MAKE) $(AM_MAKEFLAGS) h5py
 
 
 # ----------------------------------------------------------------------
@@ -599,9 +630,28 @@ installed_mercurial:
 
 
 # ----------------------------------------------------------------------
+# cmake
+# ----------------------------------------------------------------------
+cmake:
+if INSTALL_CMAKE
+	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
+	cd cmake-$(CMAKE_VER) && \
+		./bootstrap  --prefix=$(prefix) && make && make install && \
+		touch ../installed_cmake
+else
+	@echo "Skipping $@ installation."
+	touch installed_cmake
+endif
+
+installed_cmake:
+	$(MAKE) $(AM_MAKEFLAGS) cmake
+
+
+# ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_mercurial
+petsc: installed_mpi installed_hdf5 installed_mercurial installed_cmake
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1

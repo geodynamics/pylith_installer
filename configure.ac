@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.6.3-2], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [1.7.0-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -104,6 +104,22 @@ AC_ARG_ENABLE([hdf5],
 	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
 	[install_hdf5=yes])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
+
+# H5PY
+AC_ARG_ENABLE([h5py],
+    [AC_HELP_STRING([--enable-h5py],
+        [install HDF5 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_h5py=yes; else install_h5py=no; fi],
+	[install_h5py=yes])
+AM_CONDITIONAL([INSTALL_H5PY], [test "$install_h5py" = yes])
+
+# CMAKE
+AC_ARG_ENABLE([cmake],
+    [AC_HELP_STRING([--enable-cmake],
+        [install CMAKE @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cmake=yes; else install_cmake=no; fi],
+	[install_cmake=yes])
+AM_CONDITIONAL([INSTALL_CMAKE], [test "$install_cmake" = yes])
 
 # PETSC
 AC_ARG_ENABLE([petsc],
@@ -217,10 +233,23 @@ else
 fi
 AC_ARG_WITH([hdf5],
     [AC_HELP_STRING([--with-hdf5],
-        [enable HDF5 options for PyLith @<:@default=no@:>@])],
+        [enable HDF5 options for PyLith @<:@default=yes@:>@])],
 	[if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
-	[with_hdf5=no])
+	[with_hdf5=yes])
 AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
+
+# H5PY
+if test "$install_h5py" = "yes"; then
+  with_h5py=yes
+else
+  with_h5py=no
+fi
+AC_ARG_WITH([h5py],
+    [AC_HELP_STRING([--with-h5py],
+        [enable H5PY options for PyLith @<:@default=yes@:>@])],
+	[if test "$withval" = yes; then with_h5py=yes; else with_h5py=no; fi],
+	[with_h5py=no])
+AM_CONDITIONAL([WITH_H5PY], [test "$with_h5py" = yes])
 
 # PETSC options
 AC_ARG_WITH([petsc-options],
@@ -237,7 +266,7 @@ AC_ARG_WITH([pylith-svn],
 	[pylith_svn=$withval],
 	[pylith_svn=no])
 if test "$pylith_svn" = yes ; then pylith_svn="trunk"; fi
-if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.6-stable"; fi
+if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.7-stable"; fi
 AC_SUBST(pylith_svn)
 AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
 
@@ -465,6 +494,23 @@ else
   fi
 fi
 
+# H5PY
+if test "$install_h5py" = yes ; then
+   if test "$install_hdf5" = yes; then
+      echo "do nothing" >& /dev/null
+   else
+     if test "$with_hdf5" = yes; then
+       echo "do nothing" >& /dev/null
+     else
+       AC_MSG_ERROR([h5py requires HDF5.])
+     fi
+   fi
+else
+  if test "$with_h5py" = yes ; then
+    CIT_PYTHON_MODULE([h5py],[2.0.0])
+  fi
+fi
+
 # PETSC
 if test "$install_petsc" = yes ; then
   PETSC_DIR=$prefix
@@ -565,6 +611,7 @@ echo "  cppunit: $install_cppunit"
 echo "  proj4: $install_proj4"
 echo "  netcdf: $install_netcdf"
 echo "  hdf5: $install_hdf5"
+echo "  h5py: $install_h5py"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
@@ -572,6 +619,7 @@ echo "  numpy: $install_numpy"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  mercurial: $install_mercurial"
+echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
 echo ""
 if test "$pylith_svn" != no ; then

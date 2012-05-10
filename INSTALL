@@ -23,7 +23,7 @@ dependencies during the install process, so you do not need to do this
 yourself. Additionally, the installer provides the option of checking
 out the PyLith and PETSc source code from the Subversion and Mercurial
 repositories (requires subversion and mercurial be installed); only
-use this option if you want the bleeding edge versions and are willing
+use this option if you need the bleeding edge versions and are willing
 to rebuild frequently.
 
 
@@ -118,14 +118,14 @@ STEP 1 - Download and unpack the installer
 
 Download the installer.
 
-  http://www.geodynamics.org/cig/software/pylith/pylith-installer-1.6.3-2.tgz
+  http://www.geodynamics.org/cig/software/pylith/pylith-installer-1.7.0-0.tgz
 
 Untar the source code for the installer:
 
   mkdir -p $HOME/src/pylith
   cd $HOME/src/pylith
-  mv $HOME/Downloads/pylith-installer-1.6.3-2.tgz
-  tar -zxf pylith-installer-1.6.3-2.tgz
+  mv $HOME/Downloads/pylith-installer-1.7.0-0.tgz
+  tar -zxf pylith-installer-1.7.0-0.tgz
 
 
 ----------------------------------------------------------------------
@@ -146,7 +146,7 @@ need to be built.
 
 Run configure with --help to see all of the command line arguments.
 
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure --help
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure --help
 
 -------
 DEFAULT
@@ -154,11 +154,11 @@ DEFAULT
 
   The default installation assumes you have
     * C, C++, and Fortran compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -168,11 +168,11 @@ WITHOUT FORTRAN
 
   The default installation assumes you have
     * C, C++, and Fortran compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --with-fortran=no \
     --with-make-threads=2 \
     --petsc_options="--download-chaco=1 --download-c-blas-lapack=1" \
@@ -188,7 +188,7 @@ DESKTOP-LINUX-MINIMAL
 
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
     * MPI
     * NetCDF 3.6.2 or 4.1.1
     * Proj4
@@ -196,7 +196,7 @@ DESKTOP-LINUX-MINIMAL
     * cppunit
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --disable-cppunit \
     --disable-numpy \
     --disable-proj4 \
@@ -213,10 +213,10 @@ DESKTOP-LINUX-OPENMPI
   
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --enable-mpi=openmpi \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -236,10 +236,10 @@ DESKTOP-DARWIN
   
   We assume you have
     * C/C++ compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --enable-gcc=fortran \
     --enable-mpi=openmpi \
     --with-fetch=curl \
@@ -258,7 +258,7 @@ CLUSTER
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --enable-python \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -274,17 +274,17 @@ DEVELOPER
   stable tree. To use another the development trunk, use
   --with-pylith-svn=trunk; to specify another branch or tree use
   --with-pylith-svn=BRANCH where BRANCH is the name of the branch
-  (e.g., branches/v1.5-stable) in the SVN repository.
+  (e.g., branches/v1.7-stable) in the SVN repository.
 
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.4 or later
+    * Python 2.6 or later
     * MPI
     * Subversion
     * Mercurial
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.6.3-2/configure \
+  $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --with-pylith-svn=stable \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
