@@ -34,7 +34,7 @@ CPPUNIT_VER=1.12.1
 
 PCRE_VER=8.12
 SWIG_VER=2.0.6
-MERCURIAL_VER=1.8
+MERCURIAL_VER=2.2.1
 
 NUMPY_VER=1.6.1-patched
 
@@ -83,7 +83,7 @@ noinst_tmp = \
 	installed_cppunit \
 	installed_swig \
 	installed_numpy \
-	installed_proj \
+	installed_proj4 \
 	installed_netcdf \
 	installed_hdf5 \
 	installed_h5py \
