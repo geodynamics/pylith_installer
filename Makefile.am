@@ -41,7 +41,7 @@ NUMPY_VER=1.6.1-patched
 PROJ4_VER=4.8.0
 
 NETCDF_VER=4.1.1
-HDF5_VER=1.8.6
+HDF5_VER=1.8.8
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -462,7 +462,7 @@ if INSTALL_HDF5
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
 		../hdf5-$(HDF5_VER)/configure \
-			--enable-parallel --enable-shared \
+			--enable-parallel --enable-shared --enable-unsupported \
 			--disable-static --prefix=$(prefix) $(hdf5_options) \
                         CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
 			$(env_flags) $(env_mpicompilers) ; \
