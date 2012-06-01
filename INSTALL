@@ -209,14 +209,15 @@ DESKTOP-LINUX-OPENMPI
 ---------------------
 
   In this case we assume MPI does not exist on your system and you
-  want to use the OpenMPI implementation.
+  want to use the OpenMPI implementation. We must also build Python
+  to insure compatibility between the link flags for MPI and Python.
   
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.6 or later
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
+    --enable-python \
     --enable-mpi=openmpi \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -231,16 +232,18 @@ DESKTOP-DARWIN
   their own sets of problems (e.g., incompatibilities, additional
   dependencies, etc). A more robust solution is to build the gfortran
   compiler. We also build openmpi in this case because we want a
-  Fortran compiler setup for MPI, and we use curl to download files
-  because it is included in OS X but wget is not.
+  Fortran compiler setup for MPI. Installing MPI, in turn, forces
+  installtion of Python to insure compatibility in link flags between
+  MPI and Python. Finally, we use curl to download files because it is
+  included in OS X but wget is not.
   
   We assume you have
     * C/C++ compilers
-    * Python 2.6 or later
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.7.0-0/configure \
     --enable-gcc=fortran \
+    --enable-python \
     --enable-mpi=openmpi \
     --with-fetch=curl \
     --with-make-threads=2 \
