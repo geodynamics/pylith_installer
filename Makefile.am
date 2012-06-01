@@ -56,7 +56,7 @@ if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=1.8.1
+SPATIALDATA_VER=1.8.2
 PYLITH_VER=1.7.0
 endif
 
@@ -493,7 +493,7 @@ if INSTALL_H5PY
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
 		CC=mpicc python setup.py build --hdf5=$(prefix) && \
-		python setup.py install --prefix=$(prefix)
+		python setup.py install --prefix=$(prefix) && \
 		touch ../installed_h5py
 else
 if WITH_H5PY
