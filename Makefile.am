@@ -659,6 +659,9 @@ endif
 if INSTALL_HDF5
 petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib --LIBS=-lz
 endif
+if WITH_CUDA
+petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
+endif
 if USE_PYLITH_SVN
 	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
 	cd petsc-dev/config && \
@@ -705,6 +708,9 @@ pylith_options += --enable-hdf5
 endif
 if WITH_TESTING
 pylith_options += --enable-testing
+endif
+if WITH_CUDA
+pylith_options += --enable-cuda
 endif
 if USE_PYLITH_SVN
 pylith_options += --enable-swig

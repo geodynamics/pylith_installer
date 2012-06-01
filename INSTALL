@@ -289,6 +289,26 @@ DEVELOPER
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
+---------
+CUDA SUPPORT
+---------
+
+  **WARNING** Recommended for expert users only!
+
+  You must have installed the CUDA toolkit and driver. If your GPU
+  does not support double-precision floating point operations you must
+  build PETSc with single-precision support (which does not work with
+  some PETSc external packages such as ParMetis/Metis and ML).
+
+  Add the following option to the installer configure:
+    --with-cuda
+
+  If building PETSc in single precision, also add
+    --petsc_options="--with-precision=single"
+
+  If you installed cusp to a custom location, then also add
+    --petsc_options="--with-cusp-dir=REPLACE_WITH_CUSP_DIR"
+
 
 ----------------------------------------------------------------------
 STEP 3 - Setup your environment

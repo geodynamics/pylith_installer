@@ -177,7 +177,6 @@ AC_ARG_ENABLE([mercurial],
 	[install_mercurial=no])
 AM_CONDITIONAL([INSTALL_MERCURIAL], [test "$install_mercurial" = yes])
 
-
 # PYTHIA
 install_pythia=no
 if test "$install_nemesis" = yes; then
@@ -250,6 +249,14 @@ AC_ARG_WITH([h5py],
 	[if test "$withval" = yes; then with_h5py=yes; else with_h5py=no; fi],
 	[with_h5py=no])
 AM_CONDITIONAL([WITH_H5PY], [test "$with_h5py" = yes])
+
+# CUDA
+AC_ARG_WITH([cuda],
+    [AC_HELP_STRING([--with-cuda],
+        [enable CUDA support in PETSc and PyLith @<:@default=no@:>@])],
+	[if test "$withval" = yes; then with_cuda=yes; else with_cuda=no; fi],
+	[with_cuda=no])
+AM_CONDITIONAL([WITH_CUDA], [test "$with_cuda" = yes])
 
 # PETSC options
 AC_ARG_WITH([petsc-options],
@@ -508,6 +515,15 @@ if test "$install_h5py" = yes ; then
 else
   if test "$with_h5py" = yes ; then
     CIT_PYTHON_MODULE([h5py],[2.0.0])
+  fi
+fi
+
+# CUDA
+if test "$with_cuda" = yes ; then
+  AC_PATH_PROG(NVCC, nvcc)
+  if test -z "$NVCC" ; then
+    AC_MSG_FAILURE([cannot find 'nvcc'.])
+    NVCC=`echo "Error: CUDA is not installed." ; false`
   fi
 fi
 
