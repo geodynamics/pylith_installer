@@ -148,7 +148,7 @@ endif
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: installed_pylith installed_h5py
+all: installed_pylith 
 
 rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith
 
@@ -698,7 +698,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit
