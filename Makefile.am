@@ -165,10 +165,10 @@ rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcd
 # setup
 # ----------------------------------------------------------------------
 mkdest:
-$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
+	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
 
 finished_mkdest:
-$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
+	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
 
 # ----------------------------------------------------------------------
 # compilers
