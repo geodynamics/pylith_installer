@@ -65,68 +65,68 @@ endif
 # Files
 # ----------------------------------------------------------------------
 SUBDIRS = \
-bin
+	bin
 
 EXTRA_DIST = \
-AUTHORS \
-CHANGES \
-COPYING \
-INSTALL \
-NEWS \
-README
+	AUTHORS \
+	CHANGES \
+	COPYING \
+	INSTALL \
+	NEWS \
+	README
 
 
 noinst_tmp = \
-installed_compilers \
-installed_python \
-installed_mpi \
-installed_cppunit \
-installed_swig \
-installed_numpy \
-installed_proj4 \
-installed_netcdf \
-installed_hdf5 \
-installed_h5py \
-installed_fiat \
-installed_pythia \
-installed_nemesis \
-installed_spatialdata \
-installed_cmake \
-installed_petsc \
-installed_pylith
+	installed_compilers \
+	installed_python \
+	installed_mpi \
+	installed_cppunit \
+	installed_swig \
+	installed_numpy \
+	installed_proj4 \
+	installed_netcdf \
+	installed_hdf5 \
+	installed_h5py \
+	installed_fiat \
+	installed_pythia \
+	installed_nemesis \
+	installed_spatialdata \
+	installed_cmake \
+	installed_petsc \
+	installed_pylith
 
 
 noinst_builddirs = \
-gcc-build \
-python-build \
-openmpi-build \
-mpich-build \
-cppunit-build \
-swig-build \
-proj4-build \
-netcdf-build \
-hdf5-build \
-nemesis-build \
-spatialdata-build \
-pylith-build
+	gcc-build \
+	python-build \
+	openmpi-build \
+	mpich-build \
+	cppunit-build \
+	swig-build \
+	proj4-build \
+	netcdf-build \
+	hdf5-build \
+	nemesis-build \
+	spatialdata-build \
+	pylith-build
 
 
 noinst_srcdirs = \
-gcc-$(GCC_VER) \
-Python-$(PYTHON_VER) \
-openmpi-$(OPENMPI_VER) \
-mpich2-$(MPICH2_VER) \
-cppunit-$(CPPUNIT_VER) \
-swig-$(SWIG_VER) \
-proj-$(PROJ4_VER) \
-netcdf-$(NETCDF_VER) \
-hdf5-$(HDF5_VER) \
-h5py-$(H5PY_VER) \
-spatialdata-$(SPATIALDATA_VER) \
-pythia-$(PYTHIA_VER) \
-nemesis-$(NEMESIS_VER) \
-cmake-$(CMAKE_VER) \
-pylith-$(PYLITH_VER)
+	gcc-$(GCC_VER) \
+	Python-$(PYTHON_VER) \
+	openmpi-$(OPENMPI_VER) \
+	mpich2-$(MPICH2_VER) \
+	cppunit-$(CPPUNIT_VER) \
+	swig-$(SWIG_VER) \
+	proj-$(PROJ4_VER) \
+	netcdf-$(NETCDF_VER) \
+	hdf5-$(HDF5_VER) \
+	h5py-$(H5PY_VER) \
+	spatialdata-$(SPATIALDATA_VER) \
+	pythia-$(PYTHIA_VER) \
+	nemesis-$(NEMESIS_VER) \
+	cmake-$(CMAKE_VER) \
+	pylith-$(PYLITH_VER)
 
 
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
@@ -175,39 +175,39 @@ finished_mkdest:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
-$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
-$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
-cd gcc-$(GCC_VER) ; \
-	tar -zxf ../gmp-$(GMP_VER).tar.gz; \
-	ln -sf gmp-$(GMP_VER)/ gmp; \
-	tar -zxf ../mpc-$(MPC_VER).tar.gz; \
-	ln -sf mpc-$(MPC_VER)/ mpc; \
-	tar -jxf ../mpfr-$(MPFR_VER).tar.bz2; \
-	ln -sf mpfr-$(MPFR_VER)/ mpfr
-$(MKDIR_P) gcc-build
-cd gcc-build && \
-	../gcc-$(GCC_VER)/configure --prefix=$(prefix) \
-		--disable-multilib \
-		--enable-languages=$(gcc_languages) \
-		$(env_flags) && \
-	make -j $(make_threads) $(env_flags) && \
-	make install && \
-	touch ../installed_compilers
+	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
+	$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
+	cd gcc-$(GCC_VER) ; \
+		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
+		ln -sf gmp-$(GMP_VER)/ gmp; \
+		tar -zxf ../mpc-$(MPC_VER).tar.gz; \
+		ln -sf mpc-$(MPC_VER)/ mpc; \
+		tar -jxf ../mpfr-$(MPFR_VER).tar.bz2; \
+		ln -sf mpfr-$(MPFR_VER)/ mpfr
+	$(MKDIR_P) gcc-build
+	cd gcc-build && \
+		../gcc-$(GCC_VER)/configure --prefix=$(prefix) \
+			--disable-multilib \
+			--enable-languages=$(gcc_languages) \
+			$(env_flags) && \
+		make -j $(make_threads) $(env_flags) && \
+		make install && \
+		touch ../installed_compilers
 
 if GCC_FORTRAN_ONLY
-mv $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
+	mv $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
 endif
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_compilers
+	@echo "$@ already installed. Skipping installation."
+	touch installed_compilers
 endif
 
 installed_compilers:
-$(MAKE) $(AM_MAKEFLAGS) compilers
+	$(MAKE) $(AM_MAKEFLAGS) compilers
 
 
 # ----------------------------------------------------------------------
@@ -215,22 +215,22 @@ $(MAKE) $(AM_MAKEFLAGS) compilers
 # ----------------------------------------------------------------------
 python: installed_compilers
 if INSTALL_PYTHON
-$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf Python-$(PYTHON_VER).tgz
-$(MKDIR_P) python-build
-cd python-build && \
-	../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
-	--enable-shared $(env_flags) $(env_compilers) && \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_python
+	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf Python-$(PYTHON_VER).tgz
+	$(MKDIR_P) python-build
+	cd python-build && \
+		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
+		--enable-shared $(env_flags) $(env_compilers) && \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_python
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_python
+	@echo "$@ already installed. Skipping installation."
+	touch installed_python
 endif
 
 installed_python:
-$(MAKE) $(AM_MAKEFLAGS) python
+	$(MAKE) $(AM_MAKEFLAGS) python
 
 
 # ----------------------------------------------------------------------
@@ -247,28 +247,28 @@ endif
 
 else
 mpi:
-@echo "$@ already installed. Skipping installation."
-touch installed_mpi
+	@echo "$@ already installed. Skipping installation."
+	touch installed_mpi
 endif
 
 installed_mpi:
-$(MAKE) $(AM_MAKEFLAGS) mpi
+	$(MAKE) $(AM_MAKEFLAGS) mpi
 
 
 # ----------------------------------------------------------------------
 # openmpi
 # ----------------------------------------------------------------------
 openmpi: installed_compilers
-$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf openmpi-$(OPENMPI_VER).tar.gz
-$(MKDIR_P) openmpi-build
-cd openmpi-build && \
-	../openmpi-$(OPENMPI_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers); \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_mpi
-if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
+	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf openmpi-$(OPENMPI_VER).tar.gz
+	$(MKDIR_P) openmpi-build
+	cd openmpi-build && \
+		../openmpi-$(OPENMPI_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers); \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_mpi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -280,21 +280,21 @@ else
 mpich_options = --disable-fc
 endif
 mpich: installed_compilers
-$(FETCH_SCRIPT) "$(downloader)" mpich2-$(MPICH2_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf mpich2-$(MPICH2_VER).tar.gz
-$(MKDIR_P) mpich-build
-cd mpich-build && \
-	../mpich2-$(MPICH2_VER)/configure \
-		--with-pm=gforker \
-		--enable-shared \
-		--enable-sharedlibs=$(mpich_sharedarch) \
-		--disable-static --disable-mpe \
-		--prefix=$(prefix) \
-		$(env_flags) $(env_compilers) $(mpich_options) ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_mpi
-if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
+	$(FETCH_SCRIPT) "$(downloader)" mpich2-$(MPICH2_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf mpich2-$(MPICH2_VER).tar.gz
+	$(MKDIR_P) mpich-build
+	cd mpich-build && \
+		../mpich2-$(MPICH2_VER)/configure \
+			--with-pm=gforker \
+			--enable-shared \
+			--enable-sharedlibs=$(mpich_sharedarch) \
+			--disable-static --disable-mpe \
+			--prefix=$(prefix) \
+			$(env_flags) $(env_compilers) $(mpich_options) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_mpi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -302,23 +302,23 @@ if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpiru
 # ----------------------------------------------------------------------
 cppunit: installed_compilers
 if INSTALL_CPPUNIT
-$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
-$(MKDIR_P) cppunit-build
-cd cppunit-build && \
-	../cppunit-$(CPPUNIT_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers); \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_cppunit
+	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
+	$(MKDIR_P) cppunit-build
+	cd cppunit-build && \
+		../cppunit-$(CPPUNIT_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers); \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_cppunit
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_cppunit
+	@echo "$@ already installed. Skipping installation."
+	touch installed_cppunit
 endif
 
 installed_cppunit:
-$(MAKE) $(AM_MAKEFLAGS) cppunit
+	$(MAKE) $(AM_MAKEFLAGS) cppunit
 
 
 # ----------------------------------------------------------------------
@@ -326,22 +326,22 @@ $(MAKE) $(AM_MAKEFLAGS) cppunit
 # ----------------------------------------------------------------------
 pcre: installed_compilers
 if INSTALL_PCRE
-$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
-$(MKDIR_P) pcre-build
-cd pcre-build && \
-	../pcre-$(PCRE_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_pcre
+	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
+	$(MKDIR_P) pcre-build
+	cd pcre-build && \
+		../pcre-$(PCRE_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_pcre
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_pcre
+	@echo "$@ already installed. Skipping installation."
+	touch installed_pcre
 endif
 
 installed_pcre:
-$(MAKE) $(AM_MAKEFLAGS) pcre
+	$(MAKE) $(AM_MAKEFLAGS) pcre
 
 
 # ----------------------------------------------------------------------
@@ -349,26 +349,26 @@ $(MAKE) $(AM_MAKEFLAGS) pcre
 # ----------------------------------------------------------------------
 swig: installed_pcre installed_compilers
 if INSTALL_SWIG
-$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf swig-$(SWIG_VER).tar.gz
-$(MKDIR_P) swig-build
-cd swig-build && \
-	../swig-$(SWIG_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_swig
+	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
+	$(MKDIR_P) swig-build
+	cd swig-build && \
+		../swig-$(SWIG_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_swig
 else
 if WITH_SWIG
-@echo "$@ already installed. Skipping installation."
+	@echo "$@ already installed. Skipping installation."
 else
-@echo "$@ not required. Skipping installation."
+	@echo "$@ not required. Skipping installation."
 endif
-touch installed_swig
+	touch installed_swig
 endif
 
 installed_swig:
-$(MAKE) $(AM_MAKEFLAGS) swig
+	$(MAKE) $(AM_MAKEFLAGS) swig
 
 
 # ----------------------------------------------------------------------
@@ -376,19 +376,19 @@ $(MAKE) $(AM_MAKEFLAGS) swig
 # ----------------------------------------------------------------------
 numpy: installed_python
 if INSTALL_NUMPY
-$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
-cd numpy-$(NUMPY_VER) && \
-	$(PYTHON) setup.py install --prefix=$(prefix) && \
-	touch ../installed_numpy
+	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
+	cd numpy-$(NUMPY_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
+		touch ../installed_numpy
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_numpy
+	@echo "$@ already installed. Skipping installation."
+	touch installed_numpy
 endif
 
 installed_numpy:
-$(MAKE) $(AM_MAKEFLAGS) numpy
+	$(MAKE) $(AM_MAKEFLAGS) numpy
 
 
 # ----------------------------------------------------------------------
@@ -396,26 +396,26 @@ $(MAKE) $(AM_MAKEFLAGS) numpy
 # ----------------------------------------------------------------------
 proj4: installed_compilers
 if INSTALL_PROJ4
-$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
-$(MKDIR_P) proj4-build/nad
-cd proj4-build/nad && \
-	unzip ../../proj-datumgrid-1.3.zip
-cd proj4-build && \
-	../proj-$(PROJ4_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_proj4
+	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
+	$(MKDIR_P) proj4-build/nad
+	cd proj4-build/nad && \
+		unzip ../../proj-datumgrid-1.3.zip
+	cd proj4-build && \
+		../proj-$(PROJ4_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_proj4
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_proj4
+	@echo "$@ already installed. Skipping installation."
+	touch installed_proj4
 endif
 
 installed_proj4:
-$(MAKE) $(AM_MAKEFLAGS) proj4
+	$(MAKE) $(AM_MAKEFLAGS) proj4
 
 
 # ----------------------------------------------------------------------
@@ -423,30 +423,30 @@ $(MAKE) $(AM_MAKEFLAGS) proj4
 # ----------------------------------------------------------------------
 netcdf: installed_compilers
 if INSTALL_NETCDF
-$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
-$(MKDIR_P) netcdf-build
-cd netcdf-build && \
-	../netcdf-$(NETCDF_VER)/configure \
-		--prefix=$(prefix) $(env_flags) $(env_compilers) \
-		--enable-shared --disable-static --disable-netcdf-4 --disable-dap ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_netcdf
+	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
+	$(MKDIR_P) netcdf-build
+	cd netcdf-build && \
+		../netcdf-$(NETCDF_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers) \
+			--enable-shared --disable-static --disable-netcdf-4 --disable-dap ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_netcdf
 
 else
 if WITH_NETCDF
-@echo "$@ already installed. Skipping installation."
+	@echo "$@ already installed. Skipping installation."
 else
-@echo "netcdf option not requested. To enable NetCDF option, "
-@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
-@echo "--with-netcdf (to use an existing installation)."
+	@echo "netcdf option not requested. To enable NetCDF option, "
+	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
+	@echo "--with-netcdf (to use an existing installation)."
 endif
-touch installed_netcdf
+	touch installed_netcdf
 endif
 
 installed_netcdf:
-$(MAKE) $(AM_MAKEFLAGS) netcdf
+	$(MAKE) $(AM_MAKEFLAGS) netcdf
 
 
 # ----------------------------------------------------------------------
@@ -457,56 +457,56 @@ if WITH_FORTRAN
 hdf5_options = --enable-fortran
 endif
 if INSTALL_HDF5
-$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
-$(MKDIR_P) hdf5-build
-cd hdf5-build && \
-	../hdf5-$(HDF5_VER)/configure \
-		--enable-parallel --enable-shared --enable-unsupported \
-		--disable-static --prefix=$(prefix) $(hdf5_options) \
-		CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
-		$(env_flags) $(env_mpicompilers) ; \
-	make -j $(make_threads) && \
-	make install && \
-	touch ../installed_hdf5
+	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
+	$(MKDIR_P) hdf5-build
+	cd hdf5-build && \
+		../hdf5-$(HDF5_VER)/configure \
+			--enable-parallel --enable-shared --enable-unsupported \
+			--disable-static --prefix=$(prefix) $(hdf5_options) \
+                        CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
+			$(env_flags) $(env_mpicompilers) ; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_hdf5
 else
 if WITH_HDF5
-@echo "$@ already installed. Skipping installation."
+	@echo "$@ already installed. Skipping installation."
 else
-@echo "hdf5 option not requested. To enable HDF5 option, "
-@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
-@echo "--with-hdf5 (to use an existing installation)."
+	@echo "hdf5 option not requested. To enable HDF5 option, "
+	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
+	@echo "--with-hdf5 (to use an existing installation)."
 endif
-touch installed_hdf5
+	touch installed_hdf5
 endif
 
 installed_hdf5:
-$(MAKE) $(AM_MAKEFLAGS) hdf5
+	$(MAKE) $(AM_MAKEFLAGS) hdf5
 
 
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_numpy
+h5py: installed_hdf5
 if INSTALL_H5PY
-$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
-cd h5py-$(H5PY_VER) && \
-	CC=mpicc python setup.py build --hdf5=$(prefix) && \
-	python setup.py install --prefix=$(prefix) && \
-	touch ../installed_h5py
+	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
+	cd h5py-$(H5PY_VER) && \
+		CC=mpicc python setup.py build --hdf5=$(prefix) && \
+		python setup.py install --prefix=$(prefix) && \
+		touch ../installed_h5py
 else
 if WITH_H5PY
-@echo "$@ already installed. Skipping installation."
+	@echo "$@ already installed. Skipping installation."
 else
-@echo "h5py option not requested. To enable h5py option, "
-@echo "reconfigure with --enable-h5py (to install H5PY)."
+	@echo "h5py option not requested. To enable h5py option, "
+	@echo "reconfigure with --enable-h5py (to install H5PY)."
 endif
-touch installed_h5py
+	touch installed_h5py
 endif
 
 installed_h5py:
-$(MAKE) $(AM_MAKEFLAGS) h5py
+	$(MAKE) $(AM_MAKEFLAGS) h5py
 
 
 # ----------------------------------------------------------------------
@@ -514,20 +514,20 @@ $(MAKE) $(AM_MAKEFLAGS) h5py
 # ----------------------------------------------------------------------
 fiat: installed_numpy
 if INSTALL_FIAT
-$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
-cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
-$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
-$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
-cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
+	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
+	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
+	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
+	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_fiat
+	@echo "$@ already installed. Skipping installation."
+	touch installed_fiat
 endif
 
 installed_fiat:
-$(MAKE) $(AM_MAKEFLAGS) fiat
+	$(MAKE) $(AM_MAKEFLAGS) fiat
 
 
 # ----------------------------------------------------------------------
@@ -535,17 +535,17 @@ $(MAKE) $(AM_MAKEFLAGS) fiat
 # ----------------------------------------------------------------------
 pythia: installed_python
 if INSTALL_PYTHIA
-$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
-$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
-cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
+	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
+	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_pythia
+	@echo "$@ already installed. Skipping installation."
+	touch installed_pythia
 endif
 
 installed_pythia:
-$(MAKE) $(AM_MAKEFLAGS) pythia
+	$(MAKE) $(AM_MAKEFLAGS) pythia
 
 
 # ----------------------------------------------------------------------
@@ -553,23 +553,23 @@ $(MAKE) $(AM_MAKEFLAGS) pythia
 # ----------------------------------------------------------------------
 nemesis: installed_mpi installed_python installed_pythia
 if INSTALL_NEMESIS
-$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
-$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
-$(MKDIR_P) nemesis-build
-cd nemesis-build && \
-	../nemesis-$(NEMESIS_VER)/configure \
-		--prefix=$(prefix) $(env_flags) ; \
-	make && \
-	make install && \
-	touch ../installed_nemesis
+	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
+	$(MKDIR_P) nemesis-build
+	cd nemesis-build && \
+		../nemesis-$(NEMESIS_VER)/configure \
+			--prefix=$(prefix) $(env_flags) ; \
+		make && \
+		make install && \
+		touch ../installed_nemesis
 
 else
-@echo "$@ already installed. Skipping installation."
-touch installed_nemesis
+	@echo "$@ already installed. Skipping installation."
+	touch installed_nemesis
 endif
 
 installed_nemesis:
-$(MAKE) $(AM_MAKEFLAGS) nemesis
+	$(MAKE) $(AM_MAKEFLAGS) nemesis
 
 
 # ----------------------------------------------------------------------
@@ -583,11 +583,11 @@ spatialdata_options += --enable-testing
 endif
 if USE_PYLITH_SVN
 spatialdata_options += --enable-swig
-$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
-cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
+	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
+	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
-$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
