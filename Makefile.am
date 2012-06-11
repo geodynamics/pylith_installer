@@ -487,7 +487,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5
+h5py: installed_hdf5 installed_numpy
 if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
