@@ -214,8 +214,6 @@ AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 # NetCDF
 if test "$install_netcdf" = yes ; then
   with_netcdf=yes
-else
-  with_netcdf=no
 fi
 AC_ARG_WITH([netcdf],
     [AC_HELP_STRING([--with-netcdf],
@@ -227,21 +225,17 @@ AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
 # HDF5
 if test "$install_hdf5" = "yes"; then
   with_hdf5=yes
-else
-  with_hdf5=no
 fi
 AC_ARG_WITH([hdf5],
     [AC_HELP_STRING([--with-hdf5],
         [enable HDF5 options for PyLith @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
+	[echo "WITHVAL $withval"; if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
 	[with_hdf5=yes])
 AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
 
 # H5PY
 if test "$install_h5py" = "yes"; then
   with_h5py=yes
-else
-  with_h5py=no
 fi
 AC_ARG_WITH([h5py],
     [AC_HELP_STRING([--with-h5py],
