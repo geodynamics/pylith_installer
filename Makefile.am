@@ -347,7 +347,7 @@ installed_pcre:
 # ----------------------------------------------------------------------
 # swig
 # ----------------------------------------------------------------------
-swig: installed_pcre installed_compilers
+swig: installed_pcre installed_compilers installed_python
 if INSTALL_SWIG
 	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
