@@ -397,3 +397,14 @@ blas/lapack itself.
 
   4. cd $HOME/build/pylith
   5. make
+
+----------------------------------------------------------------------
+netcdf and HDF5 Fortran libraries fail to link with ifort
+----------------------------------------------------------------------
+
+This can be associated with bugs in libtool. Check to make sure the
+"pic_flag" and "wl" parameters are set in the Fortan sections. They
+should be set via something like:
+
+  pic_flag="-fPIC"
+  wl="-Wl,"
