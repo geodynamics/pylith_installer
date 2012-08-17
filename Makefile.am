@@ -139,8 +139,7 @@ env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 if WITH_FORTRAN
 env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
-# spaces in next line insure gap between command and flags.
-env_mpicompilers = CC="mpicc " CXX="mpicxx " FC="mpif90 "
+env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
 else
 env_compilers = CC=$(CC) CXX=$(CXX)
 env_mpicompilers = CC=mpicc CXX=mpicxx
