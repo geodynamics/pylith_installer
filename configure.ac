@@ -89,14 +89,6 @@ AC_ARG_ENABLE([proj4],
 	[install_proj4=yes])
 AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = yes])
 
-# NETCDF
-AC_ARG_ENABLE([netcdf],
-    [AC_HELP_STRING([--enable-netcdf],
-        [install NetCDF @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
-	[install_netcdf=yes])
-AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
-
 # HDF5
 AC_ARG_ENABLE([hdf5],
     [AC_HELP_STRING([--enable-hdf5],
@@ -112,6 +104,22 @@ AC_ARG_ENABLE([h5py],
 	[if test "$enableval" = yes ; then install_h5py=yes; else install_h5py=no; fi],
 	[install_h5py=yes])
 AM_CONDITIONAL([INSTALL_H5PY], [test "$install_h5py" = yes])
+
+# NETCDF
+AC_ARG_ENABLE([netcdf],
+    [AC_HELP_STRING([--enable-netcdf],
+        [install NetCDF @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
+	[install_netcdf=yes])
+AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
+
+# NETCDFPY
+AC_ARG_ENABLE([netcdfpy],
+    [AC_HELP_STRING([--enable-netcdfpy],
+        [install netCDF4 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_netcdfpy=yes; else install_netcdfpy=no; fi],
+	[install_netcdfpy=yes])
+AM_CONDITIONAL([INSTALL_NETCDFPY], [test "$install_netcdfpy" = yes])
 
 # CMAKE
 AC_ARG_ENABLE([cmake],
@@ -211,17 +219,6 @@ AC_ARG_WITH([fortran],
 	[with_fortran=yes])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
-# NetCDF
-if test "$install_netcdf" = yes ; then
-  with_netcdf=yes
-fi
-AC_ARG_WITH([netcdf],
-    [AC_HELP_STRING([--with-netcdf],
-        [enable NetCDF (CUBIT) options for PyLith @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_netcdf=yes; else with_netcdf=no; fi],
-	[with_netcdf=yes])
-AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
-
 # HDF5
 if test "$install_hdf5" = "yes"; then
   with_hdf5=yes
@@ -243,6 +240,28 @@ AC_ARG_WITH([h5py],
 	[if test "$withval" = yes; then with_h5py=yes; else with_h5py=no; fi],
 	[with_h5py=no])
 AM_CONDITIONAL([WITH_H5PY], [test "$with_h5py" = yes])
+
+# NetCDF
+if test "$install_netcdf" = yes ; then
+  with_netcdf=yes
+fi
+AC_ARG_WITH([netcdf],
+    [AC_HELP_STRING([--with-netcdf],
+        [enable NetCDF (CUBIT) options for PyLith @<:@default=yes@:>@])],
+	[if test "$withval" = yes; then with_netcdf=yes; else with_netcdf=no; fi],
+	[with_netcdf=yes])
+AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
+
+# netCDF (python)
+if test "$install_netcdfpy" = yes ; then
+  with_netcdfpy=yes
+fi
+AC_ARG_WITH([netcdfpy],
+    [AC_HELP_STRING([--with-netcdfpy],
+        [enable netCDF4 (python) @<:@default=yes@:>@])],
+	[if test "$withval" = yes; then with_netcdfpy=yes; else with_netcdfpy=no; fi],
+	[with_netcdfpy=yes])
+AM_CONDITIONAL([WITH_NETCDFPY], [test "$with_netcdfpy" = yes])
 
 # CUDA
 AC_ARG_WITH([cuda],
@@ -473,16 +492,6 @@ else
   CIT_PROJ4_LIB
 fi
 
-# NETCDF
-if test "$install_netcdf" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  if test "$with_netcdf" = yes ; then
-    CIT_NETCDF_HEADER
-    CIT_NETCDF_LIB
-  fi
-fi
-
 # HDF5
 if test "$install_hdf5" = yes ; then
   # Need to account for PETSc option --download-hdf5=1.
@@ -509,6 +518,38 @@ if test "$install_h5py" = yes ; then
 else
   if test "$with_h5py" = yes ; then
     CIT_PYTHON_MODULE([h5py],[2.0.0])
+  fi
+fi
+
+# NETCDF
+if test "$install_netcdf" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  if test "$with_netcdf" = yes ; then
+    CIT_NETCDF_HEADER
+    CIT_NETCDF_LIB
+  fi
+fi
+
+# NETCDF4 (python)
+if test "$install_netcdfpy" = yes ; then
+   if test "$install_netcdf" = yes; then
+      echo "do nothing" >& /dev/null
+     if test "$with_hdf5" = yes; then
+       echo "do nothing" >& /dev/null
+     else
+       AC_MSG_ERROR([netCDF4 requires HDF5.])
+     fi
+   else
+     if test "$with_netcdf" = yes && "$with_hdf5" = yes; then
+       echo "do nothing" >& /dev/null
+     else
+       AC_MSG_ERROR([netCDF4 requires NetCDF and HDF5.])
+     fi
+   fi
+else
+  if test "$with_netcdfpy" = yes ; then
+    CIT_PYTHON_MODULE([netCDF4],[1.0])
   fi
 fi
 
@@ -619,9 +660,10 @@ echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  cppunit: $install_cppunit"
 echo "  proj4: $install_proj4"
-echo "  netcdf: $install_netcdf"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
+echo "  netcdf: $install_netcdf"
+echo "  netNDF4 (python): $install_netcdfpy"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"

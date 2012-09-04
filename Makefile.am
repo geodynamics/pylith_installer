@@ -40,8 +40,11 @@ NUMPY_VER=1.6.1-patched
 
 PROJ4_VER=4.8.0
 
-NETCDF_VER=4.1.1
 HDF5_VER=1.8.8
+H5PY_VER=2.0.1
+
+NETCDF_VER=4.1.3
+NETCDFPY_VER=1.0
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -50,7 +53,6 @@ PYTHIA_VER=0.8.1.14
 NEMESIS_VER=1.0.2
 
 CMAKE_VER=2.8.8
-H5PY_VER=2.0.1
 
 if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
@@ -85,6 +87,7 @@ noinst_tmp = \
 	installed_numpy \
 	installed_proj4 \
 	installed_netcdf \
+	installed_netcdfpy \
 	installed_hdf5 \
 	installed_h5py \
 	installed_fiat \
@@ -120,6 +123,7 @@ noinst_srcdirs = \
 	swig-$(SWIG_VER) \
 	proj-$(PROJ4_VER) \
 	netcdf-$(NETCDF_VER) \
+	netCDF4-$(NETCDFPY_VER) \
 	hdf5-$(HDF5_VER) \
 	h5py-$(H5PY_VER) \
 	spatialdata-$(SPATIALDATA_VER) \
@@ -419,37 +423,6 @@ installed_proj4:
 
 
 # ----------------------------------------------------------------------
-# netcdf
-# ----------------------------------------------------------------------
-netcdf: installed_compilers
-if INSTALL_NETCDF
-	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
-	$(MKDIR_P) netcdf-build
-	cd netcdf-build && \
-		../netcdf-$(NETCDF_VER)/configure \
-			--prefix=$(prefix) $(env_flags) $(env_compilers) \
-			--enable-shared --disable-static --disable-netcdf-4 --disable-dap ; \
-		make -j $(make_threads) && \
-		make install && \
-		touch ../installed_netcdf
-
-else
-if WITH_NETCDF
-	@echo "$@ already installed. Skipping installation."
-else
-	@echo "netcdf option not requested. To enable NetCDF option, "
-	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
-	@echo "--with-netcdf (to use an existing installation)."
-endif
-	touch installed_netcdf
-endif
-
-installed_netcdf:
-	$(MAKE) $(AM_MAKEFLAGS) netcdf
-
-
-# ----------------------------------------------------------------------
 # hdf5
 # ----------------------------------------------------------------------
 hdf5: installed_mpi
@@ -507,6 +480,69 @@ endif
 
 installed_h5py:
 	$(MAKE) $(AM_MAKEFLAGS) h5py
+
+
+# ----------------------------------------------------------------------
+# netcdf
+# ----------------------------------------------------------------------
+netcdf: installed_compilers installed_hdf5
+if INSTALL_NETCDF
+if WITH_HDF5
+netcdf_4_options = --enable-netcdf-4
+else
+netcdf_4_options = --disable-netcdf-4
+endif
+	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
+	$(MKDIR_P) netcdf-build
+	cd netcdf-build && \
+		../netcdf-$(NETCDF_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_mpicompilers) \
+			--enable-shared --disable-static $(netcdf_4_options) --disable-dap ; \
+		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_netcdf
+
+else
+if WITH_NETCDF
+	@echo "$@ already installed. Skipping installation."
+else
+	@echo "netcdf option not requested. To enable NetCDF option, "
+	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
+	@echo "--with-netcdf (to use an existing installation)."
+endif
+	touch installed_netcdf
+endif
+
+installed_netcdf:
+	$(MAKE) $(AM_MAKEFLAGS) netcdf
+
+
+# ----------------------------------------------------------------------
+# netcdfpy
+# ----------------------------------------------------------------------
+netcdfpy: installed_netcdf installed_numpy
+if INSTALL_NETCDFPY
+	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER)fix1.tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf netCDF4-$(NETCDFPY_VER)fix1.tar.gz
+	echo -e "[options]\nuse_ncconfig=True" > netCDF4-$(NETCDFPY_VER)/setup.cfg
+	cd netCDF4-$(NETCDFPY_VER) && \
+		CC=mpicc $(env_flags) python setup.py build && \
+		python setup.py install --prefix=$(prefix) && \
+		touch ../installed_netcdfpy
+else
+if WITH_NETCDFPY
+	@echo "$@ already installed. Skipping installation."
+else
+	@echo "netCDF4 option not requested. To enable netCDF4 option, "
+	@echo "reconfigure with --enable-netcdfpy (to install netCDF4)."
+endif
+	touch installed_netcdfpy
+endif
+
+installed_netcdfpy:
+	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
 
 
 # ----------------------------------------------------------------------
