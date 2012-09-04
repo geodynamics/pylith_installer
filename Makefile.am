@@ -139,7 +139,7 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # Environment settings.
 # ----------------------------------------------------------------------
 abs_builddir=`pwd`
-env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
+env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
 
 if WITH_FORTRAN
 env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
@@ -437,7 +437,6 @@ if INSTALL_HDF5
 		../hdf5-$(HDF5_VER)/configure \
 			--enable-parallel --enable-shared --enable-unsupported \
 			--disable-static --prefix=$(prefix) $(hdf5_options) \
-                        CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
 			$(env_flags) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
@@ -709,7 +708,6 @@ endif
 	cd petsc-dev && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
-			--CXXFLAGS=-DMPICH_IGNORE_CXX_SEEK \
 			--with-clanguage=C++ \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
