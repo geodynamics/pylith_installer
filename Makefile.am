@@ -58,8 +58,8 @@ if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=1.9.0
-PYLITH_VER=1.8.0
+SPATIALDATA_VER=1.9.1
+PYLITH_VER=1.8.1
 endif
 
 
@@ -716,7 +716,7 @@ endif
 			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) ; \
-		make PETSC_DIR=$(abs_builddir) && \
+		make -j $(make_threads) PETSC_DIR=$(abs_builddir) && \
 		make PETSC_DIR=$(abs_builddir) install && \
 		make PETSC_DIR=$(abs_builddir) test && \
 		touch ../installed_petsc
