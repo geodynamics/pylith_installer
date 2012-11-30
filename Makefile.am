@@ -593,7 +593,7 @@ if INSTALL_NEMESIS
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
 		../nemesis-$(NEMESIS_VER)/configure \
-			--prefix=$(prefix) $(env_flags) ; \
+			--prefix=$(prefix) $(env_flags) $(env_mpicompilers); \
 		make && \
 		make install && \
 		touch ../installed_nemesis
