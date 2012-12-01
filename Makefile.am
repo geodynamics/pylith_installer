@@ -698,9 +698,9 @@ if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
 endif
 if USE_PYLITH_SVN
-	hg clone http://petsc.cs.iit.edu/petsc/petsc-dev
+	hg clone https://bitbucket.org/petsc/petsc-dev
 	cd petsc-dev/config && \
-		hg clone http://petsc.cs.iit.edu/petsc/BuildSystem BuildSystem
+		hg clone https://bitbucket.org/petsc/buildsystem BuildSystem
 else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
