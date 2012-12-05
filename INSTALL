@@ -59,10 +59,15 @@ As part of the installation process, the installer will, by default,
 run some tests to make sure specific dependencies (PETSc and
 spatialdata) as well as PyLith were installed properly.
 
-We *STRONGLY* recommend that you run the configure script in a
-different directory from the PyLith Installer source code. We
-recommend creating a build directory (for example, $HOME/build/pylith)
-where you build any software with a subdirectory for PyLith.
+IMPORTANT: We *STRONGLY* recommend that you run the configure script
+  in a different directory from the PyLith Installer source code. We
+  recommend creating a build directory (for example,
+  $HOME/build/pylith) where you build any software with a subdirectory
+  for PyLith.
+
+WARNING: If you need to reconfigure the installer, then you should
+  remove all of your build and install files *BEFORE* running
+  configure. For example, rm -r $HOME/build/pylith $HOME/pylith
 
 These instructions are written assuming that you have downloaded the
 installer source code to $HOME/Downloads and want to use the following
@@ -131,6 +136,8 @@ Untar the source code for the installer:
 ----------------------------------------------------------------------
 STEP 2 - Run configure
 ----------------------------------------------------------------------
+
+Read the previous section "RUNNING THE INSTALLER"!!
 
 On multi-core and multi-processor systems (not clusters but systems
 with more than one core and/or processor), the build process can be
