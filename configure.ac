@@ -26,6 +26,13 @@ AM_INIT_AUTOMAKE([foreign])
 # SOFTWARE TO INSTALL
 # ----------------------------------------------------------------------
 
+# FORCE INSTALLATION
+AC_ARG_ENABLE([force-install],
+    [AC_HELP_STRING([--enable-force-install],
+        [Force installation of software, overriding warnings about existing versions@<:@default=no@:>@])],
+	[if test "$enableval" != no ; then force_install=yes; else force_install=no; fi],
+	[force_install=no])
+
 # GCC
 AC_ARG_ENABLE([gcc],
     [AC_HELP_STRING([--enable-gcc],
@@ -412,8 +419,10 @@ AC_CHECK_LIB([z], [deflate],
 # MPI
 if test "$install_mpi" != no ; then
   if test "$install_python" != yes ; then
-    AC_MSG_FAILURE([Incompatible configure options. Cannot use system python with installer-built MPI. Please use --enable-python or use system MPI.])
+    AC_MSG_FAILURE([Incompatible configure options. System Python with installer-built MPI is error prone. Please use --enable-python or use system MPI.])
   fi
+  AC_PATH_PROG(existing_mpi, mpirun)
+  AC_SUBST(existing_mpi)
 else
   AC_PATH_PROG(MPICC, mpicc)
   if test -z "$MPICC"; then
@@ -486,7 +495,8 @@ fi
 
 # proj4
 if test "$install_proj4" = yes ; then
-  echo "do nothing" >& /dev/null
+  AC_PATH_PROG(existing_proj4, proj)
+  AC_SUBST(existing_proj4)
 else
   CIT_PROJ4_HEADER
   CIT_PROJ4_LIB
@@ -495,7 +505,8 @@ fi
 # HDF5
 if test "$install_hdf5" = yes ; then
   # Need to account for PETSc option --download-hdf5=1.
-  echo "do nothing" >& /dev/null
+  AC_PATH_PROG(existing_hdf5, h5dump)
+  AC_SUBST(existing_hdf5)
 else
   if test "$with_hdf5" = yes ; then
     CIT_HDF5_HEADER
@@ -523,7 +534,8 @@ fi
 
 # NETCDF
 if test "$install_netcdf" = yes ; then
-  echo "do nothing" >& /dev/null
+  AC_PATH_PROG(existing_netcdf, ncdump)
+  AC_SUBST(existing_netcdf)
 else
   if test "$with_netcdf" = yes ; then
     CIT_NETCDF_HEADER
@@ -564,6 +576,11 @@ fi
 
 # PETSC
 if test "$install_petsc" = yes ; then
+  if test -n "$PETSC_DIR"; then
+    existing_petsc=$PETSC_DIR
+  fi
+  AC_SUBST(existing_petsc)
+
   PETSC_DIR=$prefix
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=pylith_petsc_opt
@@ -577,7 +594,8 @@ fi
 
 # nemesis
 if test "$install_nemesis" = yes ; then
-  echo "do nothing" >& /dev/null
+  AC_PATH_PROG(existing_nemesis, nemesis)
+  AC_SUBST(existing_nemesis)
 else
   AC_PATH_PROG(NEMESIS, nemesis)
   if test -z $NEMESIS; then
@@ -595,11 +613,90 @@ fi
 
 # spatialdata
 if test "$install_spatialdata" = yes ; then
-  echo "do nothing" >& /dev/null
+  AC_PATH_PROG(existing_spatialdata, gensimpledb.py)
+  AC_SUBST(existing_spatialdata)
 else
   CIT_SPATIALDATA_HEADER
   CIT_SPATIALDATA_LIB
   CIT_PYTHON_MODULE([spatialdata])
+fi
+
+# ----------------------------------------------------------------------
+# Warning of existing installation
+AC_PATH_PROG(existing_pylith, pylith)
+AC_SUBST(existing_pylith)
+
+existing_fail=false
+echo ""
+echo "Examining test results for existing versions of software..."
+
+# MPI
+if test -n "$existing_mpi"; then
+  echo "WARNING: Existing version of MPI installed. Found $existing_mpi"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# PROJ
+if test -n "$existing_proj"; then
+  echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# HDF5
+if test -n "$existing_hdf5"; then
+  echo "WARNING: Existing version of HDF5 installed. Found $existing_hdf5"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# NETCDF
+if test -n "$existing_netcdf"; then
+  echo "WARNING: Existing version of NetCDF installed. Found $existing_netcdf"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# NEMESIS
+if test -n "$existing_nemesis"; then
+  echo "WARNING: Existing version of nemesis installed. Found $existing_nemesis"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# PETSC
+if test -n "$existing_petsc"; then
+  echo "WARNING: Existing version of PETSc installed. Found $existing_petsc"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# SPATIALDATA
+if test -n "$existing_spatialdata"; then
+  echo "WARNING: Existing version of spatialdata installed. Found $existing_spatialdata"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# PYLITH
+if test -n "$existing_pylith"; then
+  echo "WARNING: Existing version of PyLith installed. Found $existing_pylith"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+if test "$existing_fail" = yes ; then
+  echo ""
+  AC_MSG_ERROR(["Configure failed due to conflict with existing software. Remove existing software or reconfigure with --enable-force-install to override error message."])
 fi
 
 
