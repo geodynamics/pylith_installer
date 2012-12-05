@@ -696,7 +696,7 @@ fi
 
 if test "$existing_fail" = yes ; then
   echo ""
-  AC_MSG_ERROR(["Configure failed due to conflict with existing software. Remove existing software or reconfigure with --enable-force-install to override error message. Existing software may be configured incorrectly for use with PyLith or may have been built with incompatible compilers."])
+  AC_MSG_ERROR(["Configure failed due to conflict with existing software. Existing software may interfere with proper installation of PyLith, may be configured incorrectly for use with PyLith, or may have been built with incompatible compilers. Remove existing software (RECOMMENDED) or reconfigure with --enable-force-install to override error message. "])
 fi
 
 
