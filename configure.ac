@@ -639,8 +639,8 @@ if test -n "$existing_mpi"; then
 fi
 
 # PROJ
-if test -n "$existing_proj"; then
-  echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj"
+if test -n "$existing_proj4"; then
+  echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj4"
   if test "$force_install" != yes ; then
     existing_fail=yes
   fi
