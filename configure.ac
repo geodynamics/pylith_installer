@@ -526,6 +526,7 @@ if test "$install_h5py" = yes ; then
        AC_MSG_ERROR([h5py requires HDF5.])
      fi
    fi
+  AM_PATH_PYTHON([2.6])
 else
   if test "$with_h5py" = yes ; then
     CIT_PYTHON_MODULE([h5py],[2.0.0])
