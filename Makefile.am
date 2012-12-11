@@ -697,6 +697,11 @@ endif
 if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
 endif
+if INSTALL_CMAKE
+petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH) 
+else
+petsc_build_options = 
+endif
 if USE_PYLITH_SVN
 	hg clone https://bitbucket.org/petsc/petsc-dev
 	cd petsc-dev/config && \
@@ -716,7 +721,7 @@ endif
 			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
-		make -j$(make_threads) -C $(PETSC_ARCH) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
+		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_builddir) install && \
 		make PETSC_DIR=$(abs_builddir) test && \
 		touch ../installed_petsc
