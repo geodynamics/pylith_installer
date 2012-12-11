@@ -584,12 +584,14 @@ if test "$install_petsc" = yes ; then
   fi
   AC_SUBST(existing_petsc)
 
+  AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
+  AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
   PETSC_DIR=$prefix
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=pylith_petsc_opt
   AC_SUBST(PETSC_ARCH)
 else
-  CIT_PATH_PETSC([3.1.0])
+  CIT_PATH_PETSC([3.3.0])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
   CIT_CHECK_LIB_PETSC_SIEVE

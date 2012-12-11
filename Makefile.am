@@ -715,8 +715,8 @@ endif
 			--with-sieve=1 \
 			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_builddir) ; \
-		make -j $(make_threads) PETSC_DIR=$(abs_builddir) && \
+			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
+		make -j$(make_threads) -C $(PETSC_ARCH) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_builddir) install && \
 		make PETSC_DIR=$(abs_builddir) test && \
 		touch ../installed_petsc
