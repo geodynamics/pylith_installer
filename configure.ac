@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.8.1-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [1.8.0-2], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -404,6 +404,23 @@ if test "$install_python" = yes ; then
                 AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
                 ])
 
+  if test "$install_numpy" != yes ; then
+    AC_MSG_WARN([Incompatible configure options. Building Python requires building numpy as well. Adding installation of numpy.])
+  fi
+  install_numpy=yes
+  if test "$install_fiat" != yes ; then
+    AC_MSG_WARN([Incompatible configure options. Building Python requires building FIAT as well. Adding installation of FIAT.])
+  fi
+  install_fiat=yes
+  if test "$install_nemesis" != yes ; then
+    AC_MSG_WARN([Incompatible configure options. Building Python requires building nemesis as well. Adding installation of nemesis.])
+  fi
+  install_pythia=yes
+  install_nemesis=yes
+  if test "$install_spatialdata" != yes ; then
+    AC_MSG_WARN([Incompatible configure options. Building Python requires building spatialdata as well. Adding installation of spatialdata.])
+  fi
+  install_spatialdata=yes
 else
   AM_PATH_PYTHON([2.4])
   CIT_PYTHON_SYSCONFIG
@@ -419,7 +436,7 @@ AC_CHECK_LIB([z], [deflate],
 # MPI
 if test "$install_mpi" != no ; then
   if test "$install_python" != yes ; then
-    AC_MSG_FAILURE([Incompatible configure options. System Python with installer-built MPI is error prone. Please use --enable-python or use system MPI.])
+    AC_MSG_WARN([Potentially incompatible configure options. System Python with installer-built MPI is error prone. If build fails you should try reconfiguring with --enable-python or use system MPI.])
   fi
   AC_PATH_PROG(existing_mpi, mpirun)
   AC_SUBST(existing_mpi)
