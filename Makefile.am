@@ -34,7 +34,7 @@ CPPUNIT_VER=1.12.1
 
 PCRE_VER=8.12
 SWIG_VER=2.0.2
-MERCURIAL_VER=2.2.1
+GIT_VER=2.2.1
 
 NUMPY_VER=1.6.1-patched
 
@@ -645,23 +645,23 @@ installed_spatialdata:
 
 
 # ----------------------------------------------------------------------
-# mercurial
+# git
 # ----------------------------------------------------------------------
-mercurial: installed_python
-if INSTALL_MERCURIAL
-	$(FETCH_SCRIPT) "$(downloader)" mercurial-$(MERCURIAL_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf mercurial-$(MERCURIAL_VER).tar.gz
-	cd mercurial-$(MERCURIAL_VER) && \
+git: installed_python
+if INSTALL_GIT
+	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf git-$(GIT_VER).tar.gz
+	cd git-$(GIT_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix) && \
-		touch ../installed_mercurial
+		touch ../installed_git
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_mercurial
+	touch installed_git
 endif
 
-installed_mercurial:
-	$(MAKE) $(AM_MAKEFLAGS) mercurial
+installed_git:
+	$(MAKE) $(AM_MAKEFLAGS) git
 
 
 # ----------------------------------------------------------------------
@@ -686,7 +686,7 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_mercurial installed_cmake
+petsc: installed_mpi installed_hdf5 installed_git installed_cmake
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
@@ -703,9 +703,7 @@ else
 petsc_build_options = 
 endif
 if USE_PYLITH_SVN
-	hg clone https://bitbucket.org/petsc/petsc-dev
-	cd petsc-dev/config && \
-		hg clone https://bitbucket.org/petsc/buildsystem BuildSystem
+	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-dev
 else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz

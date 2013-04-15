@@ -184,13 +184,13 @@ AC_ARG_ENABLE([swig],
 	[install_swig=no])
 AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
 
-# MERCURIAL
-AC_ARG_ENABLE([mercurial],
-    [AC_HELP_STRING([--enable-mercurial],
-        [install mercurial @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_mercurial=yes; else install_mercurial=no; fi],
-	[install_mercurial=no])
-AM_CONDITIONAL([INSTALL_MERCURIAL], [test "$install_mercurial" = yes])
+# GIT
+AC_ARG_ENABLE([git],
+    [AC_HELP_STRING([--enable-git],
+        [install git @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_git=yes; else install_git=no; fi],
+	[install_git=no])
+AM_CONDITIONAL([INSTALL_GIT], [test "$install_git" = yes])
 
 # PYTHIA
 install_pythia=no
@@ -348,7 +348,7 @@ fi
 AC_SUBST(downloader)
 
 # svn/autoreconf
-petsc_hg=no
+petsc_git=no
 if test "$pylith_svn" != no ; then
   # SVN
   AC_PATH_PROG(SVN, svn)
@@ -360,19 +360,19 @@ if test "$pylith_svn" != no ; then
   if test -z "$AUTORECONF" ; then
     AC_MSG_FAILURE([cannot find 'autoreconf' program.])
   fi
-  # HG
-  if test "$install_mercurial" = yes; then
+  # GIT
+  if test "$install_git" = yes; then
     echo "do nothing" >& /dev/null
   else
-    AC_PATH_PROG(HG, hg)
-    if test -z "$HG" ; then
-      AC_MSG_FAILURE([cannot find 'hg' program.])
+    AC_PATH_PROG(GIT, git)
+    if test -z "$GIT" ; then
+      AC_MSG_FAILURE([cannot find 'git' program.])
     fi
   fi
-  petsc_hg=yes
+  petsc_git=yes
 fi
 AM_CONDITIONAL([WITH_SWIG], [test "$pylith_svn" != no])
-AC_SUBST(petsc_hg)
+AC_SUBST(petsc_git)
 
 # ----------------------------------------------------------------------
 # CHECK COMPATIBILITY OF OPTIONS
@@ -605,7 +605,7 @@ if test "$install_petsc" = yes ; then
   AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
   PETSC_DIR=$prefix
   AC_SUBST(PETSC_DIR)
-  PETSC_ARCH=pylith_petsc_opt
+  PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
   CIT_PATH_PETSC([3.3.0])
@@ -789,7 +789,7 @@ echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
-echo "  mercurial: $install_mercurial"
+echo "  git: $install_git"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
 echo ""
