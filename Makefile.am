@@ -27,7 +27,7 @@ MPFR_VER=2.4.2
 
 PYTHON_VER=2.7.3
 
-MPICH2_VER=1.4.1p1
+MPICH_VER=3.0.3
 OPENMPI_VER=1.4.5
 
 CPPUNIT_VER=1.12.1
@@ -120,7 +120,7 @@ noinst_srcdirs = \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
 	openmpi-$(OPENMPI_VER) \
-	mpich2-$(MPICH2_VER) \
+	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
 	swig-$(SWIG_VER) \
 	proj-$(PROJ4_VER) \
@@ -286,11 +286,11 @@ else
 mpich_options = --disable-fc
 endif
 mpich: installed_compilers
-	$(FETCH_SCRIPT) "$(downloader)" mpich2-$(MPICH2_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf mpich2-$(MPICH2_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf mpich-$(MPICH_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
-		../mpich2-$(MPICH2_VER)/configure \
+		../mpich-$(MPICH_VER)/configure \
 			--with-pm=gforker \
 			--enable-shared \
 			--enable-sharedlibs=$(mpich_sharedarch) \
@@ -678,7 +678,7 @@ if INSTALL_GIT
 	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf git-$(GIT_VER).tar.gz
 	cd git-$(GIT_VER) && \
-		make prefix=$(prefix) CPPFLAGS="-DNO_EXPAT -DNO_TCLTK -DNO_GETTEXT -I$(prefix)/include" LDFLAGS="-L$(prefix)/lib" all install && \
+		make prefix=$(prefix) CPPFLAGS="$(CPPFLAGS) -DNO_EXPAT -DNO_TCLTK -DNO_GETTEXT -I$(prefix)/include" LDFLAGS="-L$(prefix)/lib" all install && \
 		touch ../installed_git
 
 else
