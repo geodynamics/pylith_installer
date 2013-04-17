@@ -34,7 +34,9 @@ CPPUNIT_VER=1.12.1
 
 PCRE_VER=8.12
 SWIG_VER=2.0.2
-GIT_VER=2.2.1
+
+CURL_VER=7.30.0
+GIT_VER=1.8.2.1
 
 NUMPY_VER=1.6.1-patched
 
@@ -645,14 +647,38 @@ installed_spatialdata:
 
 
 # ----------------------------------------------------------------------
+# curl
+# ----------------------------------------------------------------------
+curl: 
+if INSTALL_CURL
+	$(FETCH_SCRIPT) "$(downloader)" curl-$(CURL_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(TAR) -zxf curl-$(CURL_VER).tar.gz
+	$(MKDIR_P) curl-build
+	cd curl-build && \
+		../curl-$(CURL_VER)/configure \
+			--prefix=$(prefix) $(env_flags) $(env_compilers); \
+		make && \
+		make install && \
+		touch ../installed_curl
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_curl
+endif
+
+installed_curl:
+	$(MAKE) $(AM_MAKEFLAGS) curl
+
+
+# ----------------------------------------------------------------------
 # git
 # ----------------------------------------------------------------------
-git: installed_python
+git: installed_python installed_curl
 if INSTALL_GIT
 	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
 	$(TAR) -zxf git-$(GIT_VER).tar.gz
 	cd git-$(GIT_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix) && \
+		make prefix=$(prefix) CPPFLAGS="-DNO_EXPAT -DNO_TCLTK -DNO_GETTEXT -I$(prefix)/include" LDFLAGS="-L$(prefix)/lib" all install && \
 		touch ../installed_git
 
 else

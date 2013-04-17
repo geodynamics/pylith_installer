@@ -184,6 +184,14 @@ AC_ARG_ENABLE([swig],
 	[install_swig=no])
 AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
 
+# CURL (required by git)
+AC_ARG_ENABLE([curl],
+    [AC_HELP_STRING([--enable-curl],
+        [install curl @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_curl=yes; else install_curl=no; fi],
+	[install_curl=no])
+AM_CONDITIONAL([INSTALL_CURL], [test "$install_curl" = yes])
+
 # GIT
 AC_ARG_ENABLE([git],
     [AC_HELP_STRING([--enable-git],
@@ -362,6 +370,14 @@ if test "$pylith_svn" != no ; then
   fi
   # GIT
   if test "$install_git" = yes; then
+    if test "$install_curl" = yes; then
+      echo "do nothing" >& /dev/null
+    else
+      AC_PATH_PROG(CURL, curl)
+        AC_CHECK_HEADER([curl/curl.h], [], [
+                AC_MSG_ERROR([Header file 'curl.h' not found; maybe you don't have the curl development package, e.g. 'curl-dev', installed?])
+                ])
+    fi
     echo "do nothing" >& /dev/null
   else
     AC_PATH_PROG(GIT, git)
@@ -789,6 +805,7 @@ echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
+echo "  curl: $install_curl"
 echo "  git: $install_git"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
