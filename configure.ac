@@ -292,8 +292,8 @@ AC_ARG_WITH([pylith-svn],
         [use PyLith from SVN repository (trunk, stable, BRANCH) @<:@default=no@:>@])],
 	[pylith_svn=$withval],
 	[pylith_svn=no])
-if test "$pylith_svn" = yes ; then pylith_svn="trunk"; fi
-if test "$pylith_svn" = stable ; then pylith_svn="branches/v2.0-stable"; fi
+if test "$pylith_svn" = yes ; then pylith_svn="branches/v1.7-trunk"; fi
+if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.9-stable"; fi
 AC_SUBST(pylith_svn)
 AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
 
