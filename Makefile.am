@@ -60,7 +60,7 @@ SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
 SPATIALDATA_VER=1.9.2
-PYLITH_VER=2.0.0
+PYLITH_VER=1.9.0
 endif
 
 
@@ -712,10 +712,11 @@ endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
-			--with-clanguage=C \
+			--with-clanguage=C++ \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
 			--with-shared-libraries=1 \
+			--with-sieve=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
