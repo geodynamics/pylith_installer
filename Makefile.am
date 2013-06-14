@@ -30,7 +30,7 @@ PYTHON_VER=2.7.3
 MPICH_VER=3.0.4
 OPENMPI_VER=1.4.5
 
-CPPUNIT_VER=1.12.1
+CPPUNIT_VER=1.12.1-patched
 
 PCRE_VER=8.12
 SWIG_VER=2.0.2
@@ -59,8 +59,8 @@ if USE_PYLITH_SVN
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
-SPATIALDATA_VER=1.9.1
-PYLITH_VER=1.8.0
+SPATIALDATA_VER=1.9.2
+PYLITH_VER=2.0.0
 endif
 
 
@@ -704,20 +704,18 @@ else
 petsc_build_options = 
 endif
 if USE_PYLITH_SVN
-	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-dev
+	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
 else
-	$(FETCH_SCRIPT) "$(downloader)" petsc-dev-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
-	$(TAR) -zxf petsc-dev-pylith-$(PYLITH_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(TAR) -zxf petsc-pylith-$(PYLITH_VER).tgz
 endif
-	cd petsc-dev && \
+	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
-			--with-clanguage=C++ \
+			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
 			--with-shared-libraries=1 \
-			--with-sieve=1 \
-			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \

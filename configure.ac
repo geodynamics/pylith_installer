@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010 University of California, Davis
+# Copyright (c) 2010-2013 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.8.0-2], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.0.0-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -293,7 +293,7 @@ AC_ARG_WITH([pylith-svn],
 	[pylith_svn=$withval],
 	[pylith_svn=no])
 if test "$pylith_svn" = yes ; then pylith_svn="trunk"; fi
-if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.8-stable"; fi
+if test "$pylith_svn" = stable ; then pylith_svn="branches/v2.0-stable"; fi
 AC_SUBST(pylith_svn)
 AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
 
@@ -611,10 +611,9 @@ if test "$install_petsc" = yes ; then
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
-  CIT_PATH_PETSC([3.3.0])
+  CIT_PATH_PETSC([3.4.0])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
-  CIT_CHECK_LIB_PETSC_SIEVE
 fi
 
 # nemesis
