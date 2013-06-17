@@ -611,7 +611,7 @@ if test "$install_petsc" = yes ; then
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
-  CIT_PATH_PETSC([3.4.0])
+  CIT_PATH_PETSC([3.4.1])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
 fi
