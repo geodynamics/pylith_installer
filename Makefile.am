@@ -55,7 +55,7 @@ NEMESIS_VER=1.0.2
 
 CMAKE_VER=2.8.8
 
-if USE_PYLITH_SVN
+if USE_PYLITH_GIT
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 else
@@ -617,10 +617,10 @@ spatialdata_options =
 if WITH_TESTING
 spatialdata_options += --enable-testing
 endif
-if USE_PYLITH_SVN
+if USE_PYLITH_GIT
 spatialdata_options += --enable-swig
-	$(SVN) co http://geodynamics.org/svn/cig/cs/spatialdata/trunk spatialdata-$(SPATIALDATA_VER)
-	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
+	$(GIT) clone --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
+	cd spatialdata-$(SPATIALDATA_VER) && $(GIT) submodule init && $(GIT) submodule update && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
@@ -703,7 +703,7 @@ petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH)
 else
 petsc_build_options = 
 endif
-if USE_PYLITH_SVN
+if USE_PYLITH_GIT
 	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
 else
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
@@ -750,10 +750,10 @@ endif
 if WITH_CUDA
 pylith_options += --enable-cuda
 endif
-if USE_PYLITH_SVN
+if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(SVN) co http://geodynamics.org/svn/cig/short/3D/PyLith/$(pylith_svn) pylith-$(PYLITH_VER)
-	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
+	$(GIT) clone --depth 1 https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
+	cd pylith-$(PYLITH_VER) && $(GIT) submodule init && $(GIT) submodule update && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
