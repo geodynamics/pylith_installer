@@ -286,16 +286,16 @@ AC_ARG_WITH([petsc-options],
 	[petsc_options="--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1"])
 AC_SUBST(petsc_options)
 
-# pylith svn
-AC_ARG_WITH([pylith-svn],
-    [AC_HELP_STRING([--with-pylith-svn],
-        [use PyLith from SVN repository (trunk, stable, BRANCH) @<:@default=no@:>@])],
-	[pylith_svn=$withval],
-	[pylith_svn=no])
-if test "$pylith_svn" = yes ; then pylith_svn="branches/v1.7-trunk"; fi
-if test "$pylith_svn" = stable ; then pylith_svn="branches/v1.9-stable"; fi
-AC_SUBST(pylith_svn)
-AM_CONDITIONAL([USE_PYLITH_SVN], [test "$pylith_svn" != no])
+# pylith git
+AC_ARG_WITH([pylith-git],
+    [AC_HELP_STRING([--with-pylith-git],
+        [use PyLith from GitHub repository (master, maint, BRANCH) @<:@default=no@:>@])],
+	[pylith_git=$withval],
+	[pylith_git=no])
+if test "$pylith_git" = yes ; then pylith_git="master"; fi
+if test "$pylith_git" = maint ; then pylith_git="maint"; fi
+AC_SUBST(pylith_git)
+AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -347,14 +347,9 @@ else
 fi
 AC_SUBST(downloader)
 
-# svn/autoreconf
+# autoreconf/git
 petsc_git=no
-if test "$pylith_svn" != no ; then
-  # SVN
-  AC_PATH_PROG(SVN, svn)
-  if test -z "$SVN" ; then
-    AC_MSG_FAILURE([cannot find 'svn' program.])
-  fi
+if test "$pylith_git" != no ; then
   # autoreconf 
   AC_PATH_PROG(AUTORECONF, autoreconf)
   if test -z "$AUTORECONF" ; then
@@ -374,7 +369,7 @@ if test "$pylith_svn" != no ; then
   fi
   petsc_git=yes
 fi
-AM_CONDITIONAL([WITH_SWIG], [test "$pylith_svn" != no])
+AM_CONDITIONAL([WITH_SWIG], [test "$pylith_git" != no])
 AC_SUBST(petsc_git)
 
 # ----------------------------------------------------------------------
@@ -500,7 +495,7 @@ fi
 if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
-  if test "$pylith_svn" != no ; then
+  if test "$pylith_git" != no ; then
     AC_PROG_SWIG(1.3.33)
   fi
 fi
@@ -795,10 +790,10 @@ echo "  git: $install_git"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
 echo ""
-if test "$pylith_svn" != no ; then
+if test "$pylith_git" != no ; then
   echo "  Installing development version of PETSc from repository."
-  echo "  Installing spatialdata from CIG SVN repository."
-  echo "  Building PyLith from SVN repository '$pylith_svn'."
+  echo "  Installing spatialdata from CIG GitHub repository."
+  echo "  Building PyLith branch '$pylith_git'."
 else
   echo "  Building PETSc, spatialdata, and PyLith from source tarballs."
 fi
