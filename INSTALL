@@ -21,10 +21,9 @@ addition to PyLith itself.
 The installer will download the source code for PyLith and all of the
 dependencies during the install process, so you do not need to do this
 yourself. Additionally, the installer provides the option of checking
-out the PyLith and PETSc source code from the Subversion and Mercurial
-repositories (requires subversion and mercurial be installed); only
-use this option if you need the bleeding edge versions and are willing
-to rebuild frequently.
+out the PyLith and PETSc source code from the Git repositories
+(requires git be installed); only use this option if you need the
+bleeding edge versions and are willing to rebuild frequently.
 
 
 ======================================================================
