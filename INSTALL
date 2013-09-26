@@ -21,10 +21,9 @@ addition to PyLith itself.
 The installer will download the source code for PyLith and all of the
 dependencies during the install process, so you do not need to do this
 yourself. Additionally, the installer provides the option of checking
-out the PyLith and PETSc source code from the Subversion and Mercurial
-repositories (requires subversion and mercurial be installed); only
-use this option if you need the bleeding edge versions and are willing
-to rebuild frequently.
+out the PyLith and PETSc source code from the Git repositories
+(requires git be installed); only use this option if you need the
+bleeding edge versions and are willing to rebuild frequently.
 
 
 ======================================================================
@@ -123,14 +122,14 @@ STEP 1 - Download and unpack the installer
 
 Download the installer.
 
-  http://www.geodynamics.org/cig/software/pylith/pylith-installer-1.9.0-0.tgz
+  http://www.geodynamics.org/cig/software/pylith/pylith-installer-1.9.0-1.tgz
 
 Untar the source code for the installer:
 
   mkdir -p $HOME/src/pylith
   cd $HOME/src/pylith
-  mv $HOME/Downloads/pylith-installer-1.9.0-0.tgz
-  tar -zxf pylith-installer-1.9.0-0.tgz
+  mv $HOME/Downloads/pylith-installer-1.9.0-1.tgz
+  tar -zxf pylith-installer-1.9.0-1.tgz
 
 
 ----------------------------------------------------------------------
@@ -153,7 +152,7 @@ need to be built.
 
 Run configure with --help to see all of the command line arguments.
 
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure --help
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure --help
 
 -------
 DEFAULT
@@ -165,7 +164,7 @@ DEFAULT
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -179,7 +178,7 @@ WITHOUT FORTRAN
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --with-fortran=no \
     --with-make-threads=2 \
     --petsc_options="--download-chaco=1 --download-c-blas-lapack=1" \
@@ -203,7 +202,7 @@ DESKTOP-LINUX-MINIMAL
     * cppunit
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --disable-cppunit \
     --disable-numpy \
     --disable-proj4 \
@@ -223,7 +222,7 @@ DESKTOP-LINUX-OPENMPI
     * C, C++, Fortran compilers
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --enable-python \
     --enable-mpi=openmpi \
     --with-make-threads=2 \
@@ -248,7 +247,7 @@ DESKTOP-DARWIN
     * C/C++ compilers
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --enable-gcc=fortran \
     --enable-python \
     --enable-mpi=openmpi \
@@ -268,7 +267,7 @@ CLUSTER
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
     --enable-python \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -282,9 +281,9 @@ DEVELOPER
   In this case we checkout the PETSc, spatialdata, and PyLith source
   code from the corresponding repositories using the current PyLith
   stable tree. To use another the development trunk, use
-  --with-pylith-svn=trunk; to specify another branch or tree use
-  --with-pylith-svn=BRANCH where BRANCH is the name of the branch
-  (e.g., branches/v1.7-stable) in the SVN repository.
+  --with-pylith-git=master; to specify another branch or tree use
+  --with-pylith-git=BRANCH where BRANCH is the name of the branch
+  (e.g., v1.9-stable) in the GitHub repository.
 
   We assume you have
     * C, C++, Fortran compilers
@@ -294,8 +293,8 @@ DEVELOPER
     * Mercurial
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-1.9.0-0/configure \
-    --with-pylith-svn=stable \
+  $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
+    --with-pylith-git=master \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
