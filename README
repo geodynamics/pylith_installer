@@ -1,4 +1,4 @@
-We are pleased to announce release of PyLith Installer version 1.9.0-0.
+We are pleased to announce release of PyLith Installer version 1.9.0-1.
 
 Please submit bug reports via the World Wide Web at:
     http://geodynamics.org/roundup    
@@ -14,7 +14,7 @@ from source on Unix flavored operating systems.
 
 You can download the source code from
 
-    http://geodynamics.org/cig/software/packages/short/pylith
+    http://geodynamics.org/cig/software/pylith
 
 Instructions are in the bundled INSTALL file, as well as in the PyLith
 User Manual on the web page listed above.
