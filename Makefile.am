@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2012 University of California, Davis
+# Copyright (c) 2010-2013 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -50,19 +50,23 @@ NETCDFPY_VER=1.0
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
-PYTHIA_VER=0.8.1.15
-NEMESIS_VER=1.0.2
+PYTHIA_VER=0.8.1.16
+NEMESIS_VER=1.1.0
 
 CMAKE_VER=2.8.8
 
 if USE_PYLITH_GIT
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
+if PETSC_TARBALL
+PETSC_VER=1.9.0
+else
+PETSC_VER=dev
+endif
 else
 SPATIALDATA_VER=1.9.2
 PYLITH_VER=1.9.0
 endif
-
 
 # ----------------------------------------------------------------------
 # Files
@@ -619,8 +623,8 @@ spatialdata_options += --enable-testing
 endif
 if USE_PYLITH_GIT
 spatialdata_options += --enable-swig
-	$(GIT) clone --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
-	cd spatialdata-$(SPATIALDATA_VER) && $(GIT) submodule init && $(GIT) submodule update && $(AUTORECONF) -if
+	$(GIT) clone --recursive --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
+	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
@@ -703,11 +707,11 @@ petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH)
 else
 petsc_build_options = 
 endif
-if USE_PYLITH_GIT
-	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
+if PETSC_TARBALL
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
-	$(TAR) -zxf petsc-pylith-$(PYLITH_VER).tgz
+	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
@@ -752,15 +756,15 @@ pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(GIT) clone --depth 1 https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
-	cd pylith-$(PYLITH_VER) && $(GIT) submodule init && $(GIT) submodule update && $(AUTORECONF) -if
+	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(pylith_git)
+	cd pylith-$(pylith_git) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
 	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
-		../pylith-$(PYLITH_VER)/configure \
+		../pylith-$(pylith_git)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags) $(env_mpicompilers) \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \

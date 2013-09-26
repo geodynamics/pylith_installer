@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [1.9.0-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [1.9.0-1], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -293,9 +293,16 @@ AC_ARG_WITH([pylith-git],
 	[pylith_git=$withval],
 	[pylith_git=no])
 if test "$pylith_git" = yes ; then pylith_git="master"; fi
-if test "$pylith_git" = maint ; then pylith_git="maint"; fi
 AC_SUBST(pylith_git)
 AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
+# FORCE USE OF PETSC TARBALL
+AC_ARG_WITH([petsc-tarball],
+    [AC_HELP_STRING([--with-petsc-tarball],
+        [Force use of PETSc tarball even if using PyLith from repository @<:@default=no@:>@])],
+	[force_petsc_tarball=$withval],
+	[force_petsc_tarball=no])
+AC_SUBST(force_petsc_tarball)
+AM_CONDITIONAL([PETSC_TARBALL], [test "$pylith_git" = no || test "$force_petsc_tarball" = yes])
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -791,8 +798,12 @@ echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
 echo ""
 if test "$pylith_git" != no ; then
-  echo "  Installing development version of PETSc from repository."
-  echo "  Installing spatialdata from CIG GitHub repository."
+  if test "$force_petsc_tarball" == yes ; then
+    echo "  Installing PETSc from tarball."
+  else
+    echo "  Installing PETSc from Bitbucket repository."
+  fi
+  echo "  Installing spatialdata and PyLith from CIG GitHub repository."
   echo "  Building PyLith branch '$pylith_git'."
 else
   echo "  Building PETSc, spatialdata, and PyLith from source tarballs."
