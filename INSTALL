@@ -282,9 +282,9 @@ DEVELOPER
   In this case we checkout the PETSc, spatialdata, and PyLith source
   code from the corresponding repositories using the current PyLith
   stable tree. To use another the development trunk, use
-  --with-pylith-svn=trunk; to specify another branch or tree use
-  --with-pylith-svn=BRANCH where BRANCH is the name of the branch
-  (e.g., branches/v1.7-stable) in the SVN repository.
+  --with-pylith-git=master; to specify another branch or tree use
+  --with-pylith-git=BRANCH where BRANCH is the name of the branch
+  (e.g., v1.9-stable) in the GitHub repository.
 
   We assume you have
     * C, C++, Fortran compilers
@@ -295,7 +295,7 @@ DEVELOPER
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-1.9.0-1/configure \
-    --with-pylith-svn=stable \
+    --with-pylith-git=master \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
