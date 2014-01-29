@@ -20,12 +20,12 @@ ACLOCAL_AMFLAGS = -I m4
 # ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
-GCC_VER=4.6.3
-MPC_VER=0.8.2
+GCC_VER=4.7.3
+MPC_VER=1.0.2
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
-PYTHON_VER=2.7.3
+PYTHON_VER=2.7.6
 
 MPICH_VER=3.0.4
 OPENMPI_VER=1.4.5
@@ -33,16 +33,16 @@ OPENMPI_VER=1.4.5
 CPPUNIT_VER=1.12.1-patched
 
 PCRE_VER=8.12
-SWIG_VER=2.0.2
+SWIG_VER=2.0.6
 
 GIT_VER=1.8.2.1
 
-NUMPY_VER=1.6.1-patched
+NUMPY_VER=1.7.2
 
 PROJ4_VER=4.8.0
 
-HDF5_VER=1.8.8
-H5PY_VER=2.0.1
+HDF5_VER=1.8.11
+H5PY_VER=2.2.1
 
 NETCDF_VER=4.1.3
 NETCDFPY_VER=1.0
@@ -59,13 +59,13 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=dev
 PYLITH_VER=dev
 if PETSC_TARBALL
-PETSC_VER=1.9.0
+PETSC_VER=2.0.0
 else
 PETSC_VER=dev
 endif
 else
-SPATIALDATA_VER=1.9.2
-PYLITH_VER=1.9.0
+SPATIALDATA_VER=1.9.3
+PYLITH_VER=2.0.0
 endif
 
 # ----------------------------------------------------------------------
