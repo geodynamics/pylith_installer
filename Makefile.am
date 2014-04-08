@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2013 University of California, Davis
+# Copyright (c) 2010-2014 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -56,16 +56,15 @@ NEMESIS_VER=1.1.0
 CMAKE_VER=2.8.8
 
 if USE_PYLITH_GIT
-SPATIALDATA_VER=dev
-PYLITH_VER=dev
+SPATIALDATA_VER=master
+PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
 PETSC_VER=2.0.0
-else
-PETSC_VER=dev
 endif
 else
 SPATIALDATA_VER=1.9.3
 PYLITH_VER=2.0.0
+PETSC_VER=2.0.0
 endif
 
 # ----------------------------------------------------------------------
@@ -575,7 +574,7 @@ installed_fiat:
 # ----------------------------------------------------------------------
 pythia: installed_python
 if INSTALL_PYTHIA
-	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
 	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
 
@@ -593,7 +592,7 @@ installed_pythia:
 # ----------------------------------------------------------------------
 nemesis: installed_mpi installed_python installed_pythia
 if INSTALL_NEMESIS
-	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz http://www.geodynamics.org/cig/software/pythia
+	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz https://github.com/geodynamics/nemesis/releases/download/v$(NEMESIS_VER)
 	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
@@ -626,8 +625,8 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --recursive --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://www.geodynamics.org/cig/software/pylith
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tar.gz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
+	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tar.gz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
@@ -708,7 +707,7 @@ else
 petsc_build_options = 
 endif
 if PETSC_TARBALL
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)rc1
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
 	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
@@ -756,15 +755,15 @@ pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(pylith_git)
-	cd pylith-$(pylith_git) && $(AUTORECONF) -if
+	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
+	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz http://www.geodynamics.org/cig/software/pylith
+	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)rc1
 	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
-		../pylith-$(pylith_git)/configure \
+		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags) $(env_mpicompilers) \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
