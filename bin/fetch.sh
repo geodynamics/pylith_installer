@@ -29,7 +29,7 @@ if [ ! -f $file ]; then
     exit -1
   else
     echo "Downloading $file from $url."
-    $fetch $url/$file
+    $fetch $file $url/$file
   fi
 else
     echo "Found local copy of $file."

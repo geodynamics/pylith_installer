@@ -340,14 +340,14 @@ if test "$with_fetch" = "wget" ; then
   if test -z "$WGET" ; then
     AC_MSG_FAILURE([cannot find 'wget' program.])
   else
-    downloader="$WGET -nd -r"
+    downloader="$WGET -nd -r -O"
   fi
 elif test "$with_fetch" = "curl" ; then
   AC_PATH_PROG(CURL, curl)
   if test -z "$CURL" ; then
     AC_MSG_FAILURE([cannot find 'curl' program.])
   else
-    downloader="$CURL -O"
+    downloader="$CURL -L -O -o"
   fi
 else
   AC_MSG_FAILURE([Error in configure logic for downloader.])
