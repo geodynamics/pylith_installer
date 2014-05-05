@@ -59,12 +59,12 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.0.0
+PETSC_VER=1.9.0
 endif
 else
-SPATIALDATA_VER=1.9.3
-PYLITH_VER=2.0.0
-PETSC_VER=2.0.0
+SPATIALDATA_VER=1.9.2
+PYLITH_VER=1.9.0
+PETSC_VER=1.9.0
 endif
 
 # ----------------------------------------------------------------------
@@ -625,8 +625,8 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --recursive --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tar.gz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz http://geodynamics.org/archive/software/pylith
+	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
@@ -707,7 +707,7 @@ else
 petsc_build_options = 
 endif
 if PETSC_TARBALL
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)rc1
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz http://geodynamics.org/cig/software/pylith
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
 	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
@@ -758,7 +758,7 @@ pylith_options += --enable-swig
 	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)rc1
+	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
 	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
 endif
 	$(MKDIR_P) pylith-build
