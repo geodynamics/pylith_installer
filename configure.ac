@@ -283,7 +283,7 @@ AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
         [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-fblaslapack=1"])
+	[petsc_options="--download-chaco=1 --download-ml=1  --download-f-blas-lapack=1"])
 AC_SUBST(petsc_options)
 
 # pylith git

@@ -715,10 +715,12 @@ endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
-			--with-clanguage=C \
+			--with-clanguage=C++ \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
 			--with-shared-libraries=1 \
+			--with-sieve=1 \
+			--download-boost=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
