@@ -30,7 +30,7 @@ PYTHON_VER=2.7.6
 MPICH_VER=3.0.4
 OPENMPI_VER=1.4.5
 
-CPPUNIT_VER=1.12.1-patched
+CPPUNIT_VER=1.13.2
 
 PCRE_VER=8.12
 SWIG_VER=2.0.6
@@ -59,12 +59,12 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.0.0
+PETSC_VER=2.0.3
 endif
 else
-SPATIALDATA_VER=1.9.3
-PYLITH_VER=2.0.0
-PETSC_VER=2.0.0
+SPATIALDATA_VER=1.9.4
+PYLITH_VER=2.0.3
+PETSC_VER=2.0.3
 endif
 
 # ----------------------------------------------------------------------
@@ -625,8 +625,8 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --recursive --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tar.gz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
+	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \

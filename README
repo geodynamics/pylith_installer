@@ -1,7 +1,7 @@
-We are pleased to announce release of PyLith Installer version 2.0.0-0.
+We are pleased to announce release of PyLith Installer version 2.0.3-0.
 
 Please submit bug reports via the World Wide Web at:
-    http://geodynamics.org/roundup    
+    https://github.com/geodynamics/pylith_installer/issues
 
 Please send all questions by electronic mail to:
     cig-short@geodynamics.org
