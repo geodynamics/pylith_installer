@@ -414,3 +414,8 @@ should be set via something like:
 
   pic_flag=" -fPIC"
   wl="-Wl,"
+
+In the netcdf build directory do "make clean" and then "make" to
+regenerate the object files with these flags. After the build
+succeeds, run "touch installed_netcdf" in the top-level directory.
+
