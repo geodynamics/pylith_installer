@@ -18,6 +18,11 @@
 ACLOCAL_AMFLAGS = -I m4
 
 # ----------------------------------------------------------------------
+# Packages URL
+# ----------------------------------------------------------------------
+DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
+
+# ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
 GCC_VER=4.7.3
@@ -27,10 +32,10 @@ MPFR_VER=2.4.2
 
 PYTHON_VER=2.7.6
 
-MPICH_VER=3.0.4
-OPENMPI_VER=1.4.5
+MPICH_VER=3.1.3
+OPENMPI_VER=1.8.4
 
-CPPUNIT_VER=1.12.1-patched
+CPPUNIT_VER=1.13.2
 
 PCRE_VER=8.12
 SWIG_VER=2.0.6
@@ -45,7 +50,7 @@ HDF5_VER=1.8.11
 H5PY_VER=2.2.1
 
 NETCDF_VER=4.1.3
-NETCDFPY_VER=1.0
+NETCDFPY_VER=1.0.7
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -183,10 +188,10 @@ finished_mkdest:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
-	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
 	$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
 	cd gcc-$(GCC_VER) ; \
 		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
@@ -223,7 +228,7 @@ installed_compilers:
 # ----------------------------------------------------------------------
 python: installed_compilers
 if INSTALL_PYTHON
-	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz $(DEPS_URL)
 	$(TAR) -zxf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
@@ -267,7 +272,7 @@ installed_mpi:
 # openmpi
 # ----------------------------------------------------------------------
 openmpi: installed_compilers
-	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf openmpi-$(OPENMPI_VER).tar.gz
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
@@ -288,7 +293,7 @@ else
 mpich_options = --disable-fc
 endif
 mpich: installed_compilers
-	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf mpich-$(MPICH_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
@@ -310,7 +315,7 @@ mpich: installed_compilers
 # ----------------------------------------------------------------------
 cppunit: installed_compilers
 if INSTALL_CPPUNIT
-	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
@@ -334,7 +339,7 @@ installed_cppunit:
 # ----------------------------------------------------------------------
 pcre: installed_compilers
 if INSTALL_PCRE
-	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
@@ -357,7 +362,7 @@ installed_pcre:
 # ----------------------------------------------------------------------
 swig: installed_pcre installed_compilers installed_python
 if INSTALL_SWIG
-	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
@@ -384,7 +389,7 @@ installed_swig:
 # ----------------------------------------------------------------------
 numpy: installed_python
 if INSTALL_NUMPY
-	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
 	cd numpy-$(NUMPY_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix) && \
@@ -404,8 +409,8 @@ installed_numpy:
 # ----------------------------------------------------------------------
 proj4: installed_compilers
 if INSTALL_PROJ4
-	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz http://geodynamics.org/~buildbot/deps
-	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip $(DEPS_URL)
 	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
 	$(MKDIR_P) proj4-build/nad
 	cd proj4-build/nad && \
@@ -434,7 +439,7 @@ if WITH_FORTRAN
 hdf5_options = --enable-fortran
 endif
 if INSTALL_HDF5
-	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
@@ -465,7 +470,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_numpy
 if INSTALL_H5PY
-	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
 		CC=mpicc python setup.py build --hdf5=$(prefix) && \
@@ -495,7 +500,7 @@ netcdf_4_options = --enable-netcdf-4
 else
 netcdf_4_options = --disable-netcdf-4
 endif
-	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
@@ -527,8 +532,8 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_numpy
 if INSTALL_NETCDFPY
-	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER)fix1.tar.gz http://geodynamics.org/~buildbot/deps
-	$(TAR) -zxf netCDF4-$(NETCDFPY_VER)fix1.tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
 	echo -e "[options]\nuse_ncconfig=True" > netCDF4-$(NETCDFPY_VER)/setup.cfg
 	cd netCDF4-$(NETCDFPY_VER) && \
 		CC=mpicc $(env_flags) python setup.py build && \
@@ -553,10 +558,10 @@ installed_netcdfpy:
 # ----------------------------------------------------------------------
 fiat: installed_numpy
 if INSTALL_FIAT
-	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
-	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
 	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
@@ -653,7 +658,7 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 git: installed_python
 if INSTALL_GIT
-	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf git-$(GIT_VER).tar.gz
 	cd git-$(GIT_VER) && \
 		make prefix=$(prefix) NO_EXPAT=1 NO_TCLTK=1 NO_GETTEXT=1 all install && \
@@ -673,7 +678,7 @@ installed_git:
 # ----------------------------------------------------------------------
 cmake:
 if INSTALL_CMAKE
-	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz http://geodynamics.org/~buildbot/deps
+	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
 		./bootstrap  --prefix=$(prefix) && make && make install && \
@@ -710,7 +715,7 @@ if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
-	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
+	git clone -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
@@ -737,7 +742,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy 
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit
@@ -753,7 +758,7 @@ pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
+	$(GIT) clone --recursive -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)

@@ -744,11 +744,19 @@ else
   echo "export PATH=$prefix/bin:\${PATH}" >> setup.sh
 fi
 
-if test "X${LD_LIBRARY_PATH}" = X ; then
-  echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64" >> setup.sh
-else
-  echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
-fi
+AC_CANONICAL_HOST
+case $host_os in
+  darwin*)
+    echo "export DYLD_LIBRARY_PATH=$prefix/lib" >> setup.sh
+    ;;
+  *)
+    if test "X${LD_LIBRARY_PATH}" = X ; then
+      echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64" >> setup.sh
+    else
+      echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
+    fi
+    ;;
+esac
 
 if test "X${PYTHONPATH}" = X ; then
   echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages" >> setup.sh
@@ -786,7 +794,7 @@ echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
-echo "  netNDF4 (python): $install_netcdfpy"
+echo "  netCDF4 (python): $install_netcdfpy"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
