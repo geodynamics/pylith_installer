@@ -715,7 +715,7 @@ if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
-	git clone --depth 1 -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
+	git clone -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
@@ -758,7 +758,7 @@ pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(GIT) clone --recursive --depth 1 -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
+	$(GIT) clone --recursive -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
