@@ -25,6 +25,8 @@ out the PyLith and PETSc source code from the Git repositories
 (requires git be installed); only use this option if you need the
 bleeding edge versions and are willing to rebuild frequently.
 
+If you encounter trouble during the installation, see the
+TROUBLESHOOTING section at the end of this file.
 
 ======================================================================
 System Requirements
@@ -62,7 +64,13 @@ IMPORTANT: We *STRONGLY* recommend that you run the configure script
   in a different directory from the PyLith Installer source code. We
   recommend creating a build directory (for example,
   $HOME/build/pylith) where you build any software with a subdirectory
-  for PyLith.
+  for PyLith. 
+
+IMPORTANT: We also *STRONGLY* recommend that you install PyLith and
+  its dependencies to its own directory (for example
+  --prefix=$HOME/pylith). This makes it easier to start over should
+  you encounter an error, in addition to managing multiple versions or
+  different builds.
 
 WARNING: If you need to reconfigure the installer, then you should
   remove all of your build and install files *BEFORE* running
@@ -378,6 +386,27 @@ automatically every time you open a shell.
 ======================================================================
 TROUBLESHOOTING
 ======================================================================
+
+----------------------------------------------------------------------
+Hints
+----------------------------------------------------------------------
+
+1. Did you forget STEP 3?
+
+   If you added the PyLith environment variables to your shell setup
+   (.bashrc), check to make sure the PyLith directory is listed before
+   other directories in your PATH, LD_LIBRARY_PATH (for Linux),
+   DYLD_LIBRARY_PATH (for Darwin), and PYTHONPATH.
+
+2. If you run into an error and change something (compiler,
+   environment variable, etc), you should reconfigure and rebuild.
+
+  a. Remove the build and install directories ($HOME/build/pylith and
+    $HOME/pylith).
+
+    rm -r $HOME/build/pylith and $HOME/pylith
+
+  b. Try again starting at STEP 2.
 
 ----------------------------------------------------------------------
 numpy fails to build due to a blas/lapack problem
