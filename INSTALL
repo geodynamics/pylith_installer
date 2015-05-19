@@ -419,3 +419,18 @@ In the netcdf build directory do "make clean" and then "make" to
 regenerate the object files with these flags. After the build
 succeeds, run "touch installed_netcdf" in the top-level directory.
 
+----------------------------------------------------------------------
+The clang compiler detects error building ncgen3
+----------------------------------------------------------------------
+
+From http://www.unidata.ucar.edu/software/netcdf/docs/known_problems.html#clang-ncgen3
+
+The clang compiler (default on OSX 10.9 Mavericks) detects error
+building ncgen3
+
+Building the netCDF C library with the clang C compiler, the default
+/usr/bin/cc on OSX 10.9 Mavericks, detects an error in compiling
+ncgen3/load.c. A fix is to insert the line
+
+#include <config.h>
+above the "#include <stdlib.h>" statement near the beginning of ncgen3/genlib.h.
