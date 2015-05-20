@@ -425,12 +425,69 @@ The clang compiler detects error building ncgen3
 
 From http://www.unidata.ucar.edu/software/netcdf/docs/known_problems.html#clang-ncgen3
 
-The clang compiler (default on OSX 10.9 Mavericks) detects error
+The clang compiler (default on OSX 10.9 Mavericks) detects an error
 building ncgen3
 
 Building the netCDF C library with the clang C compiler, the default
 /usr/bin/cc on OSX 10.9 Mavericks, detects an error in compiling
-ncgen3/load.c. A fix is to insert the line
+ncgen3/load.c:
+
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: expected parameter declarator
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+              ^
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:62: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                             ^
+/usr/include/secure/_common.h:30:32: note: expanded from macro '_USE_FORTIFY_LEVEL'
+#    define _USE_FORTIFY_LEVEL 2
+                               ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: expected ')'
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:62: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                             ^
+/usr/include/secure/_common.h:30:32: note: expanded from macro '_USE_FORTIFY_LEVEL'
+#    define _USE_FORTIFY_LEVEL 2
+                               ^
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: note: to match this '('
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:53: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                    ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: warning: type specifier missing, defaults to 'int' [-Wimplicit-int]
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+              ^
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:31: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                              ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: conflicting types for '__builtin___strlcat_chk'
+/usr/include/secure/_string.h:111:3: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+  ^
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: note: '__builtin___strlcat_chk' is a builtin with type 'unsigned long (char *, const char *, unsigned
+      long, unsigned long)'
+/usr/include/secure/_string.h:111:3: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+  ^
+1 warning and 3 errors generated.
+make: *** [load.o] Error 1
+
+
+A fix is to insert the line
 
 #include <config.h>
 above the "#include <stdlib.h>" statement near the beginning of ncgen3/genlib.h.
