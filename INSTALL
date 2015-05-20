@@ -234,17 +234,28 @@ DESKTOP-DARWIN
 
   Apple does not include a Fortran compiler with XCode. Although it is
   possible to sometimes install a binary version of the compiler or
-  use a Darwin package manager, such as Fink or MacPorts, these have
+  use a Darwin package manager, such as Fink or MacPorts, these can have
   their own sets of problems (e.g., incompatibilities, additional
-  dependencies, etc). A more robust solution is to build the gfortran
-  compiler. We also build openmpi in this case because we want a
-  Fortran compiler setup for MPI. Installing MPI, in turn, forces
-  installtion of Python to insure compatibility in link flags between
-  MPI and Python. Finally, we use curl to download files because it is
+  dependencies, etc).
+
+  Prior to OS X 10.10 (Yosemite) a more robust solution is to build
+  the gfortran compiler.
+
+  For OS X 10.10 (Yosemite), gcc may not be able to build Python due
+  to incompatiblities between gcc and clang in the system header
+  files. In this case, it is best to use clang and build PyLith with
+  Fortran support.
+
+  We also build openmpi in this case because we want a Fortran
+  compiler setup for MPI. Installing MPI, in turn, forces installtion
+  of Python to insure compatibility in link flags between MPI and
+  Python. Finally, we use curl to download files because it is
   included in OS X but wget is not.
   
   We assume you have
     * C/C++ compilers
+
+  With Fortran support:
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-2.0.3-0/configure \
@@ -253,6 +264,16 @@ DESKTOP-DARWIN
     --enable-mpi=openmpi \
     --with-fetch=curl \
     --with-make-threads=2 \
+    --prefix=$HOME/pylith
+
+  Without Fortran support:
+
+  mkdir -p $HOME/build/pylith
+  $HOME/src/pylith/pylith-installer-2.0.3-0/configure \
+    --enable-mpi=openmpi \
+    --with-fetch=curl \
+    --with-make-threads=2 \
+    --with-petsc-options="--download-chaco=1 --download-fblaslapack=1" \
     --prefix=$HOME/pylith
 
 -------
