@@ -242,17 +242,28 @@ DESKTOP-DARWIN
 
   Apple does not include a Fortran compiler with XCode. Although it is
   possible to sometimes install a binary version of the compiler or
-  use a Darwin package manager, such as Fink or MacPorts, these have
+  use a Darwin package manager, such as Fink or MacPorts, these can have
   their own sets of problems (e.g., incompatibilities, additional
-  dependencies, etc). A more robust solution is to build the gfortran
-  compiler. We also build openmpi in this case because we want a
-  Fortran compiler setup for MPI. Installing MPI, in turn, forces
-  installtion of Python to insure compatibility in link flags between
-  MPI and Python. Finally, we use curl to download files because it is
+  dependencies, etc).
+
+  Prior to OS X 10.10 (Yosemite) a more robust solution is to build
+  the gfortran compiler.
+
+  For OS X 10.10 (Yosemite), gcc may not be able to build Python due
+  to incompatiblities between gcc and clang in the system header
+  files. In this case, it is best to use clang and build PyLith with
+  Fortran support.
+
+  We also build openmpi in this case because we want a Fortran
+  compiler setup for MPI. Installing MPI, in turn, forces installtion
+  of Python to insure compatibility in link flags between MPI and
+  Python. Finally, we use curl to download files because it is
   included in OS X but wget is not.
   
   We assume you have
     * C/C++ compilers
+
+  With Fortran support:
 
   mkdir -p $HOME/build/pylith
   $HOME/src/pylith/pylith-installer-2.1.0-0/configure \
@@ -261,6 +272,16 @@ DESKTOP-DARWIN
     --enable-mpi=openmpi \
     --with-fetch=curl \
     --with-make-threads=2 \
+    --prefix=$HOME/pylith
+
+  Without Fortran support:
+
+  mkdir -p $HOME/build/pylith
+  $HOME/src/pylith/pylith-installer-2.0.3-0/configure \
+    --enable-mpi=openmpi \
+    --with-fetch=curl \
+    --with-make-threads=2 \
+    --with-petsc-options="--download-chaco=1 --download-fblaslapack=1" \
     --prefix=$HOME/pylith
 
 -------
@@ -448,3 +469,75 @@ In the netcdf build directory do "make clean" and then "make" to
 regenerate the object files with these flags. After the build
 succeeds, run "touch installed_netcdf" in the top-level directory.
 
+----------------------------------------------------------------------
+The clang compiler detects error building ncgen3
+----------------------------------------------------------------------
+
+From http://www.unidata.ucar.edu/software/netcdf/docs/known_problems.html#clang-ncgen3
+
+The clang compiler (default on OSX 10.9 Mavericks) detects an error
+building ncgen3
+
+Building the netCDF C library with the clang C compiler, the default
+/usr/bin/cc on OSX 10.9 Mavericks, detects an error in compiling
+ncgen3/load.c:
+
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: expected parameter declarator
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+              ^
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:62: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                             ^
+/usr/include/secure/_common.h:30:32: note: expanded from macro '_USE_FORTIFY_LEVEL'
+#    define _USE_FORTIFY_LEVEL 2
+                               ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: expected ')'
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:62: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                             ^
+/usr/include/secure/_common.h:30:32: note: expanded from macro '_USE_FORTIFY_LEVEL'
+#    define _USE_FORTIFY_LEVEL 2
+                               ^
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: note: to match this '('
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:53: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                                                    ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: warning: type specifier missing, defaults to 'int' [-Wimplicit-int]
+extern size_t strlcat(char *dst, const char *src, size_t siz);
+              ^
+/usr/include/secure/_string.h:111:44: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+                                           ^
+/usr/include/secure/_common.h:39:31: note: expanded from macro '__darwin_obsz'
+#define __darwin_obsz(object) __builtin_object_size (object, _USE_FORTIFY_LEVEL > 1 ? 1 : 0)
+                              ^
+In file included from ../../netcdf-4.1.3/ncgen3/load.c:14:
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: error: conflicting types for '__builtin___strlcat_chk'
+/usr/include/secure/_string.h:111:3: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+  ^
+../../netcdf-4.1.3/ncgen3/genlib.h:85:15: note: '__builtin___strlcat_chk' is a builtin with type 'unsigned long (char *, const char *, unsigned
+      long, unsigned long)'
+/usr/include/secure/_string.h:111:3: note: expanded from macro 'strlcat'
+  __builtin___strlcat_chk (dest, src, len, __darwin_obsz (dest))
+  ^
+1 warning and 3 errors generated.
+make: *** [load.o] Error 1
+
+
+A fix is to insert the line
+
+#include <config.h>
+above the "#include <stdlib.h>" statement near the beginning of ncgen3/genlib.h.
