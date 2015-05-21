@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2014 University of California, Davis
+# Copyright (c) 2010-2015 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.0.3-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.1.0-1], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -794,7 +794,7 @@ echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
-echo "  netNDF4 (python): $install_netcdfpy"
+echo "  netCDF4 (python): $install_netcdfpy"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
