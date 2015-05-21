@@ -50,7 +50,7 @@ HDF5_VER=1.8.11
 H5PY_VER=2.2.1
 
 NETCDF_VER=4.1.3-p1
-NETCDFPY_VER=1.0.7
+NETCDFPY_VER=1.1.8
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -58,7 +58,7 @@ FIAT_VER=0.9.9
 PYTHIA_VER=0.8.1.16
 NEMESIS_VER=1.1.0
 
-CMAKE_VER=2.8.8
+CMAKE_VER=2.8.12.2
 
 if USE_PYLITH_GIT
 SPATIALDATA_VER=master
@@ -534,7 +534,6 @@ netcdfpy: installed_netcdf installed_numpy
 if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
-	echo -e "[options]\nuse_ncconfig=True" > netCDF4-$(NETCDFPY_VER)/setup.cfg
 	cd netCDF4-$(NETCDFPY_VER) && \
 		CC=mpicc $(env_flags) python setup.py build && \
 		python setup.py install --prefix=$(prefix) && \
