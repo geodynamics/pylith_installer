@@ -266,7 +266,7 @@ DESKTOP-DARWIN
   With Fortran support:
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-1/configure \
+  $HOME/src/pylith/pylith-installer-2.1.0-2/configure \
     --enable-gcc=fortran \
     --enable-python \
     --enable-mpi=openmpi \
@@ -277,7 +277,7 @@ DESKTOP-DARWIN
   Without Fortran support:
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.0.3-0/configure \
+  $HOME/src/pylith/pylith-installer-2.1.0-2/configure \
     --enable-mpi=openmpi \
     --with-fetch=curl \
     --with-make-threads=2 \
@@ -296,7 +296,7 @@ CLUSTER
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-1/configure \
+  $HOME/src/pylith/pylith-installer-2.1.0-2/configure \
     --enable-python \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -322,7 +322,7 @@ DEVELOPER
     * Mercurial
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-1/configure \
+  $HOME/src/pylith/pylith-installer-2.1.0-2/configure \
     --with-pylith-git=master \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
