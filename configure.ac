@@ -578,7 +578,7 @@ if test "$install_netcdfpy" = yes ; then
        AC_MSG_ERROR([netCDF4 requires HDF5.])
      fi
    else
-     if test "$with_netcdf" = yes && "$with_hdf5" = yes; then
+     if test "$with_netcdf" = yes -a "$with_hdf5" = yes; then
        echo "do nothing" >& /dev/null
      else
        AC_MSG_ERROR([netCDF4 requires NetCDF and HDF5.])
