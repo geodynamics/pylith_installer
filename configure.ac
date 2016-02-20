@@ -383,19 +383,17 @@ AC_SUBST(petsc_git)
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
 
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
 # GCC
 if test "$install_gcc" = yes ; then
-  # Must have a C/C++ compiler to build gcc and run C++ configure checks.
-  AC_PROG_CC
-  AC_PROG_CXX
   if test "$with_fortran" = yes ; then
     FC=gfortran
     AC_SUBST(FC)
   fi
 else
-  # Must have a C++ compiler
-  AC_PROG_CC
-  AC_PROG_CXX
   if test "$with_fortran" = yes ; then
     AC_PROG_FC
   fi
@@ -578,7 +576,7 @@ if test "$install_netcdfpy" = yes ; then
        AC_MSG_ERROR([netCDF4 requires HDF5.])
      fi
    else
-     if test "$with_netcdf" = yes && "$with_hdf5" = yes; then
+     if test "$with_netcdf" = yes && test "$with_hdf5" = yes; then
        echo "do nothing" >& /dev/null
      else
        AC_MSG_ERROR([netCDF4 requires NetCDF and HDF5.])
@@ -613,7 +611,8 @@ if test "$install_petsc" = yes ; then
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
-  CIT_PATH_PETSC([3.4.1])
+  AC_LANG(C)
+  CIT_PATH_PETSC([3.5.3])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
 fi
