@@ -473,7 +473,7 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		CC=mpicc python setup.py build --hdf5=$(prefix) && \
+		CC=mpicc $(env_flags) python setup.py build --hdf5=$(prefix) && \
 		python setup.py install --prefix=$(prefix) && \
 		touch ../installed_h5py
 else
