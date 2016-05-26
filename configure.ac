@@ -168,6 +168,14 @@ AC_ARG_ENABLE([fiat],
 	[install_fiat=yes])
 AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 
+# SETUPTOOLS
+AC_ARG_ENABLE([setuptools],
+    [AC_HELP_STRING([--enable-setuptools],
+        [install setuptools @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
+	[install_setuptools=yes])
+AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
+
 # PCRE
 AC_ARG_ENABLE([pcre],
     [AC_HELP_STRING([--enable-pcre],
@@ -325,6 +333,13 @@ AC_SUBST(make_threads)
 AC_PROG_LIBTOOL
 AC_PROG_MKDIR_P
 AC_PROG_LN_S
+
+# cp
+AC_PATH_PROG(CP, cp)
+if test -z "$CP" ; then
+  AC_MSG_FAILURE([cannot find 'cp' program.])
+  CP=`echo "Error: cp is not installed." ; false`
+fi
 
 # tar
 AC_PATH_PROG(TAR, tar)
