@@ -55,6 +55,8 @@ NETCDFPY_VER=1.1.8
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
 
+SETUPTOOLS_VER=0.6c11
+
 PYTHIA_VER=0.8.1.16
 NEMESIS_VER=1.1.0
 
@@ -576,13 +578,32 @@ installed_fiat:
 
 
 # ----------------------------------------------------------------------
+# setuptools
+# ----------------------------------------------------------------------
+setuptools: 
+if INSTALL_SETUPTOOLS
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxvf setuptools-$(SETUPTOOLS_VER).tar.gz
+	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_setuptools
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_setuptools
+endif
+
+installed_setuptools:
+	$(MAKE) $(AM_MAKEFLAGS) setuptools
+
+
+# ----------------------------------------------------------------------
 # pythia
 # ----------------------------------------------------------------------
-pythia: installed_python
+pythia: installed_python installed_setuptools
 if INSTALL_PYTHIA
 	$(FETCH_SCRIPT) "$(downloader)" setuptools-0.6c11.tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
+	$(CP) -p setuptools-0.6c11.tar.gz pythia-$(PYTHIA_VER)
 	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
 
 else
