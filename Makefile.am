@@ -580,6 +580,7 @@ installed_fiat:
 # ----------------------------------------------------------------------
 pythia: installed_python
 if INSTALL_PYTHIA
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-0.6c11.tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
 	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
@@ -628,7 +629,7 @@ spatialdata_options += --enable-testing
 endif
 if USE_PYLITH_GIT
 spatialdata_options += --enable-swig
-	$(GIT) clone --recursive --depth 1 https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
+	$(GIT) clone --recursive https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
