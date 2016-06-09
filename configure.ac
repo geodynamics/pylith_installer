@@ -33,6 +33,14 @@ AC_ARG_ENABLE([force-install],
 	[if test "$enableval" != no ; then force_install=yes; else force_install=no; fi],
 	[force_install=no])
 
+# AUTOTOOLS
+AC_ARG_ENABLE([autotools],
+    [AC_HELP_STRING([--enable-autotools],
+        [install GNU autotools @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_autotools=yes; else install_autotools=no; fi],
+	[install_autotools=no])
+AM_CONDITIONAL([INSTALL_AUTOTOOLS], [test "$install_autotools" = yes])
+
 # GCC
 AC_ARG_ENABLE([gcc],
     [AC_HELP_STRING([--enable-gcc],
@@ -44,7 +52,6 @@ if test "$gcc_languages" = yes ; then
 fi
 AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
-AM_CONDITIONAL([GCC_FORTRAN_ONLY], [test "$gcc_languages" = fortran])
 
 # PYTHON
 AC_ARG_ENABLE([python],
@@ -371,11 +378,15 @@ AC_SUBST(downloader)
 
 # autoreconf/git
 petsc_git=no
-if test "$pylith_git" != no ; then
-  # autoreconf 
-  AC_PATH_PROG(AUTORECONF, autoreconf)
-  if test -z "$AUTORECONF" ; then
-    AC_MSG_FAILURE([cannot find 'autoreconf' program.])
+if test "$pylith_git" != no; then
+  # autoreconf
+  if test "$enable_autotools" = no; then
+    AC_PATH_PROG(AUTORECONF, autoreconf)
+    if test -z "$AUTORECONF" ; then
+      AC_MSG_FAILURE([cannot find 'autoreconf' program.])
+    fi
+  else
+    AUTORECONF=autoreconf
   fi
   # GIT
   if test "$install_git" = yes; then
@@ -440,7 +451,7 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([2.4])
+  AM_PATH_PYTHON([2.7])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED
@@ -800,6 +811,7 @@ fi
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
+echo "  autotools: $install_autotools"
 echo "  gcc: $install_gcc, languages: $gcc_languages"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
