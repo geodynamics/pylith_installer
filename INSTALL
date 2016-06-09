@@ -1,5 +1,5 @@
-Installation instructions are also available in the PyLith manual
-available on the CIG website
+Installation instructions for binary packages are available in
+the PyLith manual available on the CIG website
 
   http://www.geodynamics.org/cig/software/pylith/
 
@@ -125,6 +125,57 @@ IMPORTANT NOTE
 
 
 ----------------------------------------------------------------------
+DEPENDENCY VERSIONS
+----------------------------------------------------------------------
+
+The installer will build the following versions of the
+packages. Limitations are versions are shown. In some cases we have
+patched the libraries to address portability issues.
+
+m4 1.4.16
+autoconf 2.68
+automake 1.11.1
+libtool 2.4
+
+gcc 4.7.3
+mpc 1.0.2
+gmp 4.3.2
+mpfr 2.4.2
+
+Python 2.7.6 (>= 2.7, < 3.0)
+
+mpich 3.1.3
+openmpi 1.8.4
+
+cppunit 1.13.2
+
+pcre 8.12
+swig 2.0.6
+
+git 1.8.2.1
+
+numpy 1.7.2
+
+proj.4 4.8.0
+
+HDF5 1.8.11p2
+h5py 2.2.1
+
+netCDF 4.1.3-p2 (=4.1.3 for C++ API)
+netCDF4 (Python module) 1.1.8
+
+Scientific Python 2.9.1
+FIAT 0.9.9
+
+setuptools 0.6c11
+
+pythia 0.8.1.16 (=0.8.1.16)
+nemesis 1.1.0
+
+cmake 2.8.12.2 (>= 2.8)
+
+
+----------------------------------------------------------------------
 STEP 1 - Download and unpack the installer
 ----------------------------------------------------------------------
 
@@ -136,7 +187,7 @@ Untar the source code for the installer:
 
   mkdir -p $HOME/src/pylith
   cd $HOME/src/pylith
-  mv $HOME/Downloads/pylith-installer-2.1.0-3.tgz
+  mv $HOME/Downloads/pylith-installer-2.1.0-3.tgz $HOME/src/pylith/
   tar -zxf pylith-installer-2.1.0-3.tgz
 
 
@@ -144,7 +195,7 @@ Untar the source code for the installer:
 STEP 2 - Run configure
 ----------------------------------------------------------------------
 
-Read the previous section "RUNNING THE INSTALLER"!!
+Read the earlier section "RUNNING THE INSTALLER"!!
 
 On multi-core and multi-processor systems (not clusters but systems
 with more than one core and/or processor), the build process can be
@@ -153,7 +204,7 @@ configure argument --with-make-threads=NTHREADS where NTHREADS is the
 number of threads to use (1, 2, 4, 8, etc). The default is to use only
 one thread. In the examples below, we set the number of threads to 2.
 
-The examples below is not an exhaustive list of configure settings,
+The examples below are not an exhaustive list of configure settings,
 rather it is a list of common combinations. You can enable/disable
 building each package to select the proper set of dependencies that
 need to be built. 
@@ -168,7 +219,7 @@ DEFAULT
 
   The default installation assumes you have
     * C, C++, and Fortran compilers
-    * Python 2.6 or later
+    * Python 2.7 or later
     * MPI
 
   mkdir -p $HOME/build/pylith
@@ -182,7 +233,7 @@ WITHOUT FORTRAN
 
   The default installation assumes you have
     * C, C++, and Fortran compilers
-    * Python 2.6 or later
+    * Python 2.7 or later
     * MPI
 
   mkdir -p $HOME/build/pylith
@@ -202,7 +253,7 @@ DESKTOP-LINUX-MINIMAL
 
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.6 or later
+    * Python 2.7 or later
     * MPI
     * NetCDF 3.6.2 or 4.1.1
     * Proj4
@@ -316,7 +367,7 @@ DEVELOPER
 
   We assume you have
     * C, C++, Fortran compilers
-    * Python 2.6 or later
+    * Python 2.7 or later
     * MPI
     * Subversion
     * Mercurial
