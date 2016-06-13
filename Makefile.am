@@ -25,6 +25,11 @@ DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
 # ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
+M4_VER=1.4.16
+AUTOCONF_VER=2.68
+AUTOMAKE_VER=1.11.1
+LIBTOOL_VER=2.4
+
 GCC_VER=4.7.3
 MPC_VER=1.0.2
 GMP_VER=4.3.2
@@ -49,7 +54,7 @@ PROJ4_VER=4.8.0
 HDF5_VER=1.8.11p2
 H5PY_VER=2.2.1
 
-NETCDF_VER=4.1.3-p1
+NETCDF_VER=4.1.3-p2
 NETCDFPY_VER=1.1.8
 
 SCIENTIFICPYTHON_VER=2.9.1
@@ -188,6 +193,48 @@ finished_mkdest:
 	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
 
 # ----------------------------------------------------------------------
+# autotools
+# ----------------------------------------------------------------------
+autotools: finished_mkdest
+if INSTALL_AUTOTOOLS
+	$(FETCH_SCRIPT) "$(downloader)" m4-$(M4_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" autoconf-$(AUTOCONF_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" automake-$(AUTOMAKE_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" libtool-$(LIBTOOL_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf m4-$(M4_VER).tar.gz
+	mkdir -p m4-$(M4_VER)-build
+	cd m4-$(M4_VER)-build && \
+		../m4-$(M4_VER)/configure --prefix=$(prefix) $(env_flags) && \
+		make -j $(MAKE_THREADS) && \
+		make install
+	$(TAR) -zxf autoconf-$(AUTOCONF_VER).tar.gz
+	mkdir -p autoconf-$(AUTOCONF_VER)-build
+	cd autoconf-$(AUTOCONF_VER)-build && \
+		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix) $(env_flags) && \
+		make -j $(MAKE_THREADS) && \
+		make install
+	$(TAR) -zxf automake-$(AUTOMAKE_VER).tar.gz
+	mkdir -p automake-$(AUTOMAKE_VER)-build
+	cd automake-$(AUTOMAKE_VER)-build && \
+		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix) $(env_flags) && \
+		make -j $(MAKE_THREADS) && \
+		make install
+	$(TAR) -zxf libtool-$(LIBTOOL_VER).tar.gz
+	mkdir -p libtool-$(LIBTOOL_VER)-build
+	cd libtool-$(LIBTOOL_VER)-build && \
+		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix)  $(env_flags) && \
+		make -j $(MAKE_THREADS) && \
+		make install && \
+		touch ../installed_autotools
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_autotools
+endif
+
+installed_autotools:
+	$(MAKE) $(AM_MAKEFLAGS) autotools
+
+# ----------------------------------------------------------------------
 # compilers
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
@@ -213,10 +260,6 @@ if INSTALL_GCC
 		make -j $(make_threads) $(env_flags) && \
 		make install && \
 		touch ../installed_compilers
-
-if GCC_FORTRAN_ONLY
-	mv $(prefix)/bin/gcc $(prefix)/bin/gcc-$(GCC_VER)
-endif
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -294,7 +337,7 @@ openmpi: installed_compilers
 if WITH_FORTRAN
 mpich_options = --enable-fc
 else
-mpich_options = --disable-fc
+mpich_options = --disable-fortran
 endif
 mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
@@ -642,7 +685,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit
+spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit installed_autotools
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
@@ -734,6 +777,11 @@ petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH)
 else
 petsc_build_options = 
 endif
+if WITH_FORTRAN
+petsc_options += --with-fc=1
+else
+petsc_options += --with-fc=0
+endif
 if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
@@ -765,7 +813,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy 
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy installed_autotools
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit
