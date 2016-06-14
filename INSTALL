@@ -250,7 +250,7 @@ WITHOUT FORTRAN
 DESKTOP-LINUX-MINIMAL
 ---------------------
 
-  In this case we assume most of the dependencies have been installed
+  In this case we assume several of the dependencies have been installed
   via a package manager, and they meet the dependency requirements
   noted earlier. We do build HDF5 to insure that it is built with the
   MPI used by PETSc and PyLith.
@@ -259,7 +259,6 @@ DESKTOP-LINUX-MINIMAL
     * C, C++, Fortran compilers
     * Python 2.7
     * MPI
-    * NetCDF 3.6.2 or 4.1.1 (development package)
     * Proj4 (development package and datums)
     * Numpy
     * cppunit (development package)
@@ -269,7 +268,6 @@ DESKTOP-LINUX-MINIMAL
     --disable-cppunit \
     --disable-numpy \
     --disable-proj4 \
-    --disable-netcdf \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
