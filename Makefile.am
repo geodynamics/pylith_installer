@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2015 University of California, Davis
+# Copyright (c) 2010-2016 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -71,12 +71,12 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.1.0
+PETSC_VER=2.1.2
 endif
 else
-SPATIALDATA_VER=1.9.5
-PYLITH_VER=2.1.0
-PETSC_VER=2.1.0
+SPATIALDATA_VER=1.9.6
+PYLITH_VER=2.1.2
+PETSC_VER=2.1.2
 endif
 
 # ----------------------------------------------------------------------
