@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2015 University of California, Davis
+# Copyright (c) 2010-2016 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.1.0-3], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.1.2-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign])
@@ -94,6 +94,12 @@ AC_ARG_ENABLE([numpy],
 	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
 	[install_numpy=yes])
 AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
+AC_ARG_WITH([numpy-blaslapack],
+    [AC_HELP_STRING([--with-numpy-blaslapack],
+        [force numpy to build its own BLAS/LAPACK @<:@default=no@:>@])],
+	[if test "$withval" = yes; then with_numpy_blaslapack=yes; else with_numpy_blaslapack=no; fi],
+	[with_numpy_blaslapack=no])
+AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
 
 # PROJ4
 AC_ARG_ENABLE([proj4],
@@ -296,7 +302,7 @@ AM_CONDITIONAL([WITH_CUDA], [test "$with_cuda" = yes])
 # PETSC options
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f-blas-lapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-fblaslapack=1@:>@])],
 	[petsc_options=$withval],
 	[petsc_options="--download-chaco=1 --download-ml=1 --download-fblaslapack=1"])
 AC_SUBST(petsc_options)
@@ -811,10 +817,12 @@ fi
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
-echo "  autotools: $install_autotools"
 echo "  gcc: $install_gcc, languages: $gcc_languages"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
+echo "  autotools: $install_autotools"
+echo "  setuptools: $install_setuptools"
+echo "  lapack/blas: $install_lapack"
 echo "  cppunit: $install_cppunit"
 echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
@@ -823,7 +831,6 @@ echo "  netcdf: $install_netcdf"
 echo "  netCDF4 (python): $install_netcdfpy"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
-echo "  setuptools: $install_setuptools"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy"
 echo "  fiat: $install_fiat"

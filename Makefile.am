@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2015 University of California, Davis
+# Copyright (c) 2010-2016 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -71,12 +71,12 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.1.0
+PETSC_VER=2.1.2
 endif
 else
-SPATIALDATA_VER=1.9.5
-PYLITH_VER=2.1.0
-PETSC_VER=2.1.0
+SPATIALDATA_VER=1.9.6
+PYLITH_VER=2.1.2
+PETSC_VER=2.1.2
 endif
 
 # ----------------------------------------------------------------------
@@ -91,7 +91,8 @@ EXTRA_DIST = \
 	COPYING \
 	INSTALL \
 	NEWS \
-	README
+	README \
+	numpy_blaslapack.cfg
 
 
 noinst_tmp = \
@@ -434,10 +435,13 @@ installed_swig:
 # ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
-numpy: installed_python
+numpy: installed_python installed_lapack
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
+if WITH_NUMPY_BLASLAPACK
+	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
+endif
 	cd numpy-$(NUMPY_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch ../installed_numpy
@@ -761,7 +765,7 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_git installed_cmake
+petsc: installed_mpi installed_hdf5 installed_git installed_cmake installed_lapack
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
@@ -778,7 +782,7 @@ else
 petsc_build_options = 
 endif
 if WITH_FORTRAN
-petsc_options += --with-fc=1
+petsc_options += 
 else
 petsc_options += --with-fc=0
 endif
@@ -794,7 +798,7 @@ endif
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
-			--with-shared-libraries=1 \
+			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
