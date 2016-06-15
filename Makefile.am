@@ -778,7 +778,7 @@ else
 petsc_build_options = 
 endif
 if WITH_FORTRAN
-petsc_options += --with-fc=1
+petsc_options += 
 else
 petsc_options += --with-fc=0
 endif
@@ -794,7 +794,7 @@ endif
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-debugging=0 \
-			--with-shared-libraries=1 \
+			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
 			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
