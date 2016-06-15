@@ -91,7 +91,8 @@ EXTRA_DIST = \
 	COPYING \
 	INSTALL \
 	NEWS \
-	README
+	README \
+	numpy_blaslapack.cfg
 
 
 noinst_tmp = \
@@ -434,10 +435,13 @@ installed_swig:
 # ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
-numpy: installed_python
+numpy: installed_python installed_lapack
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
+if WITH_NUMPY_BLASLAPACK
+	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
+endif
 	cd numpy-$(NUMPY_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch ../installed_numpy
@@ -761,7 +765,7 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_git installed_cmake
+petsc: installed_mpi installed_hdf5 installed_git installed_cmake installed_lapack
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
