@@ -435,7 +435,7 @@ installed_swig:
 # ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
-numpy: installed_python installed_lapack
+numpy: installed_python
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
@@ -765,7 +765,7 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_git installed_cmake installed_lapack
+petsc: installed_mpi installed_hdf5 installed_git installed_cmake
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
