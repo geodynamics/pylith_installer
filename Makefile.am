@@ -71,12 +71,12 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.1.2
+PETSC_VER=2.1.3
 endif
 else
 SPATIALDATA_VER=1.9.6
-PYLITH_VER=2.1.2
-PETSC_VER=2.1.2
+PYLITH_VER=2.1.3
+PETSC_VER=2.1.3
 endif
 
 # ----------------------------------------------------------------------

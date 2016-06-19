@@ -181,14 +181,14 @@ STEP 1 - Download and unpack the installer
 
 Download the installer.
 
-  http://www.geodynamics.org/cig/software/pylith/pylith-installer-2.1.0-3.tgz
+  http://www.geodynamics.org/cig/software/pylith/pylith-installer-2.1.3-0.tgz
 
 Untar the source code for the installer:
 
   mkdir -p $HOME/src/pylith
   cd $HOME/src/pylith
-  mv $HOME/Downloads/pylith-installer-2.1.0-3.tgz $HOME/src/pylith/
-  tar -zxf pylith-installer-2.1.0-3.tgz
+  mv $HOME/Downloads/pylith-installer-2.1.3-0.tgz $HOME/src/pylith/
+  tar -zxf pylith-installer-2.1.3-0.tgz
 
 
 ----------------------------------------------------------------------
@@ -214,7 +214,7 @@ built. Double-check to make sure this matches what you expect.
 
 Run configure with --help to see all of the command line arguments.
 
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure --help
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure --help
 
 -------
 DEFAULT
@@ -226,7 +226,7 @@ DEFAULT
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
 
@@ -240,7 +240,7 @@ WITHOUT FORTRAN
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --with-fortran=no \
     --with-make-threads=2 \
     --petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1" \
@@ -264,7 +264,7 @@ DESKTOP-LINUX-MINIMAL
     * cppunit (development package)
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --disable-cppunit \
     --disable-numpy \
     --disable-proj4 \
@@ -283,7 +283,7 @@ DESKTOP-LINUX-OPENMPI
     * C, C++, Fortran compilers
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --enable-python \
     --enable-mpi=openmpi \
     --with-make-threads=2 \
@@ -315,7 +315,7 @@ DESKTOP-DARWIN
     * XCode with command line tools (from Apple)
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --enable-mpi=openmpi \
     --with-fetch=curl \
     --with-make-threads=2 \
@@ -334,7 +334,7 @@ CLUSTER
     * MPI
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --enable-python \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
@@ -358,7 +358,7 @@ DEVELOPER
     * Git
 
   mkdir -p $HOME/build/pylith
-  $HOME/src/pylith/pylith-installer-2.1.0-3/configure \
+  $HOME/src/pylith/pylith-installer-2.1.3-0/configure \
     --with-pylith-git=master \
     --with-make-threads=2 \
     --prefix=$HOME/pylith
