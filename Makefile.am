@@ -771,7 +771,7 @@ if WITH_HDF5
 petsc_options += --with-hdf5=1
 endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib --LIBS=-lz
+petsc_options += --with-hdf5-dir=$(prefix) --LIBS=-lz
 endif
 if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
