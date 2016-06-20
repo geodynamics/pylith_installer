@@ -55,7 +55,7 @@ HDF5_VER=1.8.11p2
 H5PY_VER=2.2.1
 
 NETCDF_VER=4.1.3-p2
-NETCDFPY_VER=1.1.8
+NETCDFPY_VER=1.1.8p1
 
 SCIENTIFICPYTHON_VER=2.9.1
 FIAT_VER=0.9.9
@@ -771,7 +771,7 @@ if WITH_HDF5
 petsc_options += --with-hdf5=1
 endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-include=$(prefix)/include --with-hdf5-lib=$(prefix)/lib/libhdf5.dylib --LIBS=-lz
+petsc_options += --with-hdf5-dir=$(prefix) --LIBS=-lz
 endif
 if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
