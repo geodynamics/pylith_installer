@@ -434,6 +434,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix/bin/python
+  PYTHON_VERSION=2.7
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
