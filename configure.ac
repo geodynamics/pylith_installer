@@ -254,7 +254,7 @@ fi
 AC_ARG_WITH([hdf5],
     [AC_HELP_STRING([--with-hdf5],
         [enable HDF5 options for PyLith @<:@default=yes@:>@])],
-	[echo "WITHVAL $withval"; if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
+	[if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
 	[with_hdf5=yes])
 AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
 
@@ -434,6 +434,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix/bin/python
+  PYTHON_VERSION=2.7
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
@@ -822,7 +823,6 @@ echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  autotools: $install_autotools"
 echo "  setuptools: $install_setuptools"
-echo "  lapack/blas: $install_lapack"
 echo "  cppunit: $install_cppunit"
 echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
@@ -832,7 +832,7 @@ echo "  netCDF4 (python): $install_netcdfpy"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
-echo "  numpy: $install_numpy"
+echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  git: $install_git"
