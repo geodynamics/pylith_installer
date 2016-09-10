@@ -20,7 +20,7 @@ AC_PREREQ(2.59)
 AC_INIT([PyLith Installer], [2.1.3-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign tar-pax])
 
 # ----------------------------------------------------------------------
 # SOFTWARE TO INSTALL
@@ -242,9 +242,9 @@ AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
 # FORTRAN
 AC_ARG_WITH([fortran],
     [AC_HELP_STRING([--with-fortran],
-        [enable Fortran options for packages @<:@default=yes@:>@])],
+        [enable Fortran options for packages @<:@default=no@:>@])],
 	[if test "$withval" = yes; then with_fortran=yes; else with_fortran=no; fi],
-	[with_fortran=yes])
+	[with_fortran=no])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
 # HDF5
@@ -302,9 +302,9 @@ AM_CONDITIONAL([WITH_CUDA], [test "$with_cuda" = yes])
 # PETSC options
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-fblaslapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1 --download-mumps=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-fblaslapack=1"])
+	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1 --download-mumps=1"])
 AC_SUBST(petsc_options)
 
 # pylith git
