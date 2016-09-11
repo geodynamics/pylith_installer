@@ -15,37 +15,75 @@
 #
 # ----------------------------------------------------------------------
 #
-# Create PyLith binary package.
-#
-# Run from the top-level PyLith build dir.
-#
-# Usage: make_package.py
+# Create docker images.
 
-PYLITH_VER=2.1.3x
-ARCH=ubuntu
-ARCH_VER=16.04
-ENV_VER=1
+class DockerApp(object):
 
-BUILDENV_VER=$(PYLITH_VER)-$(ARCH)-$(ARCH_VER)-$(ENV_VER)
-BINARY_VER=$(PYLITH_VER
+    def __init__(self, container):
+        arch = "ubuntu"
+        archVersion = "16.04"
+        pylithVersion = "2.1.3"
+        buildVersion = "1"
 
-buildenv-build: $(ARCH)-buildenv
-	docker build -f $< -t geodynamics/pylith-buildenv:$(BUILDENV_VER) .
+        buildenvTag = "%s-%s-%s" % (arch, archVersion, buildVersion)
+        binaryTag = "v%s-%s" % (pylithVersion, buildenvTag)
+        self.container = container
 
-buildenv-irun: $(ARCH)-buildenv
-	docker run -t -i geodynamics/pylith-buildenv:$(BUILDENV_VER)
-
-buildenv-push: $(ARCH)-buildenv
-	docker push geodynamics/pylith-buildenv:$(BUILDENV_VER)
-
-binary-build: $(ARCH)-binary
-	docker build -f $< -t geodynamics/pylith:$(BINARY_VER) .
-
-binary-irun: $(ARCH)-binary
-	docker run -t -i geodynamics/pylith:$(BINARY_VER) .
-
-binary-push: $(ARCH)-binary
-	docker push geodynamics/pylith:$(BINARY_VER) .
+        if container == "buildenv":
+            self.config = "%s-buildenv" % arch
+            self.repo = "geodynamics/pylith-buildenv:%s" % buildenvTag
+        elif container == "binary":
+            self.config = "%s-install" % arch
+            self.repo = "geodynamics/pylith:%s" % binaryTag
+        return
 
 
+    def build(self):
+        cmd = "docker build -f %s -t %s ." % (self.config, self.repo)
+        self._runCmd(cmd)
+        return
+
+
+    def run(self):
+        cmd = "docker run -t -i %s" % self.repo
+        self._runCmd(cmd)
+        return
+
+
+    def push(self):
+        cmd = "docker push %s" % self.repo
+        self._runCmd(cmd)
+        return
+
+
+    def _runCmd(self, cmd):
+        print("Running '%s'..." % cmd)
+        import subprocess
+        subprocess.call(cmd)
+        return
+
+    
+# ======================================================================
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--container", action="store", dest="container", choices=("buildenv","binary"), required=True)
+    parser.add_argument("--build", action="store_true", dest="build")
+    parser.add_argument("--run", action="store_true", dest="run")
+    parser.add_argument("--push", action="store_true", dest="push")
+    args = parser.parse_args()
+
+    app = DockerApp(args.container)
+
+    if args.build:
+        app.build()
+
+    if args.run:
+        app.run()
+
+    if args.push:
+        app.push()
+        
+    
 # End of file
