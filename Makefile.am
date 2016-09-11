@@ -82,9 +82,6 @@ endif
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
-SUBDIRS = \
-	bin
-
 EXTRA_DIST = \
 	AUTHORS \
 	CHANGES \
@@ -92,7 +89,11 @@ EXTRA_DIST = \
 	INSTALL \
 	NEWS \
 	README \
-	numpy_blaslapack.cfg
+	numpy_blaslapack.cfg \
+	docker/README \
+	docker/ubuntu-buildenv \
+	docker/ubuntu-install \
+	docker/build.py
 
 
 noinst_tmp = \
@@ -149,6 +150,8 @@ noinst_srcdirs = \
 	cmake-$(CMAKE_VER) \
 	pylith-$(PYLITH_VER)
 
+dist_noinst_SCRIPTS = \
+	bin/fetch.sh
 
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 

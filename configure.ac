@@ -302,9 +302,9 @@ AM_CONDITIONAL([WITH_CUDA], [test "$with_cuda" = yes])
 # PETSC options
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1 --download-mumps=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1 --download-mumps=1"])
+	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1"])
 AC_SUBST(petsc_options)
 
 # pylith git
@@ -796,9 +796,7 @@ else
 fi
 
 # ----------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile
-		bin/Makefile
-		])
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
 

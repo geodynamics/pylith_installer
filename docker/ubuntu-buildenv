@@ -1,0 +1,9 @@
+# docker build -f Dockerfile-buildenv -t baagaard/pylith-buildenv-ubuntu:16.04-1 .
+ 
+FROM ubuntu:16.04
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+RUN apt-get update
+RUN apt-get install -y g++ automake autoconf libtool curl swig python-dev cmake git zlib1g-dev
+RUN apt-get install -y python-setuptools libcppunit-dev proj-bin proj-data libproj-dev openmpi-common openmpi-bin libopenmpi-dev
+RUN apt-get update
+ENV PYTHON_VERSION 2.7
