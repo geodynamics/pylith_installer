@@ -471,7 +471,7 @@ if INSTALL_PROJ4
 		unzip ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
-			--prefix=$(prefix) $(env_flags) $(env_compilers) ; \
+			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_proj4
