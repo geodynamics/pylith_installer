@@ -1,0 +1,11 @@
+Run the container.
+  $ docker run -ti geodynamics/pylith-VERSION
+
+To "pause" the container.
+  Control-p Control-q
+
+To attach to "paused" or "running" container.
+  1. Get container id
+    $ docker ps
+  2. Attach to container
+    $ docker attach CONTAINER_ID
