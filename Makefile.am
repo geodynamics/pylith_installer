@@ -700,7 +700,7 @@ spatialdata_options += --enable-testing
 endif
 if USE_PYLITH_GIT
 spatialdata_options += --enable-swig
-	$(GIT) clone --recursive https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
+	$(GIT) clone --branch master --single-branch --recursive https://github.com/geodynamics/spatialdata.git spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
@@ -793,7 +793,7 @@ if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
 else
-	git clone -b knepley/pylith https://bitbucket.org/petsc/petsc.git petsc-pylith
+	git clone --branch knepley/pylith --single-branch https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
 	cd petsc-pylith && \
 		./configure --prefix=$(prefix) \
@@ -836,7 +836,7 @@ pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
-	$(GIT) clone --recursive -b $(pylith_git) https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
+	$(GIT) clone --branch $(pylith_git) --single-branch --recursive https://github.com/geodynamics/pylith.git pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)

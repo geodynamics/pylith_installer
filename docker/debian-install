@@ -1,12 +1,12 @@
-# docker build -f Dockerfile-install -t baagaard/pylith-install-ubuntu:16.04-VERSION .
-FROM geodynamics/pylith-buildenv:ubuntu-16.04-1
+FROM geodynamics/pylith-buildenv:debian-8-latest
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 ENV PREFIX_DIR /opt/pylith
 ENV MAKE_THREADS 8
 
 ENV PYLITH_USER pylith-user
-RUN useradd -ms /bin/bash $PYLITH_USER
+# Add user (no password)
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
 RUN mkdir $PREFIX_DIR && chown $PYLITH_USER $PREFIX_DIR && chgrp $PYLITH_USER $PREFIX_DIR
 
 # Build PyLith and install to $PREFIX_DIR
@@ -18,17 +18,32 @@ RUN git clone --depth 1 --recursive --branch baagaard/add-docker https://github.
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
-RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl --with-pylith-git --disable-cmake --disable-cppunit --disable-proj4 --enable-numpy --enable-hdf5 --enable-netcdf --enable-netcdfpy --enable-nemesis --enable-fiat --with-fortran=no --enable-force-install --with-make-threads=$MAKE_THREADS
-RUN . ./setup.sh && make
+RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
+    --with-fortran=no --enable-force-install --with-make-threads=$MAKE_THREADS \
+    --with-pylith-git \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-proj4 \
+    --enable-cmake \
+    --enable-numpy \
+    --enable-hdf5 \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    --enable-nemesis \
+    --enable-fiat \
+    && . ./setup.sh \
+    && make > make.log \
+    && cd pylith-build && make dist \
+    && cd /home/$PYLITH_USER && tar -zxvf $BUILD_DIR/build/pylith-build/pylith-*.tar.gz \
+    && rm -r $BUILD_DIR/build
 RUN unset BUILD_DIR MAKE_THREADS
 
 # Setup user and environment
 WORKDIR /home/$PYLITH_USER
-# :TODO: Copy source code to /home/pylith-user/src
-# :TODO: Remove /home/pylith-installer
-#RUN mv $BUILD_DIR/build/pylith-master src
-#RUN rm -r $BUILD_DIR/*
+
 ENV PATH $PATH:$PREFIX_DIR/bin
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/lib
 ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/lib/python$PYTHON_VERSION/site-packages
 RUN unset PREFIEX_DIR PYLITH_USER
+
+CMD /bin/bash

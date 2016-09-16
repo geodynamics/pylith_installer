@@ -20,10 +20,10 @@
 class DockerApp(object):
 
     def __init__(self, container):
-        arch = "ubuntu"
-        archVersion = "16.04"
+        arch = "debian"
+        archVersion = "8"
         pylithVersion = "2.1.3"
-        buildVersion = "1"
+        buildVersion = "latest"
 
         buildenvTag = "%s-%s-%s" % (arch, archVersion, buildVersion)
         binaryTag = "v%s-%s" % (pylithVersion, buildenvTag)
@@ -45,7 +45,7 @@ class DockerApp(object):
 
 
     def run(self):
-        cmd = "docker run -t -i %s" % self.repo
+        cmd = "docker run -t -i %s /bin/bash" % self.repo
         self._runCmd(cmd)
         return
 
@@ -59,7 +59,7 @@ class DockerApp(object):
     def _runCmd(self, cmd):
         print("Running '%s'..." % cmd)
         import subprocess
-        subprocess.call(cmd)
+        subprocess.check_call(cmd.split())
         return
 
     
