@@ -1,0 +1,26 @@
+This directory holds Docker container build instructions, aka Dockerfiles.
+
+Use the build.py script to build/run/push Docker images.
+  ./build.py --container=buildenv --build
+  ./build.py --container=binary --build
+  ./build.py --container=binary --run
+
+We use alpine linux base images to mimimize the image sizes.
+  Alpine Linux: https://alpinelinux.org/
+  Alpine Linux pakages: http://pkgs.alpinelinux.org/packages
+
+Notes on using Docker 
+
+  Reducing image sizes
+    1. Use minimal base images (e.g., alpine linux)
+    2. Disable package manager cache (apk --no-cache add ...)
+    3. Each command results in a new layer, so cleanup before completing layer
+    4. Use virtual packages to remove packages when cleaning up layer
+      a. 'apk --update add --virtual PKGNAME ... && apk del PKGNAME'
+
+  Attaching to stopped container for deugging:
+    1. Commit stopped container
+      a. Identify container using 'docker ps -a'
+      b. Create 'debug' image using 'docker commit CONTAINER_ID debug'
+    2. Start shell in container
+      a. 'docker run -ti debug /bin/bash'

@@ -1,4 +1,0 @@
-This directory holds Docker container build instructions, aka Dockerfiles.
-
-Dockerfile-buildenv  Build environment for building PyLith, includes installing dependencies.
-Dockerfile-install   Build PyLith and remaining dependencies; setup user environment.
