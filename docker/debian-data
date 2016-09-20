@@ -1,0 +1,11 @@
+FROM geodynamics/pylith-buildenv:latest
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+
+# Mount point for data
+ENV DATA_DIR /data
+RUN mkdir -p $DATA_DIR/$PYLITH_USER \
+    && chown $PYLITH_USER $DATA_DIR/$PYLITH_USER \
+    && chgrp $PYLITH_USER $DATA_DIR/$PYLITH_USER
+VOLUME $DATA_DIR
+
+CMD /bin/bash

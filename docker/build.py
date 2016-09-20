@@ -21,20 +21,22 @@ class DockerApp(object):
 
     def __init__(self, container):
         arch = "debian"
-        archVersion = "8"
         pylithVersion = "2.1.3"
         buildVersion = "latest"
 
-        buildenvTag = "%s-%s-%s" % (arch, archVersion, buildVersion)
-        binaryTag = "v%s-%s" % (pylithVersion, buildenvTag)
+        buildenvTag = buildVersion
+        binaryTag = "v[pver]-[btag]".replace("[pver]", pylithVersion).replace("[btag]", buildenvTag)
         self.container = container
 
         if container == "buildenv":
-            self.config = "%s-buildenv" % arch
-            self.repo = "geodynamics/pylith-buildenv:%s" % buildenvTag
+            self.config = arch + "-buildenv"
+            self.repo = "geodynamics/pylith-buildenv:" + buildenvTag
         elif container == "binary":
-            self.config = "%s-install" % arch
-            self.repo = "geodynamics/pylith:%s" % binaryTag
+            self.config = arch + "-install"
+            self.repo = "geodynamics/pylith:" + binaryTag
+        elif container == "data":
+            self.config = arch + "-data"
+            self.repo = "geodynamics/pylith-data:" + buildenvTag
         return
 
 
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--container", action="store", dest="container", choices=("buildenv","binary"), required=True)
+    parser.add_argument("--container", action="store", dest="container", choices=("buildenv","data","binary"), required=True)
     parser.add_argument("--build", action="store_true", dest="build")
     parser.add_argument("--run", action="store_true", dest="run")
     parser.add_argument("--push", action="store_true", dest="push")

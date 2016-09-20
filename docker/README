@@ -1,11 +1,87 @@
-Run the container.
-  $ docker run -ti geodynamics/pylith-VERSION
+What is Docker?
 
-To "pause" the container.
-  Control-p Control-q
+  From https://www.docker.com/what-docker:
 
-To attach to "paused" or "running" container.
-  1. Get container id
+    "Docker containers wrap a piece of software in a complete
+    filesystem that contains everything needed to run: code, runtime,
+    system tools, system libraries – anything that can be installed on
+    a server. This guarantees that the software will always run the
+    same, regardless of its environment.
+
+    LIGHTWEIGHT
+
+    Containers running on a single machine share the same operating
+    system kernel; they start instantly and use less RAM. Images are
+    constructed from layered filesystems and share common files,
+    making disk usage and image downloads much more efficient."
+
+======================================================================
+Setup (first time only)
+======================================================================
+
+Install Docker: https://www.docker.com/products/docker
+
+Create container to store persistent user data
+
+  This container will hold a directory where all your user data can be
+  stored for use with PyLith within Docker. This directory is not
+  directly accessible from your host computer. However, you can copy
+  files to/from your host filesystem using "docker cp" (see below).
+
+  $ docker create --name pylith-data geodynamics/pylith-data
+
+
+======================================================================
+Run Unix shell within Docker to use PyLith.
+======================================================================
+
+  $ docker run -ti --volumes-from pylith-data geodynamics/pylith
+
+  HINT: You will probably want to copy the examples from the
+  pylith-VERSION directory to the data directory, which is the
+  persistent storage.
+
+    $ cp -R ~/pylith-VERSION/examples ~/data
+
+  To "pause" the container.
+    Control-p Control-q
+
+  To attach to "paused" or "running" container.
+    1. Get container id
+      $ docker ps
+    2. Attach to container
+      $ docker attach CONTAINER_ID
+
+
+======================================================================
+Copy data to/from persistent storage volume.
+=====================================================================
+
+Copy data FROM persistent storage volume TO local host
+  $ docker cp pylith-data:/data/pylith-user/PATH/FILENAME LOCAL_PATH
+
+Copy data FROM local host TO persistent storage volume
+  $ docker cp LOCAL_PATH pylith-data:/data/pylith-user/PATH/
+
+
+======================================================================
+Docker Quick Reference
+======================================================================
+
+  List local docker images 
+    $ docker images
+
+  List all docker containers
+    $ docker ps -a
+
+  List running docker containers
     $ docker ps
-  2. Attach to container
-    $ docker attach CONTAINER_ID
+
+  Remove docker container
+    $ docker rm CONTAINER_ID
+
+  Remove docker image
+    $ docker rmi CONTAINER_ID
+
+
+  

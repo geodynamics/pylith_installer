@@ -1,18 +1,28 @@
 This directory holds Docker container build instructions, aka Dockerfiles.
 
-Use the build.py script to build/run/push Docker images.
-  ./build.py --container=buildenv --build
-  ./build.py --container=binary --build
-  ./build.py --container=binary --run
+Containers:
+  pylith-buildenv: Unix build environment for PyLith
+  pylith-data: Container holding data volume for persistent storage
+  pylith: Container holding PyLith 
 
-We use alpine linux base images to mimimize the image sizes.
+Use the build.py script to build/run/push Docker images.
+  $ ./build.py --container=buildenv --build
+  $ ./build.py --container=data --build
+  $ ./build.py --container=binary --build
+  $ ./build.py --container=binary --run
+
+We use Debian Linux base images to reduce the image size.
+  Debian packages: https://packages.debian.org/stable/allpackages?format=txt.gz
+
+We might be able to reduce the image size further using Alpine Linux
+base images. Brad tried this and opening HDF5 files failed.
   Alpine Linux: https://alpinelinux.org/
   Alpine Linux pakages: http://pkgs.alpinelinux.org/packages
 
 Notes on using Docker 
 
   Reducing image sizes
-    1. Use minimal base images (e.g., alpine linux)
+    1. Use minimal base images (e.g., debian, alpine linux)
     2. Disable package manager cache (apk --no-cache add ...)
     3. Each command results in a new layer, so cleanup before completing layer
     4. Use virtual packages to remove packages when cleaning up layer
@@ -24,3 +34,7 @@ Notes on using Docker
       b. Create 'debug' image using 'docker commit CONTAINER_ID debug'
     2. Start shell in container
       a. 'docker run -ti debug /bin/bash'
+
+  Pushing images
+    docker login
+    docker push IMAGE:TAG

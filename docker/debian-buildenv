@@ -24,13 +24,11 @@ RUN apt-get update \
 	libmpich-dev \
 	mpich \
     && rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
-
-#	openmpi-common \
-#	openmpi-bin \
-#	libopenmpi-dev \
-#	ssh
-
     
 ENV PYTHON_VERSION 2.7
+
+# Create 'pylith-user' user
+ENV PYLITH_USER pylith-user
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
 
 CMD /bin/bash
