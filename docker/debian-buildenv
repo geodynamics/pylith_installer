@@ -23,6 +23,9 @@ RUN apt-get update \
 	proj-data \
 	libmpich-dev \
 	mpich \
+	vim-common \
+	vim-runtime \
+	vim-nox \
     && rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
     
 ENV PYTHON_VERSION 2.7
