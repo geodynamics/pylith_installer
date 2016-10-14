@@ -1,0 +1,35 @@
+FROM geodynamics/pylith-buildenv:alpine-3.4-latest
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+
+ENV PREFIX_DIR /pylith
+ENV MAKE_THREADS 8
+
+ENV PYLITH_USER pylith-user
+# Add user (no password)
+RUN adduser -D -s /bin/bash $PYLITH_USER
+RUN mkdir $PREFIX_DIR && chown $PYLITH_USER $PREFIX_DIR && chgrp $PYLITH_USER $PREFIX_DIR
+
+# DEBUGGING
+RUN apk --no-cache add gdb
+
+# Build PyLith and install to $PREFIX_DIR
+ENV BUILD_DIR /home/pylith-installer
+RUN mkdir -p $BUILD_DIR/build && chown -R $PYLITH_USER $BUILD_DIR && chgrp -R $PYLITH_USER $BUILD_DIR
+USER $PYLITH_USER
+WORKDIR $BUILD_DIR
+RUN git clone --depth 1 --recursive --branch baagaard/add-docker https://github.com/geodynamics/pylith_installer.git src
+WORKDIR $BUILD_DIR/src
+RUN autoreconf --install --verbose
+WORKDIR $BUILD_DIR/build
+RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl --with-pylith-git --enable-mpi=mpich --enable-cmake --disable-cppunit --enable-proj4 --enable-numpy --enable-hdf5 --enable-netcdf --enable-netcdfpy --enable-nemesis --enable-fiat --with-fortran=no --enable-force-install --with-make-threads=$MAKE_THREADS && . ./setup.sh && make > make.log && rm -r *
+RUN unset BUILD_DIR MAKE_THREADS
+
+# :TODO: copy source directory
+
+# Setup user and environment
+WORKDIR /home/$PYLITH_USER
+
+ENV PATH $PATH:$PREFIX_DIR/bin
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/lib
+ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/lib/python$PYTHON_VERSION/site-packages
+RUN unset PREFIEX_DIR PYLITH_USER

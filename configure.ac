@@ -797,9 +797,7 @@ else
 fi
 
 # ----------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile
-		bin/Makefile
-		])
+AC_CONFIG_FILES([Makefile])
 
 AC_OUTPUT
 
