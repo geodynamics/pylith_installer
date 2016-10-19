@@ -91,8 +91,10 @@ EXTRA_DIST = \
 	README \
 	numpy_blaslapack.cfg \
 	docker/README \
-	docker/ubuntu-buildenv \
-	docker/ubuntu-install \
+	docker/README-developer \
+	docker/debian-buildenv \
+	docker/debian-data \
+	docker/debian-install \
 	docker/build.py
 
 
