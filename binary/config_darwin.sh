@@ -13,13 +13,15 @@ DEST_DIR=${BINARY_ROOT}/dist
 SRC_DIR=${BINARY_ROOT}/src/pylith_installer
 BUILD_DIR=${BINARY_ROOT}/build
 
-#cd ${SRC_DIR} && autoreconf --install --verbose --force
+cd ${SRC_DIR} && autoreconf --install --verbose --force
+
+unset PYTHONPATH LD_LIBRARY_PATH
+PATH=/bin:/usr/bin
 
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 ${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --with-fetch=curl --prefix=${DEST_DIR} ${CONFIG_ARGS} --with-petsc-options="${PETSC_OPTIONS}" CC=clang CXX=clang++
-. setup.sh
+. ${BUILD_DIR}/setup.sh
 make >& make.log
-
-
-
+cp -f ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/setup_darwin.sh ${DEST_DIR}/setup.sh
+cd ${BUILD_DIR}/pylith-build && python ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/make_package.py

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PYLITH_BRANCH=master
 BINARY_ROOT=${HOME}/pylith-binary
 if [ $# == 1 ]; then
   BINARY_ROOT=$1
@@ -15,8 +16,13 @@ BUILD_DIR=${BINARY_ROOT}/build
 
 cd ${SRC_DIR} && autoreconf --install --verbose --force
 
+unset PYTHONPATH LD_LIBRARY_PATH
+PATH=/bin:/usr/bin
+
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
-${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --prefix=${DEST_DIR} ${CONFIG_ARGS} --with-petsc-options="${PETSC_OPTIONS}"
-. setup.sh
+${SRC_DIR}/configure --with-pylith-git=${PYLITH_BRANCH} --with-make-threads=4 --prefix=${DEST_DIR} ${CONFIG_ARGS} --with-petsc-options="${PETSC_OPTIONS}"
+. ${BUILD_DIR}/setup.sh
 make >& make.log
+cp -f ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/setup_linux64.sh ${DEST_DIR}/setup.sh
+cd ${BUILD_DIR}/pylith-build && python ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/make_package.py
