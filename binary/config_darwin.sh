@@ -13,10 +13,13 @@ DEST_DIR=${BINARY_ROOT}/dist
 SRC_DIR=${BINARY_ROOT}/src/pylith_installer
 BUILD_DIR=${BINARY_ROOT}/build
 
-cd ${SRC_DIR} && autoreconf --install --verbose --force
+#cd ${SRC_DIR} && autoreconf --install --verbose --force
 
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
-${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --with-fetch=curl --prefix=${DEST_DIR} ${ARGS} --with-petsc-options="${PETSC_OPTIONS}" CC=clang CXX=clang++
+${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --with-fetch=curl --prefix=${DEST_DIR} ${CONFIG_ARGS} --with-petsc-options="${PETSC_OPTIONS}" CC=clang CXX=clang++
+. setup.sh
+make >& make.log
+
 
 

@@ -18,3 +18,5 @@ cd ${SRC_DIR} && autoreconf --install --verbose --force
 mkdir -p ${BUILD_DIR}
 cd ${BUILD_DIR}
 ${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --prefix=${DEST_DIR} ${CONFIG_ARGS} --with-petsc-options="${PETSC_OPTIONS}"
+. setup.sh
+make >& make.log
