@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Patch to pylith-master/configure.ac if user or group ids are too big.
+# -AM_INIT_AUTOMAKE([foreign subdir-objects])
+# +AM_INIT_AUTOMAKE([foreign subdir-objects tar-pax])
+
 BINARY_ROOT=${HOME}/pylith-binary
 if [ $# == 1 ]; then
   BINARY_ROOT=$1
