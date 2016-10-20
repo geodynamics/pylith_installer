@@ -29,3 +29,8 @@ ${SRC_DIR}/configure --with-pylith-git=master --with-make-threads=4 --with-fetch
 make >& make.log
 cp -f ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/setup_darwin.sh ${DEST_DIR}/setup.sh
 cd ${BUILD_DIR}/pylith-build && python ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/packager/make_package.py
+
+# Unpack tarball, unzip Python eggs (netCDF4)
+# Run python ${BUILD_DIR}/pylith-${PYLITH_BRANCH}/pylith/packager/update_darwinlinking.py
+# Update Python eggs (zip -ru EGG DIR)
+# Regenerate tarball
