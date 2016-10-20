@@ -95,7 +95,9 @@ EXTRA_DIST = \
 	docker/debian-buildenv \
 	docker/debian-data \
 	docker/debian-install \
-	docker/build.py
+	docker/build.py \
+	binary/config_linux.sh \
+	binary/config_darwin.sh
 
 
 noinst_tmp = \
