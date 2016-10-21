@@ -96,8 +96,14 @@ EXTRA_DIST = \
 	docker/debian-data \
 	docker/debian-install \
 	docker/build.py \
-	binary/config_linux.sh \
-	binary/config_darwin.sh
+	packager/build.sh \
+	packager/setup_darwin.sh \
+	packager/setup_linux32.sh \
+	packager/setup_linux64.sh \
+	make_package.py \
+	cygwin.py \
+	make_petscdist.sh \
+	update_darwinlinking.py
 
 
 noinst_tmp = \
