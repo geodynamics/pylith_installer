@@ -779,7 +779,6 @@ fi
 AC_CANONICAL_HOST
 case $host_os in
   darwin*)
-    echo "export DYLD_LIBRARY_PATH=$prefix/lib" >> setup.sh
     ;;
   *)
     if test "X${LD_LIBRARY_PATH}" = X ; then
@@ -790,7 +789,7 @@ case $host_os in
     ;;
 esac
 
-if test "X${PYTHONPATH}" = X ; then
+if test "X$PYTHONPATH" = X ; then
   echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages" >> setup.sh
 else
   echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
