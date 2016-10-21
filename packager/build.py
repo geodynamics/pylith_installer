@@ -26,24 +26,30 @@ import subprocess
 
 class BinaryApp(object):
 
-    def __init__(self, base_dir, pylith_branch, nthreads):
+    def __init__(self, base_dir, pylith_branch, nthreads, force_config):
         self.baseDir = base_dir
         self.pylithBranch = pylith_branch
         self.nthreads = nthreads
+        self.forceConfig = force_config
 
-        self.srcDir = os.join(base_dir, "src", "pylith_installer")
-        self.destDir = os.join(base_dir, "dist")
-        self.buildDir = os.join(base_dir, "build")
+        self.srcDir = os.path.join(base_dir, "src", "pylith_installer")
+        self.destDir = os.path.join(base_dir, "dist")
+        self.buildDir = os.path.join(base_dir, "build")
 
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
+        self.pythonVersion = "2.7" # :KLUDGE:
         return
 
 
     def setup(self):
-        shutil.rmtree(self.destDir)
-        shutil.rmtree(self.buildDir)
+        print("Cleaning destination directory '%s'..." % self.destDir)
+        if os.path.isdir(self.destDir):
+            shutil.rmtree(self.destDir)
+        print("Cleaning build directory '%s'..." % self.buildDir)
+        if os.path.isdir(self.buildDir):
+            shutil.rmtree(self.buildDir)
 
         os.mkdir(self.destDir)
         os.mkdir(self.buildDir)
@@ -101,34 +107,34 @@ class BinaryApp(object):
 
         # autoreconf
         os.chdir(self.srcDir)
-        cmd = "autoreconf --install --force --verbose"
+        cmd = ("autoreconf", "--install", "--force", "--verbose")
         self._runCmd(cmd)
 
-        if os.environ.has_key("PYTHONPATH"):
-            del os.environ["PYTHONPATH"]
-        if os.environ.has_key("LD_LIBRARY_PATH"):
-            del os.environ["LD_LIBRARY_PATH"]
-        os.environ["PATH"] = "/bin:/usr/bin"
+        self._setEnviron()
 
         # configure
         os.chdir(self.buildDir)
-        cmd = "%(configure)s --with-pylith-git=%(pylith_branch)s --with-make-threads=%(nthreads)d --prefix=%(dest_dir)s %(config_args)s --with-petsc-options=%(petsc_options)s" % {
-            'configure': os.join(srcDir, "configure"),
-            'pylith_branch': self.pylithBranch,
-            'nthreads': self.nthreads,
-            'dest_dir': self.destDir,
-            'config_args': " ".join(configArgs),
-            'petsc_options': " ".join(petscOptions),
-        }
+        cmd = ("%s" % os.path.join(self.srcDir, "configure"),
+               "--with-make-threads=%d" % self.nthreads,
+               "--prefix=%s" % self.destDir,
+        )
+        if not self.pylithBranch is None:
+            cmd += ("--with-pylith-git=%s" % self.pylithBranch,)
+        if self.forceConfig:
+            cmd += ("--enable-force-install",)
+
+        cmd += configArgs
+        cmd += ("--with-petsc-options=%s" % " ".join(petscOptions),)
         self._runCmd(cmd)
         return
 
 
     def build(self):
         os.chdir(self.buildDir)
-        cmd = ". %s" % os.path.join(self.buildDir, "setup.sh")
+        self._setEnviron()
+
+        cmd = ("make",)
         self._runCmd(cmd)
-        self._runCmd("make >& make.log")
         return
 
 
@@ -147,7 +153,8 @@ class BinaryApp(object):
 
         shutil.copyfile(os.path.join(self.srcDir, "packager", filename), os.path.join(self.destDir, "setup.sh"))
         os.chdir(os.path.join(self.buildDir, "pylith-build"))
-        self._runCmd(os.path.join(self.srcDir, "packager", "make_package.py"))
+        cmd = (os.path.join(self.srcDir, "packager", "make_package.py"),)
+        self._runCmd(cmd)
 
         # Darwin
         if self.os == "Darwin":
@@ -158,9 +165,31 @@ class BinaryApp(object):
         return
 
 
+    def _setEnviron(self):
+        print("Setting environment...")
+
+        path = (os.path.join(self.destDir, "bin"),
+                "/bin", 
+                "/usr/bin",
+        )
+        os.environ["PATH"] = ":".join(path)
+
+        pythonpath = (os.path.join(self.destDir, "lib", "python%s" % self.pythonVersion, "site-packages"),)
+        if self.arch == "x86_64":
+            pythonpath += (os.path.join(self.destDir, "lib64", "python%s" % self.pythonVersion, "site-packages"),)
+        os.environ["PYTHONPATH"] = ":".join(pythonpath)
+        
+        if self.os == "Linux":
+            ldpath = (os.path.join(self.destDir, "lib"),)
+            if self.arch == "x86_64":
+                ldpath += (os.path.join(self.destDir, "lib64"),)
+            os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
+        return
+
+
     def _runCmd(self, cmd):
-        print("Running '%s'..." % cmd)
-        subprocess.check_call(cmd.split())
+        print("Running '%s'..." % " ".join(cmd))
+        subprocess.check_call(cmd)
         return
 
     
@@ -177,11 +206,12 @@ if __name__ == "__main__":
     parser.add_argument("--package", action="store_true", dest="package")
     parser.add_argument("--all", action="store_true", dest="all")
     parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
-    parser.add_argument("--pylith-branch", action="store", dest="pylith_branch", default="master")
+    parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
     parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=4)
+    parser.add_argument("--force-config", action="store", dest="force_config", default=False)
     args = parser.parse_args()
 
-    app = BinaryApp(args.base_dir, args.pylith_branch, args.make_threads)
+    app = BinaryApp(args.base_dir, args.pylith_branch, args.make_threads, args.force_config)
 
     if args.setup or args.all:
         app.setup()
