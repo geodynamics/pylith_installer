@@ -255,15 +255,19 @@ def ospawn(*argv):
 
 
 def getGitInfo(srcdir):
+    revision = "unknown"
+
     workdir = os.getcwd()
     os.chdir(srcdir)
-    output = ospawn("git", "branch", "-v")
+    try:
+        output = ospawn("git", "branch", "-v")
+        for line in output:
+            if line[0] == "*":
+                values = line.split()
+                revision = values[2]
+    except:
+        revision = "unknown"
     os.chdir(workdir)
-    revision = "unknown"
-    for line in output:
-        if line[0] == "*":
-            values = line.split()
-            revision = values[2]
     return revision
 
 
