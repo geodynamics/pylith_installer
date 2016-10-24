@@ -15,13 +15,12 @@ RUN mkdir $PREFIX_DIR \
 
 USER $PYLITH_USER
 WORKDIR $BUILD_DIR
-RUN git clone --depth 1 --recursive --branch baagaard/add-docker https://github.com/geodynamics/pylith_installer.git src
+RUN git clone --depth 1 --recursive --branch master https://github.com/geodynamics/pylith_installer.git src
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=$MAKE_THREADS \
-    --with-pylith-git \
     --disable-mpi \
     --disable-cppunit \
     --disable-proj4 \

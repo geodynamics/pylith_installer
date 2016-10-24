@@ -91,9 +91,19 @@ EXTRA_DIST = \
 	README \
 	numpy_blaslapack.cfg \
 	docker/README \
-	docker/ubuntu-buildenv \
-	docker/ubuntu-install \
-	docker/build.py
+	docker/README-developer \
+	docker/debian-buildenv \
+	docker/debian-data \
+	docker/debian-install \
+	docker/build.py \
+	packager/build.sh \
+	packager/setup_darwin.sh \
+	packager/setup_linux32.sh \
+	packager/setup_linux64.sh \
+	make_package.py \
+	cygwin.py \
+	make_petscdist.sh \
+	update_darwinlinking.py
 
 
 noinst_tmp = \
