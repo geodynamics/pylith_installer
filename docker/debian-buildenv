@@ -28,6 +28,9 @@ RUN apt-get update \
 	vim-nox \
     && rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
     
+ADD certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
 ENV PYTHON_VERSION 2.7
 
 # Create 'pylith-user' user
