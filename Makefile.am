@@ -79,6 +79,8 @@ PYLITH_VER=2.1.4
 PETSC_VER=2.1.4
 endif
 
+PARAMETERSGUI_VER=1.0.0
+
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
@@ -124,7 +126,8 @@ noinst_tmp = \
 	installed_spatialdata \
 	installed_cmake \
 	installed_petsc \
-	installed_pylith
+	installed_pylith \
+	installed_parametersgui
 
 
 noinst_builddirs = \
@@ -168,7 +171,6 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 # Environment settings.
 # ----------------------------------------------------------------------
-abs_builddir=`pwd`
 env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
 
 if WITH_FORTRAN
@@ -182,11 +184,11 @@ endif
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: installed_pylith 
+all: installed_pylith installed_parametersgui
 
 deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_netcdfpy installed_git installed_cmake installed_proj4
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -813,10 +815,10 @@ endif
 			--with-debugging=0 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
-		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
-		make PETSC_DIR=$(abs_builddir) install && \
-		make PETSC_DIR=$(abs_builddir) test && \
+			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) ; \
+		make $(petsc_build_options) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
+		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
+		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
@@ -868,6 +870,24 @@ endif
 installed_pylith:
 	$(MAKE) $(AM_MAKEFLAGS) pylith
 
+
+# ----------------------------------------------------------------------
+# parametersgui (pylith-parameters)
+# ----------------------------------------------------------------------
+parametersgui: 
+if INSTALL_PARAMETERSGUI
+	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
+	cd $(prefix)/share && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
+		cd $(abs_top_builddir) && \
+		touch ../installed_parametersgui
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_parametersgui
+endif
+
+installed_parametersgui:
+	$(MAKE) $(AM_MAKEFLAGS) parametersgui
 
 # ----------------------------------------------------------------------
 # clean

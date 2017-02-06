@@ -223,6 +223,14 @@ if test "$install_spatialdata" = yes; then
 fi
 AM_CONDITIONAL([INSTALL_PYTHIA], [test "$install_pythia" = yes])
 
+# PARAMTERSGUI (PYLITH-PARAMETERS)
+AC_ARG_ENABLE([parametersgui],
+    [AC_HELP_STRING([--enable-pylith-parameters],
+        [install parametersgui @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_parametersgui=yes; else install_parametersgui=no; fi],
+	[install_parametersgui=yes])
+AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
+
 
 # ----------------------------------------------------------------------
 # OPTIONS
@@ -835,6 +843,7 @@ echo "  spatialdata: $install_spatialdata"
 echo "  git: $install_git"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
+echo "  pylith-parameters GUI: $install_parametersgui"
 echo ""
 if test "$pylith_git" != no ; then
   if test "$force_petsc_tarball" == yes ; then
