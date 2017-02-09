@@ -24,7 +24,13 @@ end of life. Note the GLIBC version (ldd --version).
   python-dev
   zlib1g-dev
 
-4. Copy any CA certificates needed to access https to
-  /usr/local/share/ca-certificates and then run
-  sudo update-ca-certificates.
+4. Copy any CA certificates needed to access https and then update the list.
+
+  Ubuntu:
+    Copy certificates to /usr/local/share/ca-certificates and then run
+    sudo update-ca-certificates.
+
+  Fedora:
+    Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
+    sudo update-ca-trust.
 
