@@ -19,6 +19,7 @@
 #
 # Step 1: Clone pylith_installer repository.
 # Step 2: Use this utility to create tarballs.
+#   Source setup.sh after running --configure.
 
 import os
 import shutil
@@ -90,6 +91,7 @@ class BinaryApp(object):
                           "--enable-numpy",
                           "--enable-cmake",
                           "--with-fortran=no",
+                          "--with-fetch=curl",
                           )
             petscOptions = ("--download-chaco=1",
                             "--download-ml",
