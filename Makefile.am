@@ -45,7 +45,7 @@ CPPUNIT_VER=1.13.2
 PCRE_VER=8.40
 SWIG_VER=3.0.2
 
-NUMPY_VER=1.7.2
+NUMPY_VER=1.11.2
 
 PROJ4_VER=4.8.0
 
@@ -56,7 +56,7 @@ NETCDF_VER=4.4.1.1
 NETCDFPY_VER=1.2.7
 
 SCIENTIFICPYTHON_VER=2.9.1p1
-FIAT_VER=0.9.9
+FIAT_VER=0.9.9p1
 
 SETUPTOOLS_VER=0.6c11
 
@@ -625,8 +625,8 @@ if INSTALL_FIAT
 	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
 	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
-	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
+	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
+	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -767,7 +767,7 @@ if WITH_HDF5
 petsc_options += --with-hdf5=1
 endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-dir=$(prefix) --LIBS=-lz
+petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
 endif
 if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
