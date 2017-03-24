@@ -72,7 +72,7 @@ if PETSC_TARBALL
 PETSC_VER=2.2.0
 endif
 else
-SPATIALDATA_VER=1.9.7
+SPATIALDATA_VER=1.9.8
 PYLITH_VER=2.2.0
 PETSC_VER=2.2.0
 endif
@@ -624,7 +624,7 @@ if INSTALL_FIAT
 	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
-	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
 	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
