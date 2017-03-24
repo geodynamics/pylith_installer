@@ -1,6 +1,40 @@
 See https://github.com/geodynamics/pylith_installer/commits/master for
 the complete log of changes made to PyLith Installer.
 
+Version 2.2.0-0
+
+  * Increment to PyLith version 2.2.0
+
+  * Add installation of PyLith Parameter Viewer 1.0.0.
+
+  * Updated Pythia to 0.8.1.18.
+
+  * Update Spatialdata to 1.9.8.
+
+  * Update dependencies so they are similar to Ubuntu 16.04 LTS.
+
+    - m4 1.4.17
+    - autoconf 2.69
+    - automake 1.15
+    - libtool 2.4.6
+    - gcc-5.4.0
+    - Python 2.7.13
+    - pcre 8.40
+    - cmake 3.7.0
+    - numpy.1.11.2
+
+  * Updated to latest SWIG that works with Pyre
+    - swig 3.0.2
+
+  * Other updates
+    - openmpi-1.8.8
+    - NetCDF 4.4.1.1
+    - netCDF4 (python) 1.2.7
+
+  * Updates with patches for using numpy 1.11.2.
+    - ScientificPython-2.9.1p1
+    - FIAT-0.9.9p1
+
 Version 2.1.4-0
 
   * Increment to PyLith version 2.1.4.
