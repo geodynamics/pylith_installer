@@ -161,6 +161,7 @@ class BinaryApp(object):
 
         # Darwin
         if self.os == "Darwin":
+            print("May need to add 'tar-pax' to AM_INIT_AUTOMAKE in pylith src/configure.ac to get 'make dist' to work in pylith-build.")
             print("Unpack tarball, unzip Python eggs (netCDF4)")
             print("Run packager/update_darwinlinking.py")
             print("Update Python eggs (zip -ru EGG DIR)")
