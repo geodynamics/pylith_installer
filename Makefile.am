@@ -448,7 +448,7 @@ installed_swig:
 # ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
-numpy: installed_python
+numpy: installed_python installed_setuptools
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz

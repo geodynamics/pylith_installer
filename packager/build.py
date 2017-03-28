@@ -73,6 +73,7 @@ class BinaryApp(object):
                           "--enable-fiat",
                           "--enable-pcre",
                           "--enable-swig",
+                          "--enable-setuptools",
                       )
             petscOptions = ("--download-chaco=1",
                             "--download-ml=1",
