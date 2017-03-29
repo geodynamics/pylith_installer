@@ -1,4 +1,4 @@
-FROM geodynamics/pylith-buildenv:latest
+FROM geodynamics/pylith-userenv:latest
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 ENV MAKE_THREADS 8

@@ -1,0 +1,45 @@
+FROM debian:jessie
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        g++ \
+	make \
+        file \
+        automake \
+        autoconf \
+        libtool \
+        curl \
+        swig \
+        python-dev \
+	libpython2.7 \
+        python-setuptools \
+        zlib1g-dev \
+        git \
+	ca-certificates \
+        libcppunit-dev \
+	libproj-dev \
+	proj-bin \
+	proj-data \
+	libmpich-dev \
+	mpich \
+	vim-common \
+	vim-runtime \
+	vim-nox \
+	less \
+	bash-completion \
+	python-matplotlib \
+	python-tk \
+	iceweasel \
+    && rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+    
+ADD certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+ENV PYTHON_VERSION 2.7
+
+# Create 'pylith-user' user
+ENV PYLITH_USER pylith-user
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+
+CMD /bin/bash
