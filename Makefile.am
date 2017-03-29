@@ -36,6 +36,7 @@ GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
 PYTHON_VER=2.7.13
+PYTHON_SITEPKGS=lib/python2.7/site-packages
 
 MPICH_VER=3.1.3
 OPENMPI_VER=1.8.8
@@ -201,7 +202,7 @@ rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcd
 # setup
 # ----------------------------------------------------------------------
 mkdest:
-	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
+	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin $(prefix)/$(PYTHON_SITEPKGS)
 
 finished_mkdest:
 	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
