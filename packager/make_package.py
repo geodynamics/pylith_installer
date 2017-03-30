@@ -116,6 +116,7 @@ class PackingList(object):
         
         binDirs = config.packaging.bin_dirs
         libDirs = config.packaging.lib_dirs
+        incDirs = config.packaging.include_dirs
         miscDirs = config.packaging.misc_dirs
         if platform.machine() == "x86_64":
             libDirs.append("lib64")
@@ -133,6 +134,11 @@ class PackingList(object):
         for d in libDirs:
             self.libraries.extend(walkDirTree(d))
         self.libraries = filterList(self.libraries, self.exclude)
+            
+        self.includes = []
+        for d in incDirs:
+            self.includes.extend(walkDirTree(d))
+        self.includes = filterList(self.includes, self.exclude)
             
         self.misc = []
         for d in miscDirs:
@@ -192,6 +198,8 @@ class PackingList(object):
         for f in self.programs:
             yield f
         for f in self.libraries:
+            yield f
+        for f in self.includes:
             yield f
         for f in self.misc:
             yield f
