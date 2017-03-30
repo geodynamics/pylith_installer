@@ -36,6 +36,7 @@ class Packaging(object):
     _name = 'packaging'
     _attrs = ['bin_dirs', 
               'lib_dirs', 
+              'include_dirs', 
               'misc_dirs',
               'files',
               'strip_list',
