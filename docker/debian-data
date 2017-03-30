@@ -1,4 +1,4 @@
-FROM geodynamics/pylith-buildenv:latest
+FROM geodynamics/pylith-baseenv:latest
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 # Mount point for data

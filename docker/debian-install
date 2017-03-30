@@ -1,4 +1,4 @@
-FROM geodynamics/pylith-userenv:latest
+FROM geodynamics/pylith-baseenv:latest
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 ENV MAKE_THREADS 8
@@ -15,7 +15,7 @@ RUN mkdir $PREFIX_DIR \
 
 USER $PYLITH_USER
 WORKDIR $BUILD_DIR
-RUN git clone --depth 1 --recursive --branch master https://github.com/geodynamics/pylith_installer.git src
+RUN git clone --depth 1 --recursive --branch baagaard/add-release-2.2.0 https://github.com/geodynamics/pylith_installer.git src
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
