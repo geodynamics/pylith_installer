@@ -37,6 +37,9 @@ end of life. Note the GLIBC version (ldd --version).
     Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
     sudo update-ca-trust.
 
+Update Guest Additions after updating VM Linux kernels
+  sudo /etc/init.d/vboxadd setup
+
 Command line interface to Oracle VirtualBox
 
   List virtual machines
@@ -52,3 +55,4 @@ Command line interface to Oracle VirtualBox
   Shutdown virtual machine
     sudo shutdown -h now
     VBoxManage controlvm NAME poweroff (if shutdown doesn't work)
+
