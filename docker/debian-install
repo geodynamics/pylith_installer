@@ -1,4 +1,4 @@
-FROM geodynamics/pylith-buildenv:latest
+FROM geodynamics/pylith-baseenv:latest
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 ENV MAKE_THREADS 8
@@ -36,6 +36,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     && cd pylith-build && make dist \
     && cd /home/$PYLITH_USER && tar -zxvf $BUILD_DIR/build/pylith-build/pylith-*.tar.gz \
     && rm -r $BUILD_DIR/build \
+    && ln -s $PREFIX_DIR/parametersgui . \
     && unset BUILD_DIR MAKE_THREADS
 
 # Setup user and environment

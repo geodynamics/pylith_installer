@@ -36,9 +36,11 @@ class Packaging(object):
     _name = 'packaging'
     _attrs = ['bin_dirs', 
               'lib_dirs', 
+              'include_dirs', 
               'misc_dirs',
               'files',
-              'strip_list',
+              'strip_libs',
+              'strip_progs',
               'exclude',
               'scripts',
               'urls',
@@ -116,10 +118,11 @@ class PackingList(object):
         
         binDirs = config.packaging.bin_dirs
         libDirs = config.packaging.lib_dirs
+        incDirs = config.packaging.include_dirs
         miscDirs = config.packaging.misc_dirs
         if platform.machine() == "x86_64":
             libDirs.append("lib64")
-        self.directories = binDirs + libDirs + miscDirs
+        self.directories = binDirs + libDirs + incDirs + miscDirs
 
         self.extraFiles = config.packaging.files
         self.exclude = config.packaging.exclude
@@ -133,6 +136,11 @@ class PackingList(object):
         for d in libDirs:
             self.libraries.extend(walkDirTree(d))
         self.libraries = filterList(self.libraries, self.exclude)
+            
+        self.includes = []
+        for d in incDirs:
+            self.includes.extend(walkDirTree(d))
+        self.includes = filterList(self.includes, self.exclude)
             
         self.misc = []
         for d in miscDirs:
@@ -162,15 +170,18 @@ class PackingList(object):
 
         self.stripList = []
         if opSys == "win":
-            for f in config.packaging.strip_list:
+            for f in config.packaging.strip_libs:
                 fdll = f.replace("lib/lib", "bin/cyg")+"-0"+libSuffix
                 if fdll in self.libraries:
                     self.stripList.append(fdll)
         else:
-            for f in config.packaging.strip_list:
+            for f in config.packaging.strip_libs:
                 flib = f+libSuffix
                 if flib in self.libraries:
                     self.stripList.append(flib)
+        for f in config.packaging.strip_progs:
+            fprogs = glob(f)
+            self.stripList += fprogs
 
         cig = [("CIG", "cig", "http://www.geodynamics.org/")]
         self.urls = cig + tupleUp(config.packaging.urls, 3)
@@ -192,6 +203,8 @@ class PackingList(object):
         for f in self.programs:
             yield f
         for f in self.libraries:
+            yield f
+        for f in self.includes:
             yield f
         for f in self.misc:
             yield f

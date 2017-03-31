@@ -19,6 +19,7 @@
 #
 # Step 1: Clone pylith_installer repository.
 # Step 2: Use this utility to create tarballs.
+#   Source setup.sh after running --configure.
 
 import os
 import shutil
@@ -72,6 +73,7 @@ class BinaryApp(object):
                           "--enable-fiat",
                           "--enable-pcre",
                           "--enable-swig",
+                          "--enable-setuptools",
                       )
             petscOptions = ("--download-chaco=1",
                             "--download-ml=1",
@@ -90,6 +92,7 @@ class BinaryApp(object):
                           "--enable-numpy",
                           "--enable-cmake",
                           "--with-fortran=no",
+                          "--with-fetch=curl",
                           )
             petscOptions = ("--download-chaco=1",
                             "--download-ml",
@@ -158,6 +161,7 @@ class BinaryApp(object):
 
         # Darwin
         if self.os == "Darwin":
+            print("May need to add 'tar-pax' to AM_INIT_AUTOMAKE in pylith src/configure.ac to get 'make dist' to work in pylith-build.")
             print("Unpack tarball, unzip Python eggs (netCDF4)")
             print("Run packager/update_darwinlinking.py")
             print("Update Python eggs (zip -ru EGG DIR)")

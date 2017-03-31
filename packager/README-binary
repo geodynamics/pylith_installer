@@ -19,12 +19,40 @@ end of life. Note the GLIBC version (ldd --version).
   autoconf
   libtool
   git
+  zlib1g-dev
+  openssh-server
+
+  Shouldn't need this since we build the compiler and Python.
   g++
   gfortran
   python-dev
-  zlib1g-dev
 
-4. Copy any CA certificates needed to access https to
-  /usr/local/share/ca-certificates and then run
-  sudo update-ca-certificates.
+4. Copy any CA certificates needed to access https and then update the list.
+
+  Ubuntu:
+    Copy certificates to /usr/local/share/ca-certificates and then run
+    sudo update-ca-certificates.
+
+  Fedora:
+    Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
+    sudo update-ca-trust.
+
+Update Guest Additions after updating VM Linux kernels
+  sudo /etc/init.d/vboxadd setup
+
+Command line interface to Oracle VirtualBox
+
+  List virtual machines
+    VBoxManage list vms
+
+  List running virtual machines
+    VBoxManage list runningvms
+
+  Start virtual machine
+    VBoxHeadless --startvm NAME
+    VBoxManage startvm NAME --type=headless
+
+  Shutdown virtual machine
+    sudo shutdown -h now
+    VBoxManage controlvm NAME poweroff (if shutdown doesn't work)
 

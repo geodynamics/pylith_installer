@@ -25,59 +25,60 @@ DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
 # ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
-M4_VER=1.4.16
-AUTOCONF_VER=2.68
-AUTOMAKE_VER=1.11.1
-LIBTOOL_VER=2.4
+M4_VER=1.4.17
+AUTOCONF_VER=2.69
+AUTOMAKE_VER=1.15
+LIBTOOL_VER=2.4.6
 
-GCC_VER=4.7.3
+GCC_VER=5.4.0
 MPC_VER=1.0.2
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
-PYTHON_VER=2.7.6
+PYTHON_VER=2.7.13
+PYTHON_SITEPKGS=lib/python2.7/site-packages
 
 MPICH_VER=3.1.3
-OPENMPI_VER=1.8.4
+OPENMPI_VER=1.8.8
 
 CPPUNIT_VER=1.13.2
 
-PCRE_VER=8.12
-SWIG_VER=2.0.6
+PCRE_VER=8.40
+SWIG_VER=3.0.2
 
-GIT_VER=1.8.2.1
-
-NUMPY_VER=1.7.2
+NUMPY_VER=1.11.2
 
 PROJ4_VER=4.8.0
 
 HDF5_VER=1.8.11p2
 H5PY_VER=2.2.1
 
-NETCDF_VER=4.4.0
-NETCDFPY_VER=1.1.8p1
+NETCDF_VER=4.4.1.1
+NETCDFPY_VER=1.2.7
 
-SCIENTIFICPYTHON_VER=2.9.1
-FIAT_VER=0.9.9
+SCIENTIFICPYTHON_VER=2.9.1p1
+FIAT_VER=0.9.9p1
 
 SETUPTOOLS_VER=0.6c11
 
-PYTHIA_VER=0.8.1.17
+PYTHIA_VER=0.8.1.18
 NEMESIS_VER=1.1.0
 
-CMAKE_VER=2.8.12.2
+CMAKE_VER=3.7.0
 
 if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.1.4
+PETSC_VER=2.2.0
 endif
 else
-SPATIALDATA_VER=1.9.7
-PYLITH_VER=2.1.4
-PETSC_VER=2.1.4
+SPATIALDATA_VER=1.9.8
+PYLITH_VER=2.2.0
+PETSC_VER=2.2.0
 endif
+
+PARAMETERSGUI_VER=1.0.0
 
 # ----------------------------------------------------------------------
 # Files
@@ -124,7 +125,8 @@ noinst_tmp = \
 	installed_spatialdata \
 	installed_cmake \
 	installed_petsc \
-	installed_pylith
+	installed_pylith \
+	installed_parametersgui
 
 
 noinst_builddirs = \
@@ -168,7 +170,6 @@ FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 # ----------------------------------------------------------------------
 # Environment settings.
 # ----------------------------------------------------------------------
-abs_builddir=`pwd`
 env_flags = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
 
 if WITH_FORTRAN
@@ -182,11 +183,11 @@ endif
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: installed_pylith 
+all: installed_pylith installed_parametersgui
 
-deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_netcdfpy installed_git installed_cmake installed_proj4
+deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_netcdfpy installed_cmake installed_proj4
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -201,7 +202,7 @@ rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcd
 # setup
 # ----------------------------------------------------------------------
 mkdest:
-	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin
+	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin $(prefix)/$(PYTHON_SITEPKGS)
 
 finished_mkdest:
 	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
@@ -448,7 +449,7 @@ installed_swig:
 # ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
-numpy: installed_python
+numpy: installed_python installed_setuptools
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
@@ -624,9 +625,9 @@ if INSTALL_FIAT
 	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
-	$(FETCH_SCRIPT) "$(downloader)" fiat-$(FIAT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf fiat-$(FIAT_VER).tar.gz
-	cd fiat-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
+	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
+	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_fiat
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -702,7 +703,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit installed_autotools
+spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit installed_autotools 
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
@@ -722,10 +723,13 @@ endif
 			--prefix=$(prefix) $(env_flags) $(env_compilers) \
 			$(spatialdata_options) ; \
 		make -j $(make_threads) && \
-		make install && \
-		touch ../installed_spatialdata
+		make install
 if WITH_TESTING
-	cd spatialdata-build && make -j $(make_threads) check
+	cd spatialdata-build && \
+		make -j $(make_threads) check && \
+		touch ../installed_spatialdata
+else
+	touch ../installed_spatialdata
 endif
 else
 	@echo "$@ already installed. Skipping installation."
@@ -734,26 +738,6 @@ endif
 
 installed_spatialdata:
 	$(MAKE) $(AM_MAKEFLAGS) spatialdata
-
-
-# ----------------------------------------------------------------------
-# git
-# ----------------------------------------------------------------------
-git: installed_python
-if INSTALL_GIT
-	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf git-$(GIT_VER).tar.gz
-	cd git-$(GIT_VER) && \
-		make prefix=$(prefix) NO_EXPAT=1 NO_TCLTK=1 NO_GETTEXT=1 all install && \
-		touch ../installed_git
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch installed_git
-endif
-
-installed_git:
-	$(MAKE) $(AM_MAKEFLAGS) git
 
 
 # ----------------------------------------------------------------------
@@ -778,13 +762,13 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: installed_mpi installed_hdf5 installed_git installed_cmake
+petsc: installed_mpi installed_hdf5 installed_cmake
 if INSTALL_PETSC
 if WITH_HDF5
 petsc_options += --with-hdf5=1
 endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-dir=$(prefix) --LIBS=-lz
+petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
 endif
 if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
@@ -813,10 +797,10 @@ endif
 			--with-debugging=0 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) ; \
-		make $(petsc_build_options) PETSC_DIR=$(abs_builddir) PETSC_ARCH=$(PETSC_ARCH) && \
-		make PETSC_DIR=$(abs_builddir) install && \
-		make PETSC_DIR=$(abs_builddir) test && \
+			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) ; \
+		make $(petsc_build_options) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
+		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
+		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
 		touch ../installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
@@ -859,15 +843,36 @@ endif
                         $(env_flags) $(env_mpicompilers) \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
-		make install && \
-		touch ../installed_pylith
+		make install
 if WITH_TESTING
-	cd pylith-build && make -j $(make_threads) check
+	cd pylith-build && \
+		make -j $(make_threads) check && \
+		touch ../installed_pylith
+else
+	touch ../installed_pylith
 endif
 
 installed_pylith:
 	$(MAKE) $(AM_MAKEFLAGS) pylith
 
+
+# ----------------------------------------------------------------------
+# parametersgui (pylith-parameters)
+# ----------------------------------------------------------------------
+parametersgui: 
+if INSTALL_PARAMETERSGUI
+	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
+	cd $(prefix) && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
+		cd $(abs_top_builddir) && \
+		touch installed_parametersgui
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_parametersgui
+endif
+
+installed_parametersgui:
+	$(MAKE) $(AM_MAKEFLAGS) parametersgui
 
 # ----------------------------------------------------------------------
 # clean

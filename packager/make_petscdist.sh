@@ -3,7 +3,7 @@
 # Customized for PETSc tarball for PyLith by Brad Aagaard.
 # Original is $PETSC_DIR/bin/maint/builddist.
 #
-# ~/src/cig/pylith/packager/make_petscdist.sh /tools/common/petsc-dist knepley/pylith
+# ~/src/cig/pylith_installer/packager/make_petscdist.sh /tools/common/petsc-dist knepley/pylith
 #
 # This script builds the PETSc tar file distribution
 #

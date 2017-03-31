@@ -37,7 +37,21 @@ Run Unix shell within Docker to use PyLith.
 
   $ docker run -ti --volumes-from pylith-data geodynamics/pylith
 
-  HINT: You will probably want to copy the examples from the
+  To enable use of GUI applications, like iceweasel (Firefox), use
+
+    $ xhost +local:root
+    $ XSOCK=/tmp/.X11-unix/X0
+    $ docker run -ti --volumes-from pylith-data -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK geodynamics/pylith
+
+  The container includes the following useful utilities:
+    * iceweasel (Firefox) web-browser for use with pylith_paramviewer
+    * vim text editor
+    * matplotlib Python plotting package
+
+  We do not yet include ParaView due to difficulties associated with
+  rendering on the host display outside the container. 
+
+HINT: You will probably want to copy the examples from the
   pylith-VERSION directory to the data directory, which is the
   persistent storage.
 
@@ -47,10 +61,17 @@ Run Unix shell within Docker to use PyLith.
     Control-p Control-q
 
   To attach to "paused" or "running" container.
-    1. Get container id
-      $ docker ps
-    2. Attach to container
-      $ docker attach CONTAINER_ID
+    # Find the container id
+    $ docker ps
+    # Attach to the container
+    $ docker attach CONTAINER_ID
+
+  To restart an existing container after it exited.
+    # Get the container id
+    $ docker ps -a
+    # Start and then attach to the container.
+    $ docker start CONTAINER_ID
+    $ docker attach CONTAINER_ID      
 
 
 ======================================================================
@@ -84,4 +105,7 @@ Docker Quick Reference
     $ docker rmi CONTAINER_ID
 
 
-  
+======================================================================
+Running GUI
+======================================================================
+

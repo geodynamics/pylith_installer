@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.1.4-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.2.2-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -205,14 +205,6 @@ AC_ARG_ENABLE([swig],
 	[install_swig=no])
 AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
 
-# GIT
-AC_ARG_ENABLE([git],
-    [AC_HELP_STRING([--enable-git],
-        [install git @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_git=yes; else install_git=no; fi],
-	[install_git=no])
-AM_CONDITIONAL([INSTALL_GIT], [test "$install_git" = yes])
-
 # PYTHIA
 install_pythia=no
 if test "$install_nemesis" = yes; then
@@ -222,6 +214,14 @@ if test "$install_spatialdata" = yes; then
   install_pythia=yes
 fi
 AM_CONDITIONAL([INSTALL_PYTHIA], [test "$install_pythia" = yes])
+
+# PARAMTERSGUI (PYLITH-PARAMETERS)
+AC_ARG_ENABLE([parametersgui],
+    [AC_HELP_STRING([--enable-pylith-parameters],
+        [install parametersgui @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_parametersgui=yes; else install_parametersgui=no; fi],
+	[install_parametersgui=yes])
+AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 
 
 # ----------------------------------------------------------------------
@@ -395,16 +395,9 @@ if test "$pylith_git" != no; then
     AUTORECONF=autoreconf
   fi
   # GIT
-  if test "$install_git" = yes; then
-    AC_PATH_PROG(CURL, curl)
-      AC_CHECK_HEADER([curl/curl.h], [], [
-              AC_MSG_ERROR([Header file 'curl.h' not found; maybe you don't have the curl development package, e.g. 'curl-dev', installed?])
-              ])
-  else
-    AC_PATH_PROG(GIT, git)
-    if test -z "$GIT" ; then
-      AC_MSG_FAILURE([cannot find 'git' program.])
-    fi
+  AC_PATH_PROG(GIT, git)
+  if test -z "$GIT" ; then
+    AC_MSG_FAILURE([cannot find 'git' program.])
   fi
   petsc_git=yes
 fi
@@ -534,7 +527,7 @@ if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$pylith_git" != no ; then
-    AC_PROG_SWIG(1.3.33)
+    AC_PROG_SWIG([2.0.4], [3.0.2])
   fi
 fi
 
@@ -832,9 +825,10 @@ echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
-echo "  git: $install_git"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
+echo "  pyre/pythia: $install_pythia"
+echo "  pylith-parameters GUI: $install_parametersgui"
 echo ""
 if test "$pylith_git" != no ; then
   if test "$force_petsc_tarball" == yes ; then
