@@ -862,8 +862,7 @@ installed_pylith:
 parametersgui: 
 if INSTALL_PARAMETERSGUI
 	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
-	cd $(prefix)/share && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
-		cd $(prefix) && ln -s share/parametersgui parametersgui && \
+	cd $(prefix) && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
 		cd $(abs_top_builddir) && \
 		touch installed_parametersgui
 
