@@ -42,8 +42,7 @@ Run Unix shell within Docker to use PyLith.
   Linux:
     $ xhost +local:root
   Darwin (using Terminal application):
-    $ xhost +YOUR_IP_ADDRESS
-    $ DISPLAY=YOUR_IP_ADDRESS:0
+    $ xhost +YOUR_IP_ADDRESS; DISPLAY=YOUR_IP_ADDRESS:0
   For Linux and Darwin, then continue with
     $ XSOCK=/tmp/.X11-unix
     $ docker run -ti --volumes-from pylith-data -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK geodynamics/pylith
