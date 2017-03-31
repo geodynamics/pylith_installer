@@ -39,8 +39,13 @@ Run Unix shell within Docker to use PyLith.
 
   To enable use of GUI applications, like iceweasel (Firefox), use
 
+  Linux:
     $ xhost +local:root
-    $ XSOCK=/tmp/.X11-unix/X0
+  Darwin (using Terminal application):
+    $ xhost +YOUR_IP_ADDRESS
+    $ DISPLAY=YOUR_IP_ADDRESS:0
+  For Linux and Darwin, then continue with
+    $ XSOCK=/tmp/.X11-unix
     $ docker run -ti --volumes-from pylith-data -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK geodynamics/pylith
 
   The container includes the following useful utilities:
