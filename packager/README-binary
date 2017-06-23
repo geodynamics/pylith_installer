@@ -56,3 +56,9 @@ Command line interface to Oracle VirtualBox
     sudo shutdown -h now
     VBoxManage controlvm NAME poweroff (if shutdown doesn't work)
 
+  Set network addresses in /etc/hosts for easy access
+
+  Updating vms
+    sudo apt-get update
+    sudo apt-get dist-upgrade
+    
