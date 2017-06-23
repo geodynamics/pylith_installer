@@ -1,6 +1,13 @@
 See https://github.com/geodynamics/pylith_installer/commits/master for
 the complete log of changes made to PyLith Installer.
 
+Version 2.2.1-0
+
+  * Increment to PyLith version 2.2.1
+
+  * Update Spatialdata to 1.9.9.
+
+
 Version 2.2.0-0
 
   * Increment to PyLith version 2.2.0
@@ -35,6 +42,7 @@ Version 2.2.0-0
     - ScientificPython-2.9.1p1
     - FIAT-0.9.9p1
 
+
 Version 2.1.4-0
 
   * Increment to PyLith version 2.1.4.
@@ -44,6 +52,7 @@ Version 2.1.4-0
   * Updated Pythia to 0.8.1.17.
 
   * Update Spatialdata to 1.9.7.
+
 
 Version 2.1.3-0
 
