@@ -21,7 +21,7 @@ class DockerApp(object):
 
     def __init__(self, container):
         arch = "debian"
-        pylithVersion = "2.2.0"
+        pylithVersion = "2.2.1rc1"
         buildVersion = "latest"
 
         baseenvTag = buildVersion
