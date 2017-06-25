@@ -165,7 +165,7 @@ class BinaryApp(object):
             print("Unpack tarball, unzip Python eggs (netCDF4)")
             print("Run packager/update_darwinlinking.py")
             print("Update Python eggs (zip -ru EGG DIR)")
-            print("Regenerate tarball")
+            print("Repack tarball")
         return
 
 
