@@ -10,7 +10,7 @@ if test ! -f bin/pylith; then
     echo "    source setup.sh"
     echo 
 else
-    export PATH="$pylith/bin:/bin:/usr/bin:$PATH"
+    export PATH="$pylith/bin:/bin:/usr/bin:/sbin/:$PATH"
     export PYTHONPATH="$pylith/lib/python2.7/site-packages"
     echo "Ready to run PyLith."
 fi
