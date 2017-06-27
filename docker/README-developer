@@ -11,6 +11,12 @@ Use the build.py script to build/run/push Docker images.
   $ ./build.py --container=binary --build
   $ ./build.py --container=binary --run
 
+Push images
+  $ docker tag geodynamics/pylith:VERSION geodynamics/pylith:latest
+  $ docker login
+  $ docker push geodynamics/pylith:VERSION
+  $ docker push geodynamics/pylith:latest
+
 We use Debian Linux base images to reduce the image size.
   Debian packages: https://packages.debian.org/stable/allpackages?format=txt.gz
 
