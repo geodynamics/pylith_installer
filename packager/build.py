@@ -174,7 +174,8 @@ class BinaryApp(object):
         print("Setting environment...")
 
         path = (os.path.join(self.destDir, "bin"),
-                "/bin", 
+                os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
+                "/bin",
                 "/usr/bin",
         )
         os.environ["PATH"] = ":".join(path)
