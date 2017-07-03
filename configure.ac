@@ -414,6 +414,9 @@ AC_PROG_CXXCPP
 
 # GCC
 if test "$install_gcc" = yes ; then
+  if test "$install_mpi" = no ; then
+    AC_MSG_ERROR([Incompatible settings: building gcc but not MPI. If you use --enable-gcc, you should also use --enable-mpi.])
+  fi
   if test "$with_fortran" = yes ; then
     FC=gfortran
     AC_SUBST(FC)
