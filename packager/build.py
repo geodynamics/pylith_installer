@@ -60,6 +60,7 @@ class BinaryApp(object):
     def configure(self):
         if self.os == "Linux":
             configArgs = ("--enable-gcc",
+                          "--enable-openssl", 
                           "--enable-python", 
                           "--enable-mpi=mpich",
                           "--enable-cppunit",
