@@ -79,6 +79,14 @@ if test "$install_mpi" = mpich ; then
 fi
 AC_SUBST(mpich_sharedarch)  
 
+# OPENSSL
+AC_ARG_ENABLE([openssl],
+    [AC_HELP_STRING([--enable-openssl],
+        [install OpenSSL @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_openssl=yes; else install_openssl=no; fi],
+	[install_openssl=no])
+AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
+
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
     [AC_HELP_STRING([--enable-cppunit],
@@ -812,6 +820,7 @@ echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
 echo "  gcc: $install_gcc, languages: $gcc_languages"
+echo "  openssl: $install_openssl"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  autotools: $install_autotools"
