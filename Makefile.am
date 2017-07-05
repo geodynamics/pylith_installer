@@ -35,7 +35,7 @@ MPC_VER=1.0.2
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
-OPENSSL_VER=1.1.0f
+OPENSSL_VER=1.0.2l
 PYTHON_VER=2.7.13
 PYTHON_SITEPKGS=lib/python2.7/site-packages
 
@@ -297,10 +297,9 @@ openssl: installed_compilers
 if INSTALL_OPENSSL
 	$(FETCH_SCRIPT) "$(downloader)" openssl-$(OPENSSL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf openssl-$(OPENSSL_VER).tar.gz
-	$(MKDIR_P) openssl-build
-	cd openssl-build && \
-		$(env_compilers) ../openssl-$(OPENSSL_VER)/config \
-			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl ; \
+	cd openssl-$(OPENSSL_VER) && \
+		$(env_compilers) ./config \
+			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl  shared; \
 		make -j $(make_threads) && \
 		make install && \
 		touch ../installed_openssl
@@ -777,7 +776,7 @@ if INSTALL_CMAKE
 	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
-		./bootstrap  --prefix=$(prefix) && make && make install && \
+		$(env_flags) ./bootstrap --verbose --prefix=$(prefix) && make && make install && \
 		touch ../installed_cmake
 else
 	@echo "Skipping $@ installation."
