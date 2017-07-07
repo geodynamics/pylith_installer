@@ -774,7 +774,7 @@ fi
 # Setup environment so dependencies are used in build
 
 CPPFLAGS="-I$prefix/include $CPPFLAGS"
-LDFLAGS="-L$prefix/lib $LDFLAGS"
+LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
