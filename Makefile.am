@@ -528,7 +528,7 @@ if INSTALL_PROJ4
 	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
 	$(MKDIR_P) proj4-build/nad
 	cd proj4-build/nad && \
-		unzip ../../proj-datumgrid-1.3.zip
+		$(UNZIP) ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
 			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
