@@ -31,14 +31,20 @@ end of life. Note the GLIBC version (ldd --version).
 
   Ubuntu:
     Copy certificates to /usr/local/share/ca-certificates and then run
-    sudo update-ca-certificates.
+    sudo update-ca-certificates
 
   Fedora:
     Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
-    sudo update-ca-trust.
+    sudo update-ca-trust
+
+  CentOS
+    Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
+    sudo update-ca-trust enable
+
 
 Update Guest Additions after updating VM Linux kernels
   sudo /etc/init.d/vboxadd setup
+
 
 Command line interface to Oracle VirtualBox
 
