@@ -109,6 +109,14 @@ AC_ARG_WITH([numpy-blaslapack],
 	[with_numpy_blaslapack=no])
 AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
 
+# SCIPY
+AC_ARG_ENABLE([scipy],
+    [AC_HELP_STRING([--enable-scipy],
+        [install scipy @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_scipy=yes; else install_scipy=no; fi],
+	[install_scipy=yes])
+AM_CONDITIONAL([INSTALL_SCIPY], [test "$install_scipy" = yes])
+
 # PROJ4
 AC_ARG_ENABLE([proj4],
     [AC_HELP_STRING([--enable-proj4],
@@ -820,7 +828,7 @@ echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
 echo "  gcc: $install_gcc, languages: $gcc_languages"
-echo "  openssl: $install_openssl"
+echo "  openssl: $install_openssl (binary package)"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  autotools: $install_autotools"
@@ -830,11 +838,12 @@ echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
-echo "  netCDF4 (python): $install_netcdfpy"
+echo "  netCDF4 (python): $install_netcdfpy (optional; post-processing)"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
+echo "  scipy: $install_scipy (optional; post-processing)"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  cmake: $install_cmake"
