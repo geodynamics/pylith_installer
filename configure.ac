@@ -562,6 +562,12 @@ fi
 if test "$install_proj4" = yes ; then
   AC_PATH_PROG(existing_proj4, proj)
   AC_SUBST(existing_proj4)
+  # Installing datums requires unzip
+  AC_PATH_PROG(UNZIP, unzip)
+  if test -z "$UNZIP" ; then
+    AC_MSG_FAILURE([cannot find 'unzip' program.])
+    UNZIP=`echo "Error: unzip is not installed." ; false`
+  fi
 else
   CIT_PROJ4_HEADER
   CIT_PROJ4_LIB
