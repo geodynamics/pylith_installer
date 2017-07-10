@@ -42,14 +42,12 @@ PYTHON_SITEPKGS=lib/python2.7/site-packages
 MPICH_VER=3.1.3
 OPENMPI_VER=1.8.8
 
-
 CPPUNIT_VER=1.13.2
 
 PCRE_VER=8.40
 SWIG_VER=3.0.2
 
 NUMPY_VER=1.11.2
-SCIPY_VER=0.17.1
 
 PROJ4_VER=4.8.0
 
@@ -191,7 +189,7 @@ endif
 # ----------------------------------------------------------------------
 all: installed_pylith installed_parametersgui
 
-deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_netcdfpy installed_scipy installed_cmake installed_proj4
+deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_netcdfpy installed_cmake installed_proj4
 
 rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
@@ -496,26 +494,6 @@ endif
 
 installed_numpy:
 	$(MAKE) $(AM_MAKEFLAGS) numpy
-
-
-# ----------------------------------------------------------------------
-# scipy
-# ----------------------------------------------------------------------
-scipy: installed_numpy
-if INSTALL_SCIPY
-	$(FETCH_SCRIPT) "$(downloader)" scipy-$(SCIPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf scipy-$(SCIPY_VER).tar.gz
-	cd scipy-$(SCIPY_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix) && \
-		touch ../installed_scipy
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch installed_scipy
-endif
-
-installed_scipy:
-	$(MAKE) $(AM_MAKEFLAGS) scipy
 
 
 # ----------------------------------------------------------------------
@@ -863,7 +841,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy installed_scipy installed_autotools
+pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy installed_autotools
 pylith_options = 
 if WITH_NETCDF
 pylith_options += --enable-cubit

@@ -109,14 +109,6 @@ AC_ARG_WITH([numpy-blaslapack],
 	[with_numpy_blaslapack=no])
 AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
 
-# SCIPY
-AC_ARG_ENABLE([scipy],
-    [AC_HELP_STRING([--enable-scipy],
-        [install scipy @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_scipy=yes; else install_scipy=no; fi],
-	[install_scipy=yes])
-AM_CONDITIONAL([INSTALL_SCIPY], [test "$install_scipy" = yes])
-
 # PROJ4
 AC_ARG_ENABLE([proj4],
     [AC_HELP_STRING([--enable-proj4],
@@ -849,7 +841,6 @@ echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
-echo "  scipy: $install_scipy (optional; post-processing)"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  cmake: $install_cmake"
