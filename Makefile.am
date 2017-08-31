@@ -79,7 +79,7 @@ PYLITH_VER=2.2.1
 PETSC_VER=2.2.1
 endif
 
-PARAMETERSGUI_VER=1.0.1
+PARAMETERSGUI_VER=1.1.0
 
 # ----------------------------------------------------------------------
 # Files
