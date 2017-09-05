@@ -801,7 +801,7 @@ if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
 endif
 if INSTALL_CMAKE
-petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH) 
+petsc_build_options = -f gmakefile -j$(make_threads)
 else
 petsc_build_options = 
 endif
@@ -824,7 +824,7 @@ endif
 			--with-debugging=0 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) ; \
+			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make $(petsc_build_options) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
