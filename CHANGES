@@ -5,7 +5,14 @@ Version 2.2.1-0
 
   * Increment to PyLith version 2.2.1
 
-  * Update Spatialdata to 1.9.9.
+  * Update Spatialdata to 1.9.10
+
+  * Update pylith_parameters to 1.1.0
+
+  * Build openssl
+
+  * Add configure check for unzip (Proj.4 datums) and generate error
+    if building gcc but not MPI.
 
 
 Version 2.2.0-0
