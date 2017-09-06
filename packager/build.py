@@ -214,7 +214,7 @@ if __name__ == "__main__":
     parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
     parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
     parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=4)
-    parser.add_argument("--force-config", action="store", dest="force_config", default=False)
+    parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
     args = parser.parse_args()
 
     app = BinaryApp(args.base_dir, args.pylith_branch, args.make_threads, args.force_config)
