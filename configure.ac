@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.2.0-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.2.1-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -78,6 +78,14 @@ if test "$install_mpi" = mpich ; then
   esac
 fi
 AC_SUBST(mpich_sharedarch)  
+
+# OPENSSL
+AC_ARG_ENABLE([openssl],
+    [AC_HELP_STRING([--enable-openssl],
+        [install OpenSSL @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_openssl=yes; else install_openssl=no; fi],
+	[install_openssl=no])
+AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -414,6 +422,9 @@ AC_PROG_CXXCPP
 
 # GCC
 if test "$install_gcc" = yes ; then
+  if test "$install_mpi" = no ; then
+    AC_MSG_ERROR([Incompatible settings: building gcc but not MPI. If you use --enable-gcc, you should also use --enable-mpi.])
+  fi
   if test "$with_fortran" = yes ; then
     FC=gfortran
     AC_SUBST(FC)
@@ -543,6 +554,12 @@ fi
 if test "$install_proj4" = yes ; then
   AC_PATH_PROG(existing_proj4, proj)
   AC_SUBST(existing_proj4)
+  # Installing datums requires unzip
+  AC_PATH_PROG(UNZIP, unzip)
+  if test -z "$UNZIP" ; then
+    AC_MSG_FAILURE([cannot find 'unzip' program.])
+    UNZIP=`echo "Error: unzip is not installed." ; false`
+  fi
 else
   CIT_PROJ4_HEADER
   CIT_PROJ4_LIB
@@ -755,7 +772,7 @@ fi
 # Setup environment so dependencies are used in build
 
 CPPFLAGS="-I$prefix/include $CPPFLAGS"
-LDFLAGS="-L$prefix/lib $LDFLAGS"
+LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
@@ -809,6 +826,7 @@ echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
 echo "  gcc: $install_gcc, languages: $gcc_languages"
+echo "  openssl: $install_openssl (binary package)"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
 echo "  autotools: $install_autotools"
@@ -818,7 +836,7 @@ echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
-echo "  netCDF4 (python): $install_netcdfpy"
+echo "  netCDF4 (python): $install_netcdfpy (optional; post-processing)"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"

@@ -35,6 +35,7 @@ MPC_VER=1.0.2
 GMP_VER=4.3.2
 MPFR_VER=2.4.2
 
+OPENSSL_VER=1.0.2l
 PYTHON_VER=2.7.13
 PYTHON_SITEPKGS=lib/python2.7/site-packages
 
@@ -70,15 +71,15 @@ if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.2.0
+PETSC_VER=2.2.1
 endif
 else
-SPATIALDATA_VER=1.9.8
-PYLITH_VER=2.2.0
-PETSC_VER=2.2.0
+SPATIALDATA_VER=1.9.10
+PYLITH_VER=2.2.1
+PETSC_VER=2.2.1
 endif
 
-PARAMETERSGUI_VER=1.0.0
+PARAMETERSGUI_VER=1.1.0
 
 # ----------------------------------------------------------------------
 # Files
@@ -109,6 +110,7 @@ EXTRA_DIST = \
 
 noinst_tmp = \
 	installed_compilers \
+	installed_openssl \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
@@ -131,6 +133,7 @@ noinst_tmp = \
 
 noinst_builddirs = \
 	gcc-build \
+	openssl-build \
 	python-build \
 	openmpi-build \
 	mpich-build \
@@ -147,6 +150,7 @@ noinst_builddirs = \
 noinst_srcdirs = \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
+	openssl-${OPENSSL_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
@@ -286,9 +290,32 @@ installed_compilers:
 
 
 # ----------------------------------------------------------------------
+# openssl
+# ----------------------------------------------------------------------
+openssl: installed_compilers
+if INSTALL_OPENSSL
+	$(FETCH_SCRIPT) "$(downloader)" openssl-$(OPENSSL_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf openssl-$(OPENSSL_VER).tar.gz
+	cd openssl-$(OPENSSL_VER) && \
+		$(env_compilers) ./config \
+			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl  shared; \
+		make -j $(make_threads) && \
+		make install && \
+		touch ../installed_openssl
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_openssl
+endif
+
+installed_openssl:
+	$(MAKE) $(AM_MAKEFLAGS) openssl
+
+
+# ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers
+python: installed_compilers installed_openssl
 if INSTALL_PYTHON
 	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz $(DEPS_URL)
 	$(TAR) -zxf Python-$(PYTHON_VER).tgz
@@ -479,7 +506,7 @@ if INSTALL_PROJ4
 	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
 	$(MKDIR_P) proj4-build/nad
 	cd proj4-build/nad && \
-		unzip ../../proj-datumgrid-1.3.zip
+		$(UNZIP) ../../proj-datumgrid-1.3.zip
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
 			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
@@ -748,7 +775,7 @@ if INSTALL_CMAKE
 	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
-		./bootstrap  --prefix=$(prefix) && make && make install && \
+		$(env_flags) ./bootstrap --verbose --prefix=$(prefix) && make && make install && \
 		touch ../installed_cmake
 else
 	@echo "Skipping $@ installation."
@@ -774,7 +801,7 @@ if WITH_CUDA
 petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
 endif
 if INSTALL_CMAKE
-petsc_build_options = -j$(make_threads) -C $(PETSC_ARCH) 
+petsc_build_options = -f gmakefile -j$(make_threads)
 else
 petsc_build_options = 
 endif
@@ -797,7 +824,7 @@ endif
 			--with-debugging=0 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags) \
-			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) ; \
+			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make $(petsc_build_options) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \

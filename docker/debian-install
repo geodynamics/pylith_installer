@@ -31,6 +31,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-netcdfpy \
     --enable-nemesis \
     --enable-fiat \
+    --with-pylith-git=master \
     && . ./setup.sh \
     && make > make.log \
     && cd pylith-build && make dist \

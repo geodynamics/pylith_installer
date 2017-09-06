@@ -60,6 +60,7 @@ class BinaryApp(object):
     def configure(self):
         if self.os == "Linux":
             configArgs = ("--enable-gcc",
+                          "--enable-openssl", 
                           "--enable-python", 
                           "--enable-mpi=mpich",
                           "--enable-cppunit",
@@ -165,7 +166,7 @@ class BinaryApp(object):
             print("Unpack tarball, unzip Python eggs (netCDF4)")
             print("Run packager/update_darwinlinking.py")
             print("Update Python eggs (zip -ru EGG DIR)")
-            print("Regenerate tarball")
+            print("Repack tarball")
         return
 
 
@@ -173,8 +174,11 @@ class BinaryApp(object):
         print("Setting environment...")
 
         path = (os.path.join(self.destDir, "bin"),
-                "/bin", 
+                os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
+                "/bin",
                 "/usr/bin",
+                "/sbin",
+                "/usr/sbin",
         )
         os.environ["PATH"] = ":".join(path)
 
@@ -212,7 +216,7 @@ if __name__ == "__main__":
     parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
     parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
     parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=4)
-    parser.add_argument("--force-config", action="store", dest="force_config", default=False)
+    parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
     args = parser.parse_args()
 
     app = BinaryApp(args.base_dir, args.pylith_branch, args.make_threads, args.force_config)
