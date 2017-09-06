@@ -177,6 +177,8 @@ class BinaryApp(object):
                 os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
                 "/bin",
                 "/usr/bin",
+                "/sbin",
+                "/usr/sbin",
         )
         os.environ["PATH"] = ":".join(path)
 
