@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:jessie-slim
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN apt-get update \
