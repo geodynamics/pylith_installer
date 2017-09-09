@@ -33,7 +33,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-fiat \
     --with-pylith-git=master \
     && . ./setup.sh \
-    && make > make.log \
+    && make \
     && cd pylith-build && make dist \
     && cd /home/$PYLITH_USER && tar -zxvf $BUILD_DIR/build/pylith-build/pylith-*.tar.gz \
     && rm -r $BUILD_DIR/build \
