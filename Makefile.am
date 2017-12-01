@@ -189,7 +189,11 @@ endif
 # ----------------------------------------------------------------------
 all: installed_pylith installed_parametersgui
 
-deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_netcdfpy installed_cmake installed_proj4
+external_deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_netcdfpy installed_cmake installed_proj4
+
+cig_deps: installed_nemesis installed_pythia
+
+deps: external_deps cig_deps
 
 rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
