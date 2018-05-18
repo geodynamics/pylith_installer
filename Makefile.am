@@ -262,11 +262,11 @@ installed_autotools:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
-	$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
+	$(TAR) -jxf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
 		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
