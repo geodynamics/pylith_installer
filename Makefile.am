@@ -674,7 +674,7 @@ installed_fiat:
 # ----------------------------------------------------------------------
 setuptools: 
 if INSTALL_SETUPTOOLS
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
 	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
 	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_setuptools
 
