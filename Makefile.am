@@ -266,7 +266,7 @@ if INSTALL_GCC
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
-	$(TAR) -jxf gcc-$(GCC_VER).tar.gz
+	$(TAR) -zxf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
 		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
