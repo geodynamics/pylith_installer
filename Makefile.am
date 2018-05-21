@@ -516,7 +516,7 @@ if INSTALL_PROJ4
 		make -j $(make_threads) && \
 		make install && \
 		$(MKDIR_P) $(prefix)/share/proj && \
-		cd $(prefix)/shape/proj && \
+		cd $(prefix)/share/proj && \
 		$(UNZIP) $(top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
 		touch ../installed_proj4
 
