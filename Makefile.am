@@ -517,7 +517,7 @@ if INSTALL_PROJ4
 		make install && \
 		$(MKDIR_P) $(prefix)/share/proj && \
 		cd $(prefix)/share/proj && \
-		$(UNZIP) $(top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
+		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
 		touch ../installed_proj4
 
 else
