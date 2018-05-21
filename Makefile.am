@@ -509,6 +509,7 @@ if INSTALL_PROJ4
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ4_DATUM_VER).zip $(DEPS_URL)
 	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
+	$(MKDIR_P) proj4-build
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
 			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
@@ -516,7 +517,7 @@ if INSTALL_PROJ4
 		make install && \
 		$(MKDIR_P) $(prefix)/share/proj && \
 		cd $(prefix)/shape/proj && \
-		$(UNZIP) $(builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
+		$(UNZIP) $(top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
 		touch ../installed_proj4
 
 else
