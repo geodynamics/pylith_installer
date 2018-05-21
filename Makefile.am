@@ -633,7 +633,7 @@ if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
-		NETCDF4_DIR=$(prefix) CPPFLAGS="-I$(prefix)/include" LDFLAGS="-L${prefix)/lib" CC=mpicc $(env_flags) python setup.py install --prefix=$(prefix) && \
+		NETCDF4_DIR=$(prefix) CPPFLAGS="-I$(prefix)/include" LDFLAGS="-L$(prefix)/lib" CC=mpicc $(env_flags) python setup.py install --prefix=$(prefix) && \
 		touch ../installed_netcdfpy
 else
 if WITH_NETCDFPY
