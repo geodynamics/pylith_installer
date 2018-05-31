@@ -324,7 +324,8 @@ AC_ARG_WITH([pylith-git],
 if test "$pylith_git" = yes ; then pylith_git="master"; fi
 AC_SUBST(pylith_git)
 AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
-# FORCE USE OF PETSC TARBALL
+
+# Force use of PETSc tarbarll
 AC_ARG_WITH([petsc-tarball],
     [AC_HELP_STRING([--with-petsc-tarball],
         [Force use of PETSc tarball even if using PyLith from repository @<:@default=no@:>@])],
@@ -332,6 +333,22 @@ AC_ARG_WITH([petsc-tarball],
 	[force_petsc_tarball=no])
 AC_SUBST(force_petsc_tarball)
 AM_CONDITIONAL([PETSC_TARBALL], [test "$pylith_git" = no || test "$force_petsc_tarball" = yes])
+
+# Spatialdata repository
+AC_ARG_WITH([spatialdata-repo],
+    [AC_HELP_STRING([--with-spatialdata-repo],
+        [URL for Spatialdata Git repository @<:@default=https://github.com/geodynamics/spatialdata.git@:>@])],
+	[spatialdata_repo="$withval"],
+	[spatialdata_repo=https://github.com/geodynamics/spatialdata.git])
+AC_SUBST(spatialdata_repo)
+
+# PyLith repository
+AC_ARG_WITH([pylith-repo],
+    [AC_HELP_STRING([--with-pylith-repo],
+        [URL for PyLith Git repository @<:@default=https://github.com/geodynamics/pylith.git@:>@])],
+	[pylith_repo="$withval"],
+	[pylith_repo=https://github.com/geodynamics/pylith.git])
+AC_SUBST(pylith_repo)
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -850,11 +867,12 @@ echo "  pylith-parameters GUI: $install_parametersgui"
 echo ""
 if test "$pylith_git" != no ; then
   if test "$force_petsc_tarball" == yes ; then
-    echo "  Installing PETSc from tarball."
+    echo "  Using PETSc tarball from PyLith release."
   else
-    echo "  Installing PETSc from Bitbucket repository."
+    echo "  Using PETSc from Bitbucket repository."
   fi
-  echo "  Installing spatialdata and PyLith from CIG GitHub repository."
+  echo "  Using spatialdata from Git repo: $spatialdata_repo."
+  echo "  Using PyLith from Git repo: $pylith_repo."
   echo "  Building PyLith branch '$pylith_git'."
 else
   echo "  Building PETSc, spatialdata, and PyLith from source tarballs."
