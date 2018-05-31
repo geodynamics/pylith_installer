@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.2.1-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.2.1-1], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -723,7 +723,7 @@ if test -n "$existing_mpi"; then
   fi
 fi
 
-# PROJ
+# PROJ4
 if test -n "$existing_proj4"; then
   echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj4"
   if test "$force_install" != yes ; then

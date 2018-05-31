@@ -30,42 +30,43 @@ AUTOCONF_VER=2.69
 AUTOMAKE_VER=1.15
 LIBTOOL_VER=2.4.6
 
-GCC_VER=5.4.0
-MPC_VER=1.0.2
-GMP_VER=4.3.2
-MPFR_VER=2.4.2
+GCC_VER=7.3.0
+MPC_VER=1.0.3
+GMP_VER=6.1.0
+MPFR_VER=3.1.4
 
 OPENSSL_VER=1.0.2l
-PYTHON_VER=2.7.13
+PYTHON_VER=2.7.15
 PYTHON_SITEPKGS=lib/python2.7/site-packages
 
-MPICH_VER=3.1.3
-OPENMPI_VER=1.8.8
+MPICH_VER=3.2.1
+OPENMPI_VER=1.10.2
 
 CPPUNIT_VER=1.13.2
 
 PCRE_VER=8.40
 SWIG_VER=3.0.2
 
-NUMPY_VER=1.11.2
+NUMPY_VER=1.14.3
 
-PROJ4_VER=4.8.0
+PROJ4_VER=5.0.1
+PROJ4_DATUM_VER=1.7
 
-HDF5_VER=1.8.11p2
-H5PY_VER=2.2.1
+HDF5_VER=1.10.2
+H5PY_VER=2.7.1
 
-NETCDF_VER=4.4.1.1
-NETCDFPY_VER=1.2.7
+NETCDF_VER=4.6.1
+NETCDFPY_VER=1.3.1
 
 SCIENTIFICPYTHON_VER=2.9.1p1
 FIAT_VER=0.9.9p1
 
-SETUPTOOLS_VER=0.6c11
+SETUPTOOLS_VER=39.1.0
 
 PYTHIA_VER=0.8.1.18
 NEMESIS_VER=1.1.0
 
-CMAKE_VER=3.7.0
+CMAKE_VER=3.11.2
 
 if USE_PYLITH_GIT
 SPATIALDATA_VER=master
@@ -262,13 +263,13 @@ installed_autotools:
 # ----------------------------------------------------------------------
 compilers: finished_mkdest
 if INSTALL_GCC
-	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.bz2 $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.bz2 $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
-	$(TAR) -jxf gcc-$(GCC_VER).tar.bz2
+	$(TAR) -zxf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
-		tar -zxf ../gmp-$(GMP_VER).tar.gz; \
+		tar -jxf ../gmp-$(GMP_VER).tar.bz2; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
 		tar -zxf ../mpc-$(MPC_VER).tar.gz; \
 		ln -sf mpc-$(MPC_VER)/ mpc; \
@@ -506,16 +507,17 @@ installed_numpy:
 proj4: installed_compilers
 if INSTALL_PROJ4
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-1.3.zip $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ4_DATUM_VER).zip $(DEPS_URL)
 	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
-	$(MKDIR_P) proj4-build/nad
-	cd proj4-build/nad && \
-		$(UNZIP) ../../proj-datumgrid-1.3.zip
+	$(MKDIR_P) proj4-build
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
 			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
+		$(MKDIR_P) $(prefix)/share/proj && \
+		cd $(prefix)/share/proj && \
+		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
 		touch ../installed_proj4
 
 else
@@ -569,7 +571,8 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		CC=mpicc $(env_flags) python setup.py build --hdf5=$(prefix) && \
+		python setup.py configure --hdf5=$(prefix) && \
+		CC=mpicc $(env_flags) python setup.py build && \
 		python setup.py install --prefix=$(prefix) && \
 		touch ../installed_h5py
 else
@@ -631,8 +634,7 @@ if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
-		CC=mpicc $(env_flags) python setup.py build && \
-		python setup.py install --prefix=$(prefix) && \
+		HDF5_DIR=$(prefix) NETCDF4_DIR=$(prefix) $(env_flags) CC=mpicc python setup.py install --prefix=$(prefix) && \
 		touch ../installed_netcdfpy
 else
 if WITH_NETCDFPY
@@ -674,8 +676,8 @@ installed_fiat:
 # ----------------------------------------------------------------------
 setuptools: 
 if INSTALL_SETUPTOOLS
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxvf setuptools-$(SETUPTOOLS_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
+	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
 	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_setuptools
 
 else
