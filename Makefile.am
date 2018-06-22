@@ -40,7 +40,7 @@ PYTHON_VER=2.7.15
 PYTHON_SITEPKGS=lib/python2.7/site-packages
 
 MPICH_VER=3.2.1
-OPENMPI_VER=1.10.2
+OPENMPI_VER=3.1.0
 
 CPPUNIT_VER=1.13.2
 
@@ -52,7 +52,7 @@ NUMPY_VER=1.14.3
 PROJ4_VER=5.0.1
 PROJ4_DATUM_VER=1.7
 
-HDF5_VER=1.10.2
+HDF5_VER=1.8.11p2
 H5PY_VER=2.7.1
 
 NETCDF_VER=4.6.1
@@ -515,7 +515,6 @@ if INSTALL_PROJ4
 			--prefix=$(prefix) --with-jni=no $(env_flags) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
-		$(MKDIR_P) $(prefix)/share/proj && \
 		cd $(prefix)/share/proj && \
 		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
 		touch ../installed_proj4
