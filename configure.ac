@@ -689,6 +689,16 @@ else
   fi
 fi
 
+# setuptools
+if test "$install_setuptools" = yes ; then
+  # Installing setuptools requires unzip
+  AC_PATH_PROG(UNZIP, unzip)
+  if test -z "$UNZIP" ; then
+    AC_MSG_FAILURE([cannot find 'unzip' program.])
+    UNZIP=`echo "Error: unzip is not installed." ; false`
+  fi
+fi
+
 # fiat
 if test "$install_fiat" = yes ; then
   echo "do nothing" >& /dev/null
