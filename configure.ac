@@ -235,6 +235,21 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------
+# Separate install location for dependencies
+AC_ARG_WITH([deps-prefix],
+    [AC_HELP_STRING([--with-deps-prefix],
+        [Install dependencies to separate directory from CIG code. @<:@default=no@:>@])],
+	[if test "$withval" = no; then prefix_deps=$prefix; else prefix_deps=$withval; fi],
+	[prefix_deps=$prefix])
+AC_SUBST(prefix_deps)
+
+# Debugging
+AC_ARG_WITH([debugging],
+    [AC_HELP_STRING([--with-debugging],
+        [Generate debugging symbols and use low-level optimization for spatialdata, PETSc, and PyLith builds. @<:@default=no@:>@])],
+	[if test "$withval" = yes; then with_debugging=yes; else with_debugging=no; fi],
+	[with_debugging=no])
+AM_CONDITIONAL([WITH_DEBUGGING], [test "$with_debugging" = yes])
 
 # TESTING
 if test "$install_cppunit" = yes ; then
@@ -797,20 +812,19 @@ fi
 
 # ----------------------------------------------------------------------
 # Setup environment so dependencies are used in build
-
-CPPFLAGS="-I$prefix/include $CPPFLAGS"
-LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
+CPPFLAGS="-I$prefix_deps/include -I$prefix/include $CPPFLAGS"
+LDFLAGS="-L$prefix_deps/lib -L$prefix_deps/lib64 -L$prefix/lib -L$prefix/lib64 $LDFLAGS"
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
-
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
 
+TEMPVAR="$prefix_deps/bin:$prefix/bin"
 if test "X${PATH}" = X ; then
-  echo "export PATH=$prefix/bin" >> setup.sh
+  echo "export PATH=$TEMPVAR" >> setup.sh
 else
-  echo "export PATH=$prefix/bin:\${PATH}" >> setup.sh
+  echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
 fi
 
 AC_CANONICAL_HOST
@@ -818,18 +832,21 @@ case $host_os in
   darwin*)
     ;;
   *)
+    TEMPVAR="$prefix_deps/lib:$prefix_deps/lib64:$prefix/lib:$prefix/lib64"
     if test "X${LD_LIBRARY_PATH}" = X ; then
-      echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64" >> setup.sh
+      echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
     else
-      echo "export LD_LIBRARY_PATH=$prefix/lib:$prefix/lib64:\${LD_LIBRARY_PATH}" >> setup.sh
+      echo "export LD_LIBRARY_PATH=$TEMPVAR:\${LD_LIBRARY_PATH}" >> setup.sh
     fi
     ;;
 esac
 
+TEMPVAR="$prefix_deps/lib/python$PYTHON_VERSION/site-packages:$prefix_deps/lib64/python$PYTHON_VERSION/site-packages"
+TEMPVAR="$TEMPVAR:$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
 if test "X$PYTHONPATH" = X ; then
-  echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages" >> setup.sh
+  echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
 else
-  echo "export PYTHONPATH=$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages:\${PYTHONPATH}" >> setup.sh
+  echo "export PYTHONPATH=$TEMPVAR:\${PYTHONPATH}" >> setup.sh
 fi
 
 # ----------------------------------------------------------------------
@@ -849,6 +866,7 @@ if test "$with_fortran" = yes ; then
 else
   echo "C,C++"
 fi
+echo "  Debugging: $with_debugging"
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
@@ -899,7 +917,9 @@ echo "  build PyLith and it dependencies or add these settings to your "
 echo "  .bashrc or equivalent file and open a new terminal (i.e., shell)."
 echo ""
 echo "  Step 2"
-echo "  Running \"make\" will install PyLith and its dependencies to $prefix."
+echo "  Running \"make\" will install"
+echo "      PyLith dependencies to $prefix_deps."
+echo "      PyLith to $prefix."
 echo ""
 echo "  Step 3"
 echo "  If you did not setup your .bashrc with the environment variables, be sure "
