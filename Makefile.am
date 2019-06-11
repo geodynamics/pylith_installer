@@ -48,6 +48,7 @@ PCRE_VER=8.40
 SWIG_VER=3.0.2
 
 NUMPY_VER=1.14.3
+SIX_VER=1.12.0
 
 PROJ4_VER=5.0.1
 PROJ4_DATUM_VER=1.7
@@ -117,6 +118,7 @@ noinst_tmp = \
 	installed_cppunit \
 	installed_swig \
 	installed_numpy \
+	installed_six \
 	installed_proj4 \
 	installed_netcdf \
 	installed_netcdfpy \
@@ -203,7 +205,7 @@ cig_deps: installed_nemesis installed_pythia
 
 deps: external_deps cig_deps
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy six proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -510,6 +512,26 @@ installed_numpy:
 
 
 # ----------------------------------------------------------------------
+# six
+# ----------------------------------------------------------------------
+six: installed_python installed_setuptools
+if INSTALL_SIX
+	$(FETCH_SCRIPT) "$(downloader)" six-$(SIX_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf six-$(SIX_VER).tar.gz
+	cd six-$(SIX_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		touch ../installed_six
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch installed_six
+endif
+
+installed_six:
+	$(MAKE) $(AM_MAKEFLAGS) six
+
+
+# ----------------------------------------------------------------------
 # proj4
 # ----------------------------------------------------------------------
 proj4: installed_compilers
@@ -573,7 +595,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_numpy
+h5py: installed_hdf5 installed_numpy installed_six
 if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz

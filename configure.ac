@@ -109,6 +109,14 @@ AC_ARG_WITH([numpy-blaslapack],
 	[with_numpy_blaslapack=no])
 AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
 
+# SIX
+AC_ARG_ENABLE([six],
+    [AC_HELP_STRING([--enable-six],
+        [install six @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_six=yes; else install_six=no; fi],
+	[install_six=no])
+AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
+
 # PROJ4
 AC_ARG_ENABLE([proj4],
     [AC_HELP_STRING([--enable-proj4],
@@ -886,6 +894,7 @@ echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
+echo "  six: $install_six"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  cmake: $install_cmake"

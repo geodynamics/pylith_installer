@@ -66,6 +66,7 @@ class BinaryApp(object):
                           "--enable-cppunit",
                           "--enable-numpy",
                           "--with-numpy-blaslapack",
+                          "--enable-six",
                           "--enable-proj4",
                           "--enable-hdf5",
                           "--enable-netcdfpy",
