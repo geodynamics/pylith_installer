@@ -21,21 +21,19 @@ class DockerApp(object):
 
     def __init__(self, container):
         arch = "debian"
-        pylithVersion = "2.2.1"
+        pylithVersion = "2.2.2"
         buildVersion = "latest"
 
         baseenvTag = buildVersion
-        binaryTag = "v[pver]-[btag]".replace("[pver]", pylithVersion).replace("[btag]", baseenvTag)
+        binaryTag = "v{pver}-{btag}".format(pver=pylithVersion, btag=baseenvTag)
         self.container = container
-
+        self.config = arch + "-" + container
+        
         if container == "baseenv":
-            self.config = arch + "-userenv"
             self.repo = "geodynamics/pylith-baseenv:" + baseenvTag
         elif container == "binary":
-            self.config = arch + "-install"
             self.repo = "geodynamics/pylith:" + binaryTag
         elif container == "data":
-            self.config = arch + "-data"
             self.repo = "geodynamics/pylith-data:" + baseenvTag
         return
 

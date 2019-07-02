@@ -53,32 +53,32 @@ SIX_VER=1.12.0
 PROJ4_VER=5.0.1
 PROJ4_DATUM_VER=1.7
 
-HDF5_VER=1.8.11p2
-H5PY_VER=2.7.1
+HDF5_VER=1.10.5
+H5PY_VER=2.9.0
 
-NETCDF_VER=4.6.1
-NETCDFPY_VER=1.3.1
+NETCDF_VER=4.6.3
+NETCDFPY_VER=1.5.0.1
 
 SCIENTIFICPYTHON_VER=2.9.1p1
 FIAT_VER=0.9.9p1
 
 SETUPTOOLS_VER=39.1.0
 
-PYTHIA_VER=0.8.1.18
+PYTHIA_VER=0.8.1.19
 NEMESIS_VER=1.1.0
 
-CMAKE_VER=3.11.2
+CMAKE_VER=3.14.2
 
 if USE_PYLITH_GIT
 SPATIALDATA_VER=master
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=2.2.1
+PETSC_VER=2.2.2
 endif
 else
-SPATIALDATA_VER=1.9.10
-PYLITH_VER=2.2.1
-PETSC_VER=2.2.1
+SPATIALDATA_VER=1.10.0
+PYLITH_VER=2.2.2
+PETSC_VER=2.2.2
 endif
 
 PARAMETERSGUI_VER=1.1.0
@@ -259,10 +259,10 @@ if INSTALL_AUTOTOOLS
 		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix_deps)  $(env_flags_deps) && \
 		make -j $(MAKE_THREADS) && \
 		make install && \
-		touch ../installed_autotools
+		touch $(abs_top_builddir)/installed_autotools
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_autotools
+	touch $(abs_top_builddir)/installed_autotools
 endif
 
 installed_autotools:
@@ -293,11 +293,11 @@ if INSTALL_GCC
 			$(env_flags_deps) && \
 		make -j $(make_threads) $(env_flags_deps) && \
 		make install && \
-		touch ../installed_compilers
+		touch $(abs_top_builddir)/installed_compilers
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_compilers
+	touch $(abs_top_builddir)/installed_compilers
 endif
 
 installed_compilers:
@@ -316,11 +316,11 @@ if INSTALL_OPENSSL
 			--prefix=$(prefix_deps) --openssldir=$(prefix_deps)/share/openssl  shared; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_openssl
+		touch $(abs_top_builddir)/installed_openssl
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_openssl
+	touch $(abs_top_builddir)/installed_openssl
 endif
 
 installed_openssl:
@@ -340,10 +340,10 @@ if INSTALL_PYTHON
 		--enable-shared $(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_python
+		touch $(abs_top_builddir)/installed_python
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_python
+	touch $(abs_top_builddir)/installed_python
 endif
 
 installed_python:
@@ -365,7 +365,7 @@ endif
 else
 mpi:
 	@echo "$@ already installed. Skipping installation."
-	touch installed_mpi
+	touch $(abs_top_builddir)/installed_mpi
 endif
 
 installed_mpi:
@@ -384,7 +384,7 @@ openmpi: installed_compilers
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_mpi
+		touch $(abs_top_builddir)/installed_mpi
 	if [ ! -x $(prefix_deps)/bin/mpirun ]; then cd $(prefix_deps)/bin && $(LN_S) mpiexec mpirun; fi
 
 
@@ -410,7 +410,7 @@ mpich: installed_compilers
 			$(env_flags_deps) $(env_compilers) $(mpich_options) ; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_mpi
+		touch $(abs_top_builddir)/installed_mpi
 	if [ ! -x $(prefix_deps)/bin/mpirun ]; then cd $(prefix_deps)/bin && $(LN_S) mpiexec mpirun; fi
 
 
@@ -427,11 +427,11 @@ if INSTALL_CPPUNIT
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_cppunit
+		touch $(abs_top_builddir)/installed_cppunit
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_cppunit
+	touch $(abs_top_builddir)/installed_cppunit
 endif
 
 installed_cppunit:
@@ -451,10 +451,10 @@ if INSTALL_PCRE
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_pcre
+		touch $(abs_top_builddir)/installed_pcre
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_pcre
+	touch $(abs_top_builddir)/installed_pcre
 endif
 
 installed_pcre:
@@ -474,14 +474,14 @@ if INSTALL_SWIG
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_swig
+		touch $(abs_top_builddir)/installed_swig
 else
 if WITH_SWIG
 	@echo "$@ already installed. Skipping installation."
 else
 	@echo "$@ not required. Skipping installation."
 endif
-	touch installed_swig
+	touch $(abs_top_builddir)/installed_swig
 endif
 
 installed_swig:
@@ -500,11 +500,11 @@ if WITH_NUMPY_BLASLAPACK
 endif
 	cd numpy-$(NUMPY_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
-		touch ../installed_numpy
+		touch $(abs_top_builddir)/installed_numpy
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_numpy
+	touch $(abs_top_builddir)/installed_numpy
 endif
 
 installed_numpy:
@@ -520,11 +520,11 @@ if INSTALL_SIX
 	$(TAR) -zxf six-$(SIX_VER).tar.gz
 	cd six-$(SIX_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
-		touch ../installed_six
+		touch $(abs_top_builddir)/installed_six
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_six
+	touch $(abs_top_builddir)/installed_six
 endif
 
 installed_six:
@@ -547,11 +547,11 @@ if INSTALL_PROJ4
 		make install && \
 		cd $(prefix_deps)/share/proj && \
 		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
-		touch ../installed_proj4
+		touch $(abs_top_builddir)/installed_proj4
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_proj4
+	touch $(abs_top_builddir)/installed_proj4
 endif
 
 installed_proj4:
@@ -576,7 +576,7 @@ if INSTALL_HDF5
 			$(env_flags_deps) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_hdf5
+		touch $(abs_top_builddir)/installed_hdf5
 else
 if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
@@ -585,7 +585,7 @@ else
 	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
 	@echo "--with-hdf5 (to use an existing installation)."
 endif
-	touch installed_hdf5
+	touch $(abs_top_builddir)/installed_hdf5
 endif
 
 installed_hdf5:
@@ -603,7 +603,7 @@ if INSTALL_H5PY
 		python setup.py configure --hdf5=$(prefix_deps) && \
 		CC=mpicc $(env_flags_deps) python setup.py build && \
 		python setup.py install --prefix=$(prefix_deps) && \
-		touch ../installed_h5py
+		touch $(abs_top_builddir)/installed_h5py
 else
 if WITH_H5PY
 	@echo "$@ already installed. Skipping installation."
@@ -611,7 +611,7 @@ else
 	@echo "h5py option not requested. To enable h5py option, "
 	@echo "reconfigure with --enable-h5py (to install H5PY)."
 endif
-	touch installed_h5py
+	touch $(abs_top_builddir)/installed_h5py
 endif
 
 installed_h5py:
@@ -628,17 +628,17 @@ netcdf_4_options = --enable-netcdf-4
 else
 netcdf_4_options = --disable-netcdf-4
 endif
-	$(FETCH_SCRIPT) "$(downloader)" netcdf-$(NETCDF_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf netcdf-$(NETCDF_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" netcdf-c-$(NETCDF_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
-		../netcdf-$(NETCDF_VER)/configure \
+		../netcdf-c-$(NETCDF_VER)/configure \
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_mpicompilers) \
 			--enable-shared --disable-static $(netcdf_4_options) --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		make -j $(make_threads) && \
 		make install && \
-		touch ../installed_netcdf
+		touch $(abs_top_builddir)/installed_netcdf
 
 else
 if WITH_NETCDF
@@ -648,7 +648,7 @@ else
 	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
 	@echo "--with-netcdf (to use an existing installation)."
 endif
-	touch installed_netcdf
+	touch $(abs_top_builddir)/installed_netcdf
 endif
 
 installed_netcdf:
@@ -664,7 +664,7 @@ if INSTALL_NETCDFPY
 	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
 		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc python setup.py install --prefix=$(prefix_deps) && \
-		touch ../installed_netcdfpy
+		touch $(abs_top_builddir)/installed_netcdfpy
 else
 if WITH_NETCDFPY
 	@echo "$@ already installed. Skipping installation."
@@ -672,7 +672,7 @@ else
 	@echo "netCDF4 option not requested. To enable netCDF4 option, "
 	@echo "reconfigure with --enable-netcdfpy (to install netCDF4)."
 endif
-	touch installed_netcdfpy
+	touch $(abs_top_builddir)/installed_netcdfpy
 endif
 
 installed_netcdfpy:
@@ -689,11 +689,11 @@ if INSTALL_FIAT
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps)
 	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
-	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch ../installed_fiat
+	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_fiat
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_fiat
+	touch $(abs_top_builddir)/installed_fiat
 endif
 
 installed_fiat:
@@ -707,11 +707,11 @@ setuptools:
 if INSTALL_SETUPTOOLS
 	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
 	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
-	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch ../installed_setuptools
+	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_setuptools
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_setuptools
+	touch $(abs_top_builddir)/installed_setuptools
 endif
 
 installed_setuptools:
@@ -727,11 +727,11 @@ if INSTALL_PYTHIA
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
 	$(CP) -p setuptools-0.6c11.tar.gz pythia-$(PYTHIA_VER)
-	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch ../installed_pythia
+	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_pythia
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_pythia
+	touch $(abs_top_builddir)/installed_pythia
 endif
 
 installed_pythia:
@@ -751,11 +751,11 @@ if INSTALL_NEMESIS
 			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
 		make && \
 		make install && \
-		touch ../installed_nemesis
+		touch $(abs_top_builddir)/installed_nemesis
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_nemesis
+	touch $(abs_top_builddir)/installed_nemesis
 endif
 
 installed_nemesis:
@@ -791,13 +791,13 @@ endif
 if WITH_TESTING
 	cd spatialdata-build && \
 		make -j $(make_threads) check && \
-		touch ../installed_spatialdata
+		touch $(abs_top_builddir)/installed_spatialdata
 else
-	touch ../installed_spatialdata
+	touch $(abs_top_builddir)/installed_spatialdata
 endif
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_spatialdata
+	touch $(abs_top_builddir)/installed_spatialdata
 endif
 
 installed_spatialdata:
@@ -813,10 +813,10 @@ if INSTALL_CMAKE
 	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
 		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make && make install && \
-		touch ../installed_cmake
+		touch $(abs_top_builddir)/installed_cmake
 else
 	@echo "Skipping $@ installation."
-	touch installed_cmake
+	touch $(abs_top_builddir)/installed_cmake
 endif
 
 installed_cmake:
@@ -864,10 +864,10 @@ endif
 		make -f gmakefile -j$(make_threads) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
-		touch ../installed_petsc
+		touch $(abs_top_builddir)/installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_petsc
+	touch $(abs_top_builddir)/installed_petsc
 endif
 
 
@@ -911,9 +911,9 @@ endif
 if WITH_TESTING
 	cd pylith-build && \
 		make -j $(make_threads) check && \
-		touch ../installed_pylith
+		touch $(abs_top_builddir)/installed_pylith
 else
-	touch ../installed_pylith
+	touch $(abs_top_builddir)/installed_pylith
 endif
 
 installed_pylith:
@@ -928,11 +928,11 @@ if INSTALL_PARAMETERSGUI
 	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
 	cd $(prefix) && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
 		cd $(abs_top_builddir) && \
-		touch installed_parametersgui
+		touch $(abs_top_builddir)/installed_parametersgui
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch installed_parametersgui
+	touch $(abs_top_builddir)/installed_parametersgui
 endif
 
 installed_parametersgui:
