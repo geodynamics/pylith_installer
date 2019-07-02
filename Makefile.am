@@ -96,9 +96,9 @@ EXTRA_DIST = \
 	numpy_blaslapack.cfg \
 	docker/README \
 	docker/README-developer \
-	docker/debian-buildenv \
+	docker/debian-baseenv \
 	docker/debian-data \
-	docker/debian-install \
+	docker/debian-binary \
 	docker/build.py \
 	packager/build.py \
 	packager/setup_darwin.sh \
