@@ -1,0 +1,81 @@
+# ----------------------------------------------------------------------
+#
+# Brad T. Aagaard, U.S. Geological Survey
+# Charles A. Williams, GNS Science
+# Matthew G. Knepley, University of Chicago
+#
+# This code was developed as part of the Computational Infrastructure
+# for Geodynamics (http://geodynamics.org).
+#
+# Copyright (c) 2010-2016 University of California, Davis
+#
+# See COPYING for license information.
+#
+# ----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# Packages URL
+# ----------------------------------------------------------------------
+DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
+
+# ----------------------------------------------------------------------
+# Package Versions
+# ----------------------------------------------------------------------
+M4_VER=1.4.17
+AUTOCONF_VER=2.69
+AUTOMAKE_VER=1.16.1
+LIBTOOL_VER=2.4.6
+
+GCC_VER=8.3.0
+MPC_VER=1.1.0
+GMP_VER=6.2.0
+MPFR_VER=4.0.2
+
+OPENSSL_VER=1.1.1d
+PYTHON_VER=2.7.16
+PYTHON_SITEPKGS=lib/python2.7/site-packages
+
+MPICH_VER=3.3.2
+OPENMPI_VER=4.0.2
+
+CPPUNIT_VER=1.15.1
+
+PCRE_VER=8.40
+SWIG_VER=3.0.2
+
+NUMPY_VER=1.16.6
+SIX_VER=1.14.0
+
+SQLITE_VER=3310100
+PROJ_VER=6.3.0
+PROJ_DATUM_VER=1.8
+
+HDF5_VER=1.10.6
+H5PY_VER=2.10.0
+
+NETCDF_VER=4.7.3
+NETCDFPY_VER=1.5.3
+
+SETUPTOOLS_VER=44.0.0
+
+PYTHIA_VER=0.8.1.19
+NEMESIS_VER=1.1.0
+
+CMAKE_VER=3.16.3
+
+if USE_PYLITH_GIT
+SPATIALDATA_VER=master
+PYLITH_VER=$(pylith_git)
+if PETSC_TARBALL
+PETSC_VER=2.2.2
+endif
+else
+SPATIALDATA_VER=1.10.0
+PYLITH_VER=2.2.2
+PETSC_VER=2.2.2
+endif
+
+PARAMETERSGUI_VER=1.1.0
+
+
+# End of file
