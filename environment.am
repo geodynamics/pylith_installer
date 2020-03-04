@@ -1,0 +1,35 @@
+# ----------------------------------------------------------------------
+#
+# Brad T. Aagaard, U.S. Geological Survey
+# Charles A. Williams, GNS Science
+# Matthew G. Knepley, University of Chicago
+#
+# This code was developed as part of the Computational Infrastructure
+# for Geodynamics (http://geodynamics.org).
+#
+# Copyright (c) 2010-2016 University of California, Davis
+#
+# See COPYING for license information.
+#
+# ----------------------------------------------------------------------
+
+FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
+
+env_flags_deps = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
+
+if WITH_DEBUGGING
+env_flags_cig = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS) -g -O" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK -g -O" FCFLAGS="$(FCFLAGS) -g -O"
+else
+env_flags_cig = CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
+endif
+
+if WITH_FORTRAN
+env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
+env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
+else
+env_compilers = CC=$(CC) CXX=$(CXX)
+env_mpicompilers = CC=mpicc CXX=mpicxx
+endif
+
+
+# End of file

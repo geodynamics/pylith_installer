@@ -1,5 +1,3 @@
-# -*- autoconf -*-
-#
 # ----------------------------------------------------------------------
 #
 # Brad T. Aagaard, U.S. Geological Survey
@@ -17,7 +15,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.2.2-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [3.0.0-0], [cig-short@geodynamics.org])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -117,13 +115,21 @@ AC_ARG_ENABLE([six],
 	[install_six=no])
 AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
 
-# PROJ4
-AC_ARG_ENABLE([proj4],
-    [AC_HELP_STRING([--enable-proj4],
-        [install Proj4 @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_proj4=yes; else install_proj4=no; fi],
-	[install_proj4=yes])
-AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = yes])
+# SQLITE
+AC_ARG_ENABLE([sqlite],
+    [AC_HELP_STRING([--enable-sqlite],
+        [install Sqlite @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_sqlite=yes; else install_sqlite=no; fi],
+	[install_sqlite=yes])
+AM_CONDITIONAL([INSTALL_SQLITE], [test "$install_sqlite" = yes])
+
+# PROJ
+AC_ARG_ENABLE([proj],
+    [AC_HELP_STRING([--enable-proj],
+        [install Proj @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_proj=yes; else install_proj=no; fi],
+	[install_proj=yes])
+AM_CONDITIONAL([INSTALL_PROJ], [test "$install_proj" = yes])
 
 # HDF5
 AC_ARG_ENABLE([hdf5],
@@ -188,14 +194,6 @@ AC_ARG_ENABLE([nemesis],
 	[if test "$enableval" = yes ; then install_nemesis=yes; else install_nemesis=no; fi],
 	[install_nemesis=yes])
 AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
-
-# FIAT
-AC_ARG_ENABLE([fiat],
-    [AC_HELP_STRING([--enable-fiat],
-        [install FIAT @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_fiat=yes; else install_fiat=no; fi],
-	[install_fiat=yes])
-AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 
 # SETUPTOOLS
 AC_ARG_ENABLE([setuptools],
@@ -448,6 +446,9 @@ if test "$pylith_git" != no; then
     AC_MSG_FAILURE([cannot find 'git' program.])
   fi
   petsc_git=yes
+  petsc_repo="https://gitlab.com/petsc/petsc.git"
+  AC_SUBST(petsc_repo)
+
 fi
 AM_CONDITIONAL([WITH_SWIG], [test "$pylith_git" != no])
 AC_SUBST(petsc_git)
@@ -488,10 +489,6 @@ if test "$install_python" = yes ; then
     AC_MSG_WARN([Incompatible configure options. Building Python requires building numpy as well. Adding installation of numpy.])
   fi
   install_numpy=yes
-  if test "$install_fiat" != yes ; then
-    AC_MSG_WARN([Incompatible configure options. Building Python requires building FIAT as well. Adding installation of FIAT.])
-  fi
-  install_fiat=yes
   if test "$install_nemesis" != yes ; then
     AC_MSG_WARN([Incompatible configure options. Building Python requires building nemesis as well. Adding installation of nemesis.])
   fi
@@ -590,10 +587,32 @@ else
   CIT_NUMPY_INCDIR
 fi
 
-# proj4
-if test "$install_proj4" = yes ; then
-  AC_PATH_PROG(existing_proj4, proj)
-  AC_SUBST(existing_proj4)
+# sqlite
+if test "$install_sqlite" = yes ; then
+  AC_PATH_PROG(existing_sqlite, sqlite)
+  AC_SUBST(existing_sqlite)
+else
+  AC_LANG(C++)
+  AC_CHECK_HEADER([sqlite3.h], [], [
+    AC_MSG_ERROR([sqlite3 header not found; try CPPFLAGS="-I<sqlite3 include dir>"])
+  ])dnl
+  AC_MSG_CHECKING([for real_pcre in -lsqlite3])
+  AC_REQUIRE_CPP
+  AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <sqlite3.h>]],
+                     [[sqlite3* db = NULL;]],
+		     [[sqlite3_open("blah", &db);]])],
+    [AC_MSG_RESULT(yes)],
+    [AC_MSG_RESULT(no)
+    AC_MSG_ERROR([sqlite3 library not found; try LDFLAGS="-L<sqlite3 lib dir>"])
+  ])dnl
+  AC_PATH_PROG(SQLITE3, sqlite3)
+fi
+
+# proj
+if test "$install_proj" = yes ; then
+  AC_PATH_PROG(existing_proj, proj)
+  AC_SUBST(existing_proj)
   # Installing datums requires unzip
   AC_PATH_PROG(UNZIP, unzip)
   if test -z "$UNZIP" ; then
@@ -601,8 +620,8 @@ if test "$install_proj4" = yes ; then
     UNZIP=`echo "Error: unzip is not installed." ; false`
   fi
 else
-  CIT_PROJ4_HEADER
-  CIT_PROJ4_LIB
+  CIT_PROJ6_HEADER
+  CIT_PROJ6_LIB
 fi
 
 # HDF5
@@ -630,7 +649,7 @@ if test "$install_h5py" = yes ; then
      fi
    fi
   if test "$install_python" = no ; then
-    AM_PATH_PYTHON([2.6])
+    AM_PATH_PYTHON([2.7])
   fi
 else
   if test "$with_h5py" = yes ; then
@@ -722,13 +741,6 @@ if test "$install_setuptools" = yes ; then
   fi
 fi
 
-# fiat
-if test "$install_fiat" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  CIT_PYTHON_MODULE([FIAT],[0.9.9])
-fi
-
 # spatialdata
 if test "$install_spatialdata" = yes ; then
   AC_PATH_PROG(existing_spatialdata, gensimpledb.py)
@@ -756,9 +768,17 @@ if test -n "$existing_mpi"; then
   fi
 fi
 
-# PROJ4
-if test -n "$existing_proj4"; then
-  echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj4"
+# SQLITE
+if test -n "$existing_sqlite"; then
+  echo "WARNING: Existing version of SQLITE installed. Found $existing_sqlite"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# PROJ
+if test -n "$existing_proj"; then
+  echo "WARNING: Existing version of PROJ installed. Found $existing_proj"
   if test "$force_install" != yes ; then
     existing_fail=yes
   fi
@@ -819,28 +839,55 @@ fi
 
 
 # ----------------------------------------------------------------------
+AC_CANONICAL_HOST
 # Setup environment so dependencies are used in build
-CPPFLAGS="-I$prefix_deps/include -I$prefix/include $CPPFLAGS"
-LDFLAGS="-L$prefix_deps/lib -L$prefix_deps/lib64 -L$prefix/lib -L$prefix/lib64 $LDFLAGS"
+if test "X${prefix_deps}" = "X${prefix}" ; then
+  CPPFLAGS="-I$prefix/include $CPPFLAGS"
+else
+  CPPFLAGS="-I$prefix_deps/include -I$prefix/include $CPPFLAGS"
+fi
+
+case $host_os in
+  darwin*)
+    if test "X${prefix_deps}" = "X${prefix}" ; then
+      LDFLAGS="-L$prefix/lib $LDFLAGS"
+    else
+      LDFLAGS="-L$prefix_deps/lib -L$prefix/lib $LDFLAGS"
+    fi
+    ;;
+  *)
+    if test "X${prefix_deps}" = "X${prefix}" ; then
+      LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
+    else
+      LDFLAGS="-L$prefix_deps/lib -L$prefix_deps/lib64 -L$prefix/lib -L$prefix/lib64 $LDFLAGS"
+    fi
+  ;;
+esac
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
-
-TEMPVAR="$prefix_deps/bin:$prefix/bin"
+TEMPVAR="$prefix/bin"
 if test "X${PATH}" = X ; then
   echo "export PATH=$TEMPVAR" >> setup.sh
 else
   echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
 fi
+if test "X${prefix_deps}" != "X${prefix}"; then
+  TEMPVAR="$prefix_deps/bin"
+  echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
+fi
 
-AC_CANONICAL_HOST
 case $host_os in
   darwin*)
     ;;
   *)
-    TEMPVAR="$prefix_deps/lib:$prefix_deps/lib64:$prefix/lib:$prefix/lib64"
+    if test "X${prefix_deps}" = "X${prefix}"; then
+      TEMPVAR="$prefix/lib:$prefix/lib64"
+    else
+      TEMPVAR="$prefix_deps/lib:$prefix_deps/lib64:$prefix/lib:$prefix/lib64"
+    fi
     if test "X${LD_LIBRARY_PATH}" = X ; then
       echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
     else
@@ -849,8 +896,12 @@ case $host_os in
     ;;
 esac
 
-TEMPVAR="$prefix_deps/lib/python$PYTHON_VERSION/site-packages:$prefix_deps/lib64/python$PYTHON_VERSION/site-packages"
-TEMPVAR="$TEMPVAR:$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+if test "X${prefix_deps}" = "X${prefix}"; then
+  TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+else
+  TEMPVAR="$prefix_deps/lib/python$PYTHON_VERSION/site-packages:$prefix_deps/lib64/python$PYTHON_VERSION/site-packages"
+  TEMPVAR="$TEMPVAR:$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+fi
 if test "X$PYTHONPATH" = X ; then
   echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
 else
@@ -858,7 +909,7 @@ else
 fi
 
 # ----------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile dependencies/Makefile cig/Makefile])
 
 AC_OUTPUT
 
@@ -885,7 +936,8 @@ echo "  mpi: $install_mpi"
 echo "  autotools: $install_autotools"
 echo "  setuptools: $install_setuptools"
 echo "  cppunit: $install_cppunit"
-echo "  proj4: $install_proj4"
+echo "  sqlite: $install_sqlite"
+echo "  proj: $install_proj"
 echo "  hdf5: $install_hdf5"
 echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
@@ -895,7 +947,6 @@ echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
 echo "  six: $install_six"
-echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
@@ -906,7 +957,7 @@ if test "$pylith_git" != no ; then
   if test "$force_petsc_tarball" == yes ; then
     echo "  Using PETSc tarball from PyLith release."
   else
-    echo "  Using PETSc from Bitbucket repository."
+    echo "  Using PETSc from Git repo: $petsc_repo."
   fi
   echo "  Using spatialdata from Git repo: $spatialdata_repo."
   echo "  Using PyLith from Git repo: $pylith_repo."
