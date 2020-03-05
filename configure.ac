@@ -599,9 +599,10 @@ else
   AC_MSG_CHECKING([for real_pcre in -lsqlite3])
   AC_REQUIRE_CPP
   AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([[#include <sqlite3.h>]],
-                     [[sqlite3* db = NULL;]],
-		     [[sqlite3_open("blah", &db);]])],
+    [AC_LANG_PROGRAM([[#include <cstddef>]
+                      [#include <sqlite3.h>]],
+                     [[sqlite3* db = NULL;]
+		      [sqlite3_open("blah", &db);]])],
     [AC_MSG_RESULT(yes)],
     [AC_MSG_RESULT(no)
     AC_MSG_ERROR([sqlite3 library not found; try LDFLAGS="-L<sqlite3 lib dir>"])
