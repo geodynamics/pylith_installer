@@ -708,7 +708,7 @@ if test "$install_petsc" = yes ; then
 
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
-  PETSC_DIR=$prefix
+  PETSC_DIR=$prefix/petsc
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
