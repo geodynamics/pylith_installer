@@ -61,13 +61,13 @@ pythia:
 if INSTALL_PYTHIA
 	$(FETCH_SCRIPT) "$(downloader)" setuptools-0.6c11.tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
-	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
+	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
 	$(CP) -p setuptools-0.6c11.tar.gz pythia-$(PYTHIA_VER)
-	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_pythia
+	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_builddir)/installed_pythia
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_pythia
+	touch $(abs_builddir)/installed_pythia
 endif
 
 installed_pythia:
@@ -80,18 +80,18 @@ installed_pythia:
 nemesis: installed_pythia
 if INSTALL_NEMESIS
 	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz https://github.com/geodynamics/nemesis/releases/download/v$(NEMESIS_VER)
-	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
+	$(TAR) -xf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
 		../nemesis-$(NEMESIS_VER)/configure \
 			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
 		make && \
 		make install && \
-		touch $(abs_top_builddir)/installed_nemesis
+		touch $(abs_builddir)/installed_nemesis
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_nemesis
+	touch $(abs_builddir)/installed_nemesis
 endif
 
 installed_nemesis:
@@ -115,7 +115,7 @@ spatialdata_options += --enable-swig
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
@@ -127,13 +127,13 @@ endif
 if WITH_TESTING
 	cd spatialdata-build && \
 		make -j $(make_threads) check && \
-		touch $(abs_top_builddir)/installed_spatialdata
+		touch $(abs_builddir)/installed_spatialdata
 else
-	touch $(abs_top_builddir)/installed_spatialdata
+	touch $(abs_builddir)/installed_spatialdata
 endif
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_spatialdata
+	touch $(abs_builddir)/installed_spatialdata
 endif
 
 installed_spatialdata:
@@ -166,25 +166,24 @@ petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
-	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
+	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz && mv petsc-pylith $(PETSC_DIR)
 else
-	git clone --branch knepley/pylith --single-branch https://bitbucket.org/petsc/petsc.git petsc-pylith
+	git clone --branch knepley/pylith --single-branch $(petsc_repo) $(PETSC_DIR)
 endif
-	cd petsc-pylith && \
-		./configure --prefix=$(prefix) \
+	cd $(PETSC_DIR) && \
+		./configure \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags_cig) \
-			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
-		make -f gmakefile -j$(make_threads) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
-		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
-		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
-		touch $(abs_top_builddir)/installed_petsc
+			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
+		make -f gmakefile -j$(make_threads) PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
+		make PETSC_DIR=$(PETSC_DIR) test && \
+		touch $(abs_builddir)/installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_petsc
+	touch $(abs_builddir)/installed_petsc
 endif
 
 
@@ -215,7 +214,7 @@ pylith_options += --enable-swig
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
-	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
+	$(TAR) -xf pylith-$(PYLITH_VER).tgz
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
@@ -228,9 +227,9 @@ endif
 if WITH_TESTING
 	cd pylith-build && \
 		make -j $(make_threads) check && \
-		touch $(abs_top_builddir)/installed_pylith
+		touch $(abs_builddir)/installed_pylith
 else
-	touch $(abs_top_builddir)/installed_pylith
+	touch $(abs_builddir)/installed_pylith
 endif
 
 installed_pylith:
@@ -243,13 +242,13 @@ installed_pylith:
 parametersgui: 
 if INSTALL_PARAMETERSGUI
 	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
-	cd $(prefix) && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
-		cd $(abs_top_builddir) && \
-		touch $(abs_top_builddir)/installed_parametersgui
+	cd $(prefix) && $(TAR) -xf $(abs_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
+		cd $(abs_builddir) && \
+		touch $(abs_builddir)/installed_parametersgui
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_parametersgui
+	touch $(abs_builddir)/installed_parametersgui
 endif
 
 installed_parametersgui:
