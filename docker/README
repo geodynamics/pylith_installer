@@ -75,7 +75,7 @@ HINT: You will probably want to copy the examples from the
     $ docker ps -a
     # Start and then attach to the container.
     $ docker start CONTAINER_ID
-    $ docker attach CONTAINER_ID      
+    $ docker attach CONTAINER_ID
 
 
 ======================================================================
@@ -108,6 +108,10 @@ Docker Quick Reference
   Remove docker image
     $ docker rmi CONTAINER_ID
 
+  Attach to stopped container with a different command
+    $ docker ps -a
+    $ docker commit CONTAINERID debug_container
+    $ docker run -ti --entrypoint=bash $IMAGE -s
 
 ======================================================================
 Running GUI
