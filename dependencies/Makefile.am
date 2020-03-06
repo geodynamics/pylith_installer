@@ -427,6 +427,8 @@ if INSTALL_SQLITE
 SQLITE3_CFLAGS = "-I$(prefix_deps)/include"
 SQLITE3_LIBS = "-L$(prefix_deps)/lib -lsqlite3"
 else
+SQLITE3_CFLAGS = "-I."
+SQLITE3_LIBS = "-L. -lsqlite3"
 endif
 if INSTALL_PROJ
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
