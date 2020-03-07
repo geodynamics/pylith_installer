@@ -26,8 +26,7 @@ RUN apt-get update \
 	cmake \
 	vim-common \
 	vim-runtime \
-	vim-nox \
-    && rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+	vim-nox
     
 COPY certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
@@ -38,7 +37,6 @@ ENV PYTHON_VERSION 2.7
 ENV PYLITH_USER pylith-user
 RUN useradd --create-home --shell /bin/bash $PYLITH_USER
 
-ENV MAKE_THREADS 8
 ENV PREFIX_DIR /opt/pylith
 ENV BUILD_DIR /home/pylith-installer
 
@@ -56,7 +54,7 @@ WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
-    --with-fortran=no --enable-force-install --with-make-threads=$MAKE_THREADS \
+    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --disable-mpi \
     --disable-cppunit \
@@ -70,7 +68,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     && . ./setup.sh \
     && make -C dependencies \
     && rm -r $BUILD_DIR/build \
-    && unset BUILD_DIR MAKE_THREADS
+    && unset BUILD_DIR
 
 # Setup user and environment
 WORKDIR /home/$PYLITH_USER
@@ -78,6 +76,9 @@ WORKDIR /home/$PYLITH_USER
 ENV PATH $PATH:$PREFIX_DIR/dependencies/bin
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/dependencies/lib
 ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages
+
+
+#RUN rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
 
 
 CMD /bin/bash
