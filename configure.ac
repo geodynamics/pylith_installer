@@ -478,7 +478,7 @@ fi
 
 # Python
 if test "$install_python" = yes ; then
-  PYTHON=$prefix/bin/python
+  PYTHON=$prefix_deps/bin/python
   PYTHON_VERSION=2.7
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
