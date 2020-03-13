@@ -49,6 +49,10 @@ RUN mkdir $PREFIX_DIR \
 
 USER $PYLITH_USER
 WORKDIR $BUILD_DIR
+ENV PATH $PATH:$PREFIX_DIR/dependencies/bin
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/dependencies/lib
+ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages
+
 RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
@@ -60,6 +64,8 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
+    --enable-pcre \
+    --enable-swig \
     --enable-proj \
     --enable-numpy \
     --enable-hdf5 \
@@ -72,10 +78,6 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
 
 # Setup user and environment
 WORKDIR /home/$PYLITH_USER
-
-ENV PATH $PATH:$PREFIX_DIR/dependencies/bin
-ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/dependencies/lib
-ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages
 
 
 #RUN rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
