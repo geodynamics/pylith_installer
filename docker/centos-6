@@ -3,12 +3,15 @@ MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN yum install -y \
         gcc \
+	gcc-c++ \
 	make \
         file \
         automake \
         autoconf \
         libtool \
         curl \
+	openssl \
+	openssl-devel \
         zlib-devel \
 	unzip \
         git \
@@ -17,7 +20,6 @@ RUN yum install -y \
 	vim-common \
 	vim-runtime
     
-ENV PATH $PATH:/usr/lib64/mpich/bin
 
 COPY certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
@@ -53,7 +55,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --enable-gcc \
-    --enable-mpi \
+    --enable-mpi=mpich \
     --enable-cppunit \
     --disable-cmake \
     --enable-sqlite \

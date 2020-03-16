@@ -70,7 +70,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -85,7 +85,12 @@ all: finished_mkdest installed_compilers installed_openssl installed_python inst
 # setup
 # ----------------------------------------------------------------------
 mkdest:
-	$(MKDIR_P) $(prefix_deps)/include $(prefix_deps)/lib $(prefix_deps)/bin $(prefix_deps)/$(PYTHON_SITEPKGS)
+	$(MKDIR_P) \
+		$(prefix_deps)/include \
+		$(prefix_deps)/lib \
+		$(prefix_deps)/bin \
+		$(prefix_deps)/$(PYTHON_SITEPKGS) \
+		$(prefix_deps)/$(PYTHON64_SITEPKGS)
 
 finished_mkdest:
 	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@

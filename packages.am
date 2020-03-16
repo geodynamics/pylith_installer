@@ -34,6 +34,7 @@ MPFR_VER=3.1.4
 OPENSSL_VER=1.1.1d
 PYTHON_VER=2.7.16
 PYTHON_SITEPKGS=lib/python2.7/site-packages
+PYTHON64_SITEPKGS=lib64/python2.7/site-packages
 
 MPICH_VER=3.3.2
 OPENMPI_VER=4.0.2
