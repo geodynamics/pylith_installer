@@ -139,22 +139,22 @@ compilers: finished_mkdest
 if INSTALL_GCC
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.bz2 $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
 	$(TAR) -xf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
-		$(TAR) -xf ../gmp-$(GMP_VER).tar.gz; \
+		$(TAR) -xf ../gmp-$(GMP_VER).tar.bz2; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
 		$(TAR) -xf ../mpc-$(MPC_VER).tar.gz; \
 		ln -sf mpc-$(MPC_VER)/ mpc; \
-		$(TAR) -xf ../mpfr-$(MPFR_VER).tar.gz; \
+		$(TAR) -xf ../mpfr-$(MPFR_VER).tar.bz2; \
 		ln -sf mpfr-$(MPFR_VER)/ mpfr
 	$(MKDIR_P) gcc-build
 	cd gcc-build && \
 		../gcc-$(GCC_VER)/configure --prefix=$(prefix_deps) \
 			--disable-multilib \
 			--enable-languages=$(gcc_languages) \
-			CFLAGS=-stdc99 CXXFLags=-stdc99 && \
+			$(env_flags_deps) && \
 		make -j $(make_threads) $(env_flags_deps) && \
 		make install && \
 		touch $(abs_builddir)/installed_compilers

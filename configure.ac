@@ -458,6 +458,7 @@ AC_SUBST(petsc_git)
 # ----------------------------------------------------------------------
 
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
 
@@ -930,7 +931,7 @@ echo "  Debugging: $with_debugging"
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
-echo "  gcc: $install_gcc, languages: $gcc_languages"
+echo "  gcc: $install_gcc, languages: $gcc_languages, flags: $gcc_flags"
 echo "  openssl: $install_openssl (binary package)"
 echo "  Python: $install_python"
 echo "  mpi: $install_mpi"

@@ -1,0 +1,82 @@
+FROM centos:6
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+
+RUN yum install -y \
+        gcc \
+	make \
+        file \
+        automake \
+        autoconf \
+        libtool \
+        curl \
+        zlib-devel \
+	unzip \
+        git \
+	ca-certificates \
+	cmake \
+	vim-common \
+	vim-runtime
+    
+ENV PATH $PATH:/usr/lib64/mpich/bin
+
+COPY certs/ /usr/share/pki/ca-trust-source/anchors
+RUN update-ca-trust enable
+
+
+ENV PYTHON_VERSION 2.7
+
+# Create 'pylith-user' user
+ENV PYLITH_USER pylith-user
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+
+ENV PREFIX_DIR /opt/pylith
+ENV BUILD_DIR /home/pylith-installer
+
+RUN mkdir $PREFIX_DIR \
+  && chown $PYLITH_USER $PREFIX_DIR \
+  && chgrp $PYLITH_USER $PREFIX_DIR \
+  && mkdir -p $BUILD_DIR/build \
+  && chown -R $PYLITH_USER $BUILD_DIR \
+  && chgrp -R $PYLITH_USER $BUILD_DIR
+
+USER $PYLITH_USER
+WORKDIR $BUILD_DIR
+ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
+ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$LD_LIBRARY_PATH
+ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+
+RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
+WORKDIR $BUILD_DIR/src
+RUN autoreconf --install --verbose
+WORKDIR $BUILD_DIR/build
+RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
+    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
+    --with-deps-prefix=$PREFIX_DIR/dependencies \
+    --enable-gcc \
+    --enable-mpi \
+    --enable-cppunit \
+    --disable-cmake \
+    --enable-sqlite \
+    --enable-python \
+    --enable-setuptools \
+    --enable-pcre \
+    --enable-swig \
+    --enable-proj \
+    --enable-numpy \
+    --enable-hdf5 \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    && . ./setup.sh \
+    && make -C dependencies \
+    && rm -r $BUILD_DIR/build \
+    && unset BUILD_DIR
+
+# Setup user and environment
+WORKDIR /home/$PYLITH_USER
+
+
+
+#RUN rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+
+
+CMD /bin/bash
