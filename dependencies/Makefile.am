@@ -154,7 +154,7 @@ if INSTALL_GCC
 		../gcc-$(GCC_VER)/configure --prefix=$(prefix_deps) \
 			--disable-multilib \
 			--enable-languages=$(gcc_languages) \
-			$(env_flags_deps) && \
+			CFLAGS=-stdc99 CXXFLags=-stdc99 && \
 		make -j $(make_threads) $(env_flags_deps) && \
 		make install && \
 		touch $(abs_builddir)/installed_compilers
