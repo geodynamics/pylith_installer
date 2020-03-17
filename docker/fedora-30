@@ -1,0 +1,102 @@
+FROM fedora:30
+MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+
+RUN dnf install -y \
+        gcc \
+	gcc-c++ \
+	make \
+        file \
+        automake \
+        autoconf \
+        libtool \
+        curl \
+	python2 \
+	python2-devel \
+	python2-libs \
+        python2-setuptools \
+	python2-six \
+	python2-pip \
+	zlib \
+        zlib-devel \
+	blas \
+	blas-devel \
+	lapack \
+	lapack-devel \
+	atlas \
+	atlas-devel \
+	openssl \
+	openssl-libs \
+	unzip \
+        git \
+	ca-certificates \
+	cppunit \
+        cppunit-devel \
+	openmpi \
+	openmpi-devel \
+	sqlite \
+	sqlite-libs \
+	sqlite-devel \
+	cmake \
+	vim \
+	vim-common
+
+ENV PATH $PATH:/usr/lib64/openmpi/bin
+
+COPY certs/ /usr/share/pki/ca-trust-source/anchors
+RUN update-ca-trust enable
+
+
+ENV PYTHON_VERSION 2.7
+
+# Create 'pylith-user' user
+ENV PYLITH_USER pylith-user
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+
+ENV PREFIX_DIR /opt/pylith
+ENV BUILD_DIR /home/pylith-installer
+
+RUN mkdir $PREFIX_DIR \
+  && chown $PYLITH_USER $PREFIX_DIR \
+  && chgrp $PYLITH_USER $PREFIX_DIR \
+  && mkdir -p $BUILD_DIR/build \
+  && chown -R $PYLITH_USER $BUILD_DIR \
+  && chgrp -R $PYLITH_USER $BUILD_DIR
+
+USER $PYLITH_USER
+WORKDIR $BUILD_DIR
+ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
+ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$PREFIX_DIR/dependencies/lib64:$LD_LIBRARY_PATH
+ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PREFIX_DIR/dependencies/lib64/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+
+RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
+WORKDIR $BUILD_DIR/src
+RUN autoreconf --install --verbose
+WORKDIR $BUILD_DIR/build
+RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
+    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
+    --with-deps-prefix=$PREFIX_DIR/dependencies \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-cmake \
+    --disable-sqlite \
+    --enable-pcre \
+    --enable-swig \
+    --enable-proj \
+    --enable-numpy \
+    --enable-cftime \
+    --enable-hdf5 \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    && make -C dependencies \
+    && rm -r $BUILD_DIR/build \
+    && unset BUILD_DIR
+
+# Setup user and environment
+WORKDIR /home/$PYLITH_USER
+
+
+
+#RUN dnf clean all
+
+
+CMD /bin/bash
