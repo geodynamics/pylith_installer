@@ -115,6 +115,14 @@ AC_ARG_ENABLE([six],
 	[install_six=no])
 AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
 
+# CFTIME
+AC_ARG_ENABLE([cftime],
+    [AC_HELP_STRING([--enable-cftime],
+        [install cftime @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_cftime=yes; else install_cftime=no; fi],
+	[install_cftime=no])
+AM_CONDITIONAL([INSTALL_CFTIME], [test "$install_cftime" = yes])
+
 # SQLITE
 AC_ARG_ENABLE([sqlite],
     [AC_HELP_STRING([--enable-sqlite],
@@ -948,7 +956,8 @@ echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
 echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
-echo "  six: $install_six"
+echo "  six: $install_six (required by h5py)"
+echo "  cftime: $install_cftime (required by netCDF4)"
 echo "  spatialdata: $install_spatialdata"
 echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"

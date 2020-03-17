@@ -28,6 +28,7 @@ noinst_tmp = \
 	installed_swig \
 	installed_numpy \
 	installed_six \
+	installed_cftime \
 	installed_sqlite \
 	installed_proj \
 	installed_hdf5 \
@@ -58,13 +59,15 @@ noinst_srcdirs = \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
-	sqlite-$(SQLITE_VER) \
 	swig-$(SWIG_VER) \
+	numpy-$(NUMPY_VER) \
+	cftime-$(CFTIME_VER) \
+	sqlite-$(SQLITE_VER) \
 	proj-$(PROJ4_VER) \
-	netcdf-$(NETCDF_VER) \
-	netCDF4-$(NETCDFPY_VER) \
 	hdf5-$(HDF5_VER) \
 	h5py-$(H5PY_VER) \
+	netcdf-$(NETCDF_VER) \
+	netCDF4-$(NETCDFPY_VER) \
 	cmake-$(CMAKE_VER)
 
 # ----------------------------------------------------------------------
@@ -401,6 +404,26 @@ installed_six:
 
 
 # ----------------------------------------------------------------------
+# cftime
+# ----------------------------------------------------------------------
+cftime: installed_python installed_numpy
+if INSTALL_CFTIME
+	$(FETCH_SCRIPT) "$(downloader)" cftime-$(CFTIME_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf cftime-$(CFTIME_VER).tar.gz
+	cd cftime-$(CFTIME_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		touch $(abs_builddir)/installed_cftime
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_cftime
+endif
+
+installed_cftime:
+	$(MAKE) $(AM_MAKEFLAGS) cftime
+
+
+# ----------------------------------------------------------------------
 # sqlite
 # ----------------------------------------------------------------------
 sqlite: installed_compilers
@@ -559,7 +582,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 # netcdfpy
 # ----------------------------------------------------------------------
-netcdfpy: installed_netcdf installed_numpy
+netcdfpy: installed_netcdf installed_numpy installed_cftime
 if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
