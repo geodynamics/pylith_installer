@@ -71,7 +71,6 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-hdf5 \
     --enable-netcdf \
     --enable-netcdfpy \
-    && . ./setup.sh \
     && make -C dependencies \
     && rm -r $BUILD_DIR/build \
     && unset BUILD_DIR
@@ -80,7 +79,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
 WORKDIR /home/$PYLITH_USER
 
 
-#RUN rm -fr /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+#RUN apt-get clean
 
 
 CMD /bin/bash
