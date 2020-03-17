@@ -524,9 +524,9 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		python setup.py configure --hdf5=$(prefix_deps) && \
-		CC=mpicc $(env_flags_deps) python setup.py build && \
-		python setup.py install --prefix=$(prefix_deps) && \
+		$(PYTHON) setup.py configure --hdf5=$(prefix_deps) && \
+		CC=mpicc $(env_flags_deps) $(PYTHON) setup.py build && \
+		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_h5py
 else
 if WITH_H5PY
@@ -587,7 +587,7 @@ if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
-		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc python setup.py install --prefix=$(prefix_deps) && \
+		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 if WITH_NETCDFPY
