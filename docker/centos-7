@@ -1,4 +1,4 @@
-FROM centos:6
+FROM centos:7
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN yum install -y \
@@ -14,6 +14,7 @@ RUN yum install -y \
 	openssl-devel \
         zlib-devel \
 	unzip \
+	bzip2 \
         git \
 	ca-certificates \
 	cmake \
@@ -55,7 +56,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --enable-gcc \
-    --enable-mpi=mpich \
+    --enable-mpi=openmpi \
     --enable-cppunit \
     --disable-cmake \
     --enable-sqlite \

@@ -1,9 +1,9 @@
-FROM centos:6
+FROM debian:testing
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
-RUN yum install -y \
-        gcc \
-	gcc-c++ \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        clang-9 \
 	make \
         file \
         automake \
@@ -11,19 +11,23 @@ RUN yum install -y \
         libtool \
         curl \
 	openssl \
-	openssl-devel \
-        zlib-devel \
+	libssl-dev \
+        zlib1g-dev \
 	unzip \
         git \
 	ca-certificates \
+        libcppunit-dev \
 	cmake \
 	vim-common \
-	vim-runtime
+	vim-runtime \
+	vim-nox
     
+COPY certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
-COPY certs/ /usr/share/pki/ca-trust-source/anchors
-RUN update-ca-trust enable
-
+RUN update-alternatives --install /usr/bin/cc cc /usr/bin/clang-9 100 && \
+    update-alternatives --install /usr/bin/cpp cpp /usr/bin/clang++-9 100 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-9 100
 
 ENV PYTHON_VERSION 2.7
 
@@ -43,9 +47,9 @@ RUN mkdir $PREFIX_DIR \
 
 USER $PYLITH_USER
 WORKDIR $BUILD_DIR
-ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
-ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$PREFIX_DIR/dependencies/lib64:$LD_LIBRARY_PATH
-ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PREFIX_DIR/dependencies/lib64/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+ENV PATH $PATH:$PREFIX_DIR/dependencies/bin
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/dependencies/lib
+ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages
 
 RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
 WORKDIR $BUILD_DIR/src
@@ -54,13 +58,11 @@ WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
-    --enable-gcc \
-    --enable-mpi=mpich \
+    --enable-mpi=openmpi \
+    --enable-python \
     --enable-cppunit \
     --disable-cmake \
     --enable-sqlite \
-    --enable-python \
-    --enable-setuptools \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
@@ -68,6 +70,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-hdf5 \
     --enable-netcdf \
     --enable-netcdfpy \
+    LDFLAGS=-L/usr/lib/x86_64-linux-gnu \
     && make -C dependencies \
     && rm -r $BUILD_DIR/build \
     && unset BUILD_DIR
@@ -76,8 +79,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
 WORKDIR /home/$PYLITH_USER
 
 
-
-#RUN yum clean
+#RUN apt-get clean
 
 
 CMD /bin/bash
