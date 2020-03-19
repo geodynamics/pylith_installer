@@ -469,7 +469,7 @@ if INSTALL_PROJ
 		../proj-$(PROJ_VER)/configure \
 			--prefix=$(prefix_deps) --with-jni=no SQLITE3_CFLAGS=$(SQLITE3_CFLAGS) SQLITE3_LIBS=$(SQLITE3_LIBS) $(env_flags_deps) $(env_compilers) ; \
 		$(UNZIP) -o $(abs_builddir)/proj-datumgrid-$(PROJ_DATUM_VER).zip -d $(abs_builddir)/proj-$(PROJ_VER)/data && \
-		make && \
+		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_proj
 
