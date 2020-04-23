@@ -13,6 +13,8 @@ RUN apt-get update \
         python-dev \
 	libpython2.7 \
         python-setuptools \
+	python-numpy \
+	cython \
         zlib1g-dev \
 	unzip \
         git \
@@ -20,18 +22,27 @@ RUN apt-get update \
         libcppunit-dev \
 	libmpich-dev \
 	mpich \
+	libhdf5-mpich-103 \
+	libhdf5-mpich-dev \
+	python-h5py \
 	sqlite3 \
 	libsqlite3-0 \
 	libsqlite3-dev \
 	cmake \
+	lcov \
+	valgrind \
 	vim-common \
 	vim-runtime \
 	vim-nox
     
-COPY certs/ /usr/local/share/ca-certificates
+COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
+RUN update-alternatives --set mpi /usr/bin/mpicc.mpich
 ENV PYTHON_VERSION 2.7
+ENV HDF5_INCDIR /usr/include/hdf5/mpich
+ENV HDF5_LIBDIR /usr/lib/x86_64-linux-gnu/hdf5/mpich
+
 
 # Create 'pylith-user' user
 ENV PYLITH_USER pylith-user
@@ -53,22 +64,25 @@ ENV PATH $PATH:$PREFIX_DIR/dependencies/bin
 ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX_DIR/dependencies/lib
 ENV PYTHONPATH $PYTHONPATH:$PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages
 
-RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
+COPY --chown=pylith-user:pylith-user . $BUILD_DIR/src
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
     --disable-mpi \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
+    --disable-hdf5 \
+    --disable-h5py \
+    --disable-numpy \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
-    --enable-numpy \
-    --enable-hdf5 \
+    --enable-cftime \
     --enable-netcdf \
     --enable-netcdfpy \
     && . ./setup.sh \

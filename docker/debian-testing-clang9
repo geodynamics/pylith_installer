@@ -18,6 +18,8 @@ RUN apt-get update \
 	ca-certificates \
         libcppunit-dev \
 	cmake \
+	lcov \
+	valgrind \
 	vim-common \
 	vim-runtime \
 	vim-nox
@@ -67,6 +69,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-swig \
     --enable-proj \
     --enable-numpy \
+    --enable-cftime \
     --enable-hdf5 \
     --enable-netcdf \
     --enable-netcdfpy \

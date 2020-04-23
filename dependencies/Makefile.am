@@ -343,7 +343,8 @@ if INSTALL_SWIG
 	$(MKDIR_P) swig-build
 	cd swig-build && \
 		../swig-$(SWIG_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) ; \
+			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS) $(PCRE_INCLUDES)" LDFLAGS="$(LDFLAGS) $(PCRE_LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_swig
@@ -453,13 +454,6 @@ installed_sqlite:
 # Disable parallel build to prevent internal compiler error when
 # building some modules (Ubuntu 18,04 and 190.10).
 proj: installed_compilers installed_sqlite
-if INSTALL_SQLITE
-SQLITE3_CFLAGS = "-I$(prefix_deps)/include"
-SQLITE3_LIBS = "-L$(prefix_deps)/lib -lsqlite3"
-else
-SQLITE3_CFLAGS = "-I."
-SQLITE3_LIBS = "-L. -lsqlite3"
-endif
 if INSTALL_PROJ
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ_DATUM_VER).zip $(DEPS_URL)
@@ -467,7 +461,9 @@ if INSTALL_PROJ
 	$(MKDIR_P) proj-build
 	cd proj-build && \
 		../proj-$(PROJ_VER)/configure \
-			--prefix=$(prefix_deps) --with-jni=no SQLITE3_CFLAGS=$(SQLITE3_CFLAGS) SQLITE3_LIBS=$(SQLITE3_LIBS) $(env_flags_deps) $(env_compilers) ; \
+			--prefix=$(prefix_deps) --with-jni=no \
+			SQLITE3_CFLAGS=$(SQLITE3_INCLUDES) SQLITE3_LIBS="$(SQLITE3_LDFLAGS) -lsqlite3" \
+			$(env_flags_deps) $(env_compilers); \
 		$(UNZIP) -o $(abs_builddir)/proj-datumgrid-$(PROJ_DATUM_VER).zip -d $(abs_builddir)/proj-$(PROJ_VER)/data && \
 		make -j $(make_threads) && \
 		make install && \
@@ -497,18 +493,12 @@ if INSTALL_HDF5
 		../hdf5-$(HDF5_VER)/configure \
 			--enable-parallel --enable-shared --enable-unsupported \
 			--disable-static --prefix=$(prefix_deps) $(hdf5_options) \
-			$(env_flags_deps) $(env_mpicompilers) ; \
+			$(env_flags_deps) $(env_mpicompilers); \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_hdf5
 else
-if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "hdf5 option not requested. To enable HDF5 option, "
-	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
-	@echo "--with-hdf5 (to use an existing installation)."
-endif
 	touch $(abs_builddir)/installed_hdf5
 endif
 
@@ -524,17 +514,12 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		$(PYTHON) setup.py configure --hdf5=$(prefix_deps) && \
-		CC=mpicc $(env_flags_deps) $(PYTHON) setup.py build && \
+		$(PYTHON) setup.py configure --hdf5-libdir=$(HDF5_LIBDIR) --hdf5-includedir=$(HDF5_INCDIR) && \
+		CC=mpicc $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" $(PYTHON) setup.py build && \
 		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_h5py
 else
-if WITH_H5PY
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "h5py option not requested. To enable h5py option, "
-	@echo "reconfigure with --enable-h5py (to install H5PY)."
-endif
 	touch $(abs_builddir)/installed_h5py
 endif
 
@@ -547,31 +532,21 @@ installed_h5py:
 # ----------------------------------------------------------------------
 netcdf: installed_compilers installed_hdf5
 if INSTALL_NETCDF
-if WITH_HDF5
-netcdf_4_options = --enable-netcdf-4
-else
-netcdf_4_options = --disable-netcdf-4
-endif
 	$(FETCH_SCRIPT) "$(downloader)" netcdf-c-$(NETCDF_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
 		../netcdf-c-$(NETCDF_VER)/configure \
 			--prefix=$(prefix_deps) $(env_flags_deps) $(env_mpicompilers) \
-			--enable-shared --disable-static $(netcdf_4_options) --disable-dap ; \
+			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
+			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_netcdf
 
 else
-if WITH_NETCDF
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "netcdf option not requested. To enable NetCDF option, "
-	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
-	@echo "--with-netcdf (to use an existing installation)."
-endif
 	touch $(abs_builddir)/installed_netcdf
 endif
 
@@ -587,15 +562,11 @@ if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
-		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) \
+		NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
-if WITH_NETCDFPY
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "netCDF4 option not requested. To enable netCDF4 option, "
-	@echo "reconfigure with --enable-netcdfpy (to install netCDF4)."
-endif
 	touch $(abs_builddir)/installed_netcdfpy
 endif
 

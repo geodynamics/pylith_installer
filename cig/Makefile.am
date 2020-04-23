@@ -121,6 +121,8 @@ endif
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
 			--prefix=$(prefix) $(env_flags_cig) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
 		make -j $(make_threads) && \
 		make install
@@ -145,14 +147,9 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 petsc:
 if INSTALL_PETSC
-if WITH_HDF5
 petsc_options += --with-hdf5=1
-endif
 if INSTALL_HDF5
 petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
-endif
-if WITH_CUDA
-petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
 endif
 if WITH_DEBUGGING
 petsc_options += --with-debugging=1
@@ -177,8 +174,9 @@ endif
 			--with-mpicompilers=1 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags_cig) \
+			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
-		make -f gmakefile -j$(make_threads) PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
+		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(PETSC_DIR) test && \
 		touch $(abs_builddir)/installed_petsc
 else
@@ -195,18 +193,9 @@ installed_petsc:
 # pylith
 # ----------------------------------------------------------------------
 pylith: installed_pythia installed_nemesis installed_spatialdata installed_petsc
-pylith_options = 
-if WITH_NETCDF
-pylith_options += --enable-cubit
-endif
-if WITH_HDF5
-pylith_options += --enable-hdf5
-endif
+pylith_options = --enable-netcdf --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing
-endif
-if WITH_CUDA
-pylith_options += --enable-cuda
 endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
@@ -221,6 +210,8 @@ endif
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLDUES) $(NETCDF_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install
