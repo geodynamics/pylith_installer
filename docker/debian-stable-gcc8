@@ -3,38 +3,38 @@ MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        g++ \
-	make \
-        file \
-        automake \
-        autoconf \
-        libtool \
-        curl \
-        python-dev \
-	libpython2.7 \
-        python-setuptools \
-	python-numpy \
-	python-cftime \
-        zlib1g-dev \
-	unzip \
-        git \
-	ca-certificates \
-        libcppunit-dev \
-	libmpich-dev \
-	mpich \
-	libhdf5-mpich-103 \
-	libhdf5-mpich-dev \
-	python-h5py \
-	sqlite3 \
-	libsqlite3-0 \
-	libsqlite3-dev \
-	cmake \
-	lcov \
-	valgrind \
-	vim-common \
-	vim-runtime \
-	vim-nox
-    
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python-dev \
+      libpython2.7 \
+      python-setuptools \
+      python-numpy \
+      python-cftime \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-dev \
+      libmpich-dev \
+      mpich \
+      libhdf5-mpich-103 \
+      libhdf5-mpich-dev \
+      python-h5py \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      cmake \
+      lcov \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
@@ -75,7 +75,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --disable-mpi \
     --disable-hdf5 \
-    --disable-h5py \    
+    --disable-h5py \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \

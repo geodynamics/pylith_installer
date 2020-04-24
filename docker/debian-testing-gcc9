@@ -3,40 +3,40 @@ MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        g++ \
-	make \
-        file \
-        automake \
-        autoconf \
-        libtool \
-        curl \
-        python-dev \
-	libpython2.7 \
-        python-setuptools \
-	python-numpy \
-	python-six \
-	cython \
-        zlib1g-dev \
-	unzip \
-        git \
-	ca-certificates \
-        libcppunit-dev \
-	libopenmpi-dev \
-	libopenmpi3 \
-	openmpi-bin \
-	openmpi-common \
-	libhdf5-openmpi-103 \
-	libhdf5-openmpi-dev \
-	sqlite3 \
-	libsqlite3-0 \
-	libsqlite3-dev \
-	cmake \
-	lcov \
-	valgrind \
-	vim-common \
-	vim-runtime \
-	vim-nox
-    
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python-dev \
+      libpython2.7 \
+      python-setuptools \
+      python-numpy \
+      python-six \
+      cython \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-dev \
+      libopenmpi-dev \
+      libopenmpi3 \
+      openmpi-bin \
+      openmpi-common \
+      libhdf5-openmpi-103 \
+      libhdf5-openmpi-dev \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      cmake \
+      lcov \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 

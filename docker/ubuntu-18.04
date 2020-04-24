@@ -3,40 +3,40 @@ MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
-        g++ \
-	make \
-        file \
-        automake \
-        autoconf \
-        libtool \
-        curl \
-        python-dev \
-	libpython2.7 \
-        python-setuptools \
-	python-numpy \
-        zlib1g-dev \
-	unzip \
-        git \
-	ca-certificates \
-	libcppunit-1.14.0 \
-        libcppunit-dev \
-	libopenmpi-dev \
-	libopenmpi2 \
-	openmpi-bin \
-	openmpi-common \
-	libhdf5-openmpi-100 \
-	libhdf5-openmpi-dev \
-	python-h5py \
-	sqlite3 \
-	libsqlite3-0 \
-	libsqlite3-dev \
-	cmake \
-	lcov \
-	valgrind \
-	vim-common \
-	vim-runtime \
-	vim-nox
-    
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python-dev \
+      libpython2.7 \
+      python-setuptools \
+      python-numpy \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-1.14.0 \
+      libcppunit-dev \
+      libopenmpi-dev \
+      libopenmpi2 \
+      openmpi-bin \
+      openmpi-common \
+      libhdf5-openmpi-100 \
+      libhdf5-openmpi-dev \
+      python-h5py \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      cmake \
+      lcov \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
@@ -79,10 +79,10 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --disable-numpy \
     --disable-hdf5 \
     --disable-h5py \
-    --enable-cftime \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
+    --enable-cftime \
     --enable-netcdf \
     --enable-netcdfpy \
     && . ./setup.sh \
