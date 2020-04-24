@@ -1,24 +1,24 @@
-FROM fedora:30
+30FROM fedora:30
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN dnf install -y \
-        gcc \
-	gcc-c++ \
+  gcc \
+  gcc-c++ \
 	make \
-        file \
-        automake \
-        autoconf \
-        libtool \
-        curl \
+  file \
+  automake \
+  autoconf \
+  libtool \
+  curl \
 	python2 \
 	python2-devel \
 	python2-libs \
 	python2-numpy \
-        python2-setuptools \
+  python2-setuptools \
 	python2-six \
 	python2-Cython \
 	zlib \
-        zlib-devel \
+  zlib-devel \
 	blas \
 	blas-devel \
 	lapack \
@@ -28,10 +28,10 @@ RUN dnf install -y \
 	openssl \
 	openssl-libs \
 	unzip \
-        git \
+  git \
 	ca-certificates \
 	cppunit \
-        cppunit-devel \
+  cppunit-devel \
 	openmpi \
 	openmpi-devel \
 	hdf5-openmpi \
