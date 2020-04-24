@@ -24,17 +24,24 @@ SUBDIRS = \
 # ----------------------------------------------------------------------
 EXTRA_DIST = \
 	AUTHORS \
-	CHANGES \
+	CHANGES.md \
 	COPYING \
-	INSTALL \
-	NEWS \
-	README \
+	NEWS.md \
+	README.md \
 	docker/README \
 	docker/README-developer \
-	docker/debian-buildenv \
-	docker/debian-data \
-	docker/debian-install \
-	docker/build.py \
+	docker/centos-6 \
+	docker/centos-7 \
+	docker/debian-stable-gcc8 \
+	docker/debian-testing-clang8 \
+	docker/debian-testing-clang9 \
+	docker/debian-testing-gcc9 \
+	docker/fedora-30 \
+	docker/fedora-31 \
+	docker/fedora-32 \
+	docker/ubuntu-18.04 \
+	docker/ubuntu-19.10 \
+	docker/ubuntu-20.04 \
 	packager/build.py \
 	packager/setup_darwin.sh \
 	packager/setup_linux32.sh \

@@ -1,0 +1,12 @@
+remote_theme: pmarsceill/just-the-docs
+title: PyLith Installer
+baseurl: /pylith-installer
+#search_enabled: true
+aux_links:
+    "GitHub repository":
+      - "//github.com/geodynamics/pylith_installer"
+
+plugins:
+  - jekyll-seo-tag
+
+installer-version: 3.0.0-0
