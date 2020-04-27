@@ -1,7 +1,7 @@
-FROM centos:6
+FROM centos:8
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
-RUN yum install -y \
+RUN dnf install -y \
         gcc \
 	gcc-c++ \
 	make \
@@ -16,16 +16,26 @@ RUN yum install -y \
 	unzip \
         git \
 	ca-certificates \
+	python2 \
+	python2-devel \
+	python2-six \
+	python2-numpy \
+	python2-setuptools \
+	python2-Cython \
+	mpich \
+	mpich-devel \
 	cmake \
-	lcov \
+	sqlite \
+	sqlite-devel \
 	valgrind \
 	vim-common \
-	vim-runtime
+	vim-minimal
     
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
 
+ENV PATH $PATH:/usr/lib64/mpich/bin
 
 ENV PYTHON_VERSION 2.7
 
@@ -57,18 +67,14 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --disable-cmake \
-    --enable-gcc \
-    --enable-mpi=mpich \
+    --disable-sqlite \
+    --disable-setuptools \
+    --disable-numpy \
+    --disable-six \
     --enable-cppunit \
-    --enable-sqlite \
-    --enable-python \
-    --enable-setuptools \
-    --enable-cython \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
-    --enable-numpy \
-    --enable-six \
     --enable-cftime \
     --enable-hdf5 \
     --enable-h5py \
@@ -83,7 +89,7 @@ WORKDIR /home/$PYLITH_USER
 
 
 
-#RUN yum clean
+#RUN dnf clean
 
 
 CMD /bin/bash
