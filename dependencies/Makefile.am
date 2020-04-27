@@ -20,12 +20,16 @@ include $(top_srcdir)/environment.am
 # Files
 # ----------------------------------------------------------------------
 noinst_tmp = \
+	installed_autotools \
 	installed_compilers \
 	installed_openssl \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
+	installed_pcre \
 	installed_swig \
+	installed_setuptools \
+	installed_cython \
 	installed_numpy \
 	installed_six \
 	installed_cftime \
@@ -40,6 +44,10 @@ noinst_tmp = \
 
 noinst_builddirs = \
 	gcc-build \
+	m4-build \
+	autoconf-build \
+	automake-build \
+	libtool-build \
 	openssl-build \
 	python-build \
 	openmpi-build \
@@ -48,19 +56,27 @@ noinst_builddirs = \
 	swig-build \
 	sqlite-build \
 	proj4-build \
-	netcdf-build \
-	hdf5-build
+	hdf5-build \
+	netcdf-build
 
 
 noinst_srcdirs = \
+	m4-$(M4_VER) \
+	autoconf-$(AUTOCONF_VER) \
+	automake-$(AUTOMAKE_VER) \
+	libtool-$(LIBTOOL_VER) \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
 	openssl-${OPENSSL_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
+	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
+	setuptools-$(SETUPTOOLS_VER) \
+	Cython-$(CYTHON_VER) \
 	numpy-$(NUMPY_VER) \
+	size-$(SIX_VER) \
 	cftime-$(CFTIME_VER) \
 	sqlite-$(SQLITE_VER) \
 	proj-$(PROJ4_VER) \
@@ -73,7 +89,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -108,26 +124,26 @@ if INSTALL_AUTOTOOLS
 	$(FETCH_SCRIPT) "$(downloader)" automake-$(AUTOMAKE_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" libtool-$(LIBTOOL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf m4-$(M4_VER).tar.gz
-	mkdir -p m4-$(M4_VER)-build
-	cd m4-$(M4_VER)-build && \
+	mkdir -p m4-build
+	cd m4-build && \
 		../m4-$(M4_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
 		make -j $(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf autoconf-$(AUTOCONF_VER).tar.gz
-	mkdir -p autoconf-$(AUTOCONF_VER)-build
-	cd autoconf-$(AUTOCONF_VER)-build && \
+	mkdir -p autoconf-build
+	cd autoconf-build && \
 		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
 		make -j $(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf automake-$(AUTOMAKE_VER).tar.gz
-	mkdir -p automake-$(AUTOMAKE_VER)-build
-	cd automake-$(AUTOMAKE_VER)-build && \
+	mkdir -p automake-build
+	cd automake-build && \
 		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
 		make -j $(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf libtool-$(LIBTOOL_VER).tar.gz
-	mkdir -p libtool-$(LIBTOOL_VER)-build
-	cd libtool-$(LIBTOOL_VER)-build && \
+	mkdir -p libtool-build
+	cd libtool-build && \
 		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix_deps)  $(env_flags_deps) && \
 		make -j $(MAKE_THREADS) && \
 		make install && \
@@ -509,7 +525,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_numpy installed_six
+h5py: installed_hdf5 installed_numpy installed_six installed_cython
 if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
@@ -590,6 +606,24 @@ endif
 
 installed_setuptools:
 	$(MAKE) $(AM_MAKEFLAGS) setuptools
+
+
+# ----------------------------------------------------------------------
+# cython
+# ----------------------------------------------------------------------
+cython: 
+if INSTALL_CYTHON
+	$(FETCH_SCRIPT) "$(downloader)" Cython-$(CYTHON_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf Cython-$(CYTHON_VER).tar.gz
+	cd Cython-$(CYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_builddir)/installed_cython
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_cython
+endif
+
+installed_cython:
+	$(MAKE) $(AM_MAKEFLAGS) cython
 
 
 # ----------------------------------------------------------------------

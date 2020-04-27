@@ -247,6 +247,14 @@ AC_ARG_ENABLE([setuptools],
 	[install_setuptools=yes])
 AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
 
+# CYTHON
+AC_ARG_ENABLE([cython],
+    [AC_HELP_STRING([--enable-cython],
+        [install cython @<:@default=no@:>@])],
+	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
+	[install_cython=no])
+AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
+
 # PCRE
 AC_ARG_ENABLE([pcre],
     [AC_HELP_STRING([--enable-pcre],
