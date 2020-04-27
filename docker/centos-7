@@ -18,11 +18,13 @@ RUN yum install -y \
         git \
 	ca-certificates \
 	cmake \
+	lcov \
+	valgrind \
 	vim-common \
 	vim-runtime
     
 
-COPY certs/ /usr/share/pki/ca-trust-source/anchors
+COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
 
 
@@ -48,25 +50,29 @@ ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
 ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$PREFIX_DIR/dependencies/lib64:$LD_LIBRARY_PATH
 ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PREFIX_DIR/dependencies/lib64/python$PYTHON_VERSION/site-packages:$PYTHONPATH
 
-RUN git clone --depth 1 --recursive --branch baagaard/feature-update-dependencies https://github.com/geodynamics/pylith_installer.git src
+COPY --chown=pylith-user:pylith-user . $BUILD_DIR/src
 WORKDIR $BUILD_DIR/src
 RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
+    --disable-cmake \
     --enable-gcc \
     --enable-mpi=openmpi \
     --enable-cppunit \
-    --disable-cmake \
     --enable-sqlite \
     --enable-python \
     --enable-setuptools \
+    --enable-cython \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
     --enable-numpy \
+    --enable-six \
+    --enable-cftime \
     --enable-hdf5 \
+    --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \
     && make -C dependencies \
