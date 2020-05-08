@@ -14,76 +14,77 @@
 # See COPYING for license information.
 #
 # ----------------------------------------------------------------------
-#
-# Create docker images.
+
+"""Application for building and pushing docker images.
+"""
+
+import os
+import argparse
+import subprocess
 
 class DockerApp(object):
+    """Application for building and pushing docker images.
+    """
 
-    def __init__(self, container):
-        arch = "debian"
-        pylithVersion = "2.2.2"
-        buildVersion = "latest"
+    def __init__(self):
+        self.docker_filename = None
+        self.tag = None
 
-        baseenvTag = buildVersion
-        binaryTag = "v{pver}-{btag}".format(pver=pylithVersion, btag=baseenvTag)
-        self.container = container
-        self.config = arch + "-" + container
-        
-        if container == "baseenv":
-            self.repo = "geodynamics/pylith-baseenv:" + baseenvTag
-        elif container == "binary":
-            self.repo = "geodynamics/pylith:" + binaryTag
-        elif container == "data":
-            self.repo = "geodynamics/pylith-data:" + baseenvTag
+    def main(self, **kwargs):
+        """Main entry point
+        """
+        args = argparse.Namespace(**kwargs) if kwargs else self._parse_command_line()
+        self.initialize(args)
+
+        if args.build:
+            self.build()
+
+        if args.push:
+            self.push()
+
+    def initialize(self, args):
+        """Initialize builder.
+        """
+        self.docker_filename = args.dockerfile
+        self.tag = "-".join([args.prefix, os.path.split(args.dockerfile)[-1]])
         return
-
 
     def build(self):
-        cmd = "docker build -f %s -t %s ." % (self.config, self.repo)
-        self._runCmd(cmd)
-        return
-
-
-    def run(self):
-        cmd = "docker run -t -i %s /bin/bash" % self.repo
-        self._runCmd(cmd)
-        return
-
+        """Build docker image.
+        """
+        cmd = "docker build -t {tag} -f {dockerfile} .".format(tag=self.tag, dockerfile=self.docker_filename)
+        self._run_cmd(cmd)
 
     def push(self):
-        cmd = "docker push %s" % self.repo
-        self._runCmd(cmd)
+        """Push docker image to Docker Hub.
+        """
+        cmd = "docker push {tag}".format(tag=self.tag)
+        self._run_cmd(cmd)
         return
 
+    @staticmethod
+    def _parse_command_line():
+        """Parse command line arguments.
+        """
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--dockerfile", action="store", dest="dockerfile", required=True)
+        parser.add_argument("--prefix", action="store", dest="prefix", default="geodynamics/pylith-testenv")
+        parser.add_argument("--build", action="store_true", dest="build")
+        parser.add_argument("--push", action="store_true", dest="push")
+        return parser.parse_args()
 
-    def _runCmd(self, cmd):
+    @staticmethod
+    def _run_cmd(cmd):
+        """Run shell command.
+        """
         print("Running '%s'..." % cmd)
-        import subprocess
         subprocess.check_call(cmd.split())
         return
 
-    
+
 # ======================================================================
 if __name__ == "__main__":
-    import argparse
+    DockerApp().main()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--container", action="store", dest="container", choices=("baseenv","data","binary"), required=True)
-    parser.add_argument("--build", action="store_true", dest="build")
-    parser.add_argument("--run", action="store_true", dest="run")
-    parser.add_argument("--push", action="store_true", dest="push")
-    args = parser.parse_args()
 
-    app = DockerApp(args.container)
-
-    if args.build:
-        app.build()
-
-    if args.run:
-        app.run()
-
-    if args.push:
-        app.push()
-        
-    
 # End of file
