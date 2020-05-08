@@ -2,49 +2,52 @@ FROM fedora:31
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN dnf install -y \
-  gcc \
-	gcc-c++ \
-	make \
-  file \
-  automake \
-  autoconf \
-  libtool \
-  curl \
-	python2 \
-	python2-devel \
-	python2-libs \
-	python2-numpy \
-  python2-setuptools \
-	python2-six \
-	python2-Cython \
-	zlib \
-  zlib-devel \
-	blas \
-	blas-devel \
-	lapack \
-	lapack-devel \
-	atlas \
-	atlas-devel \
-	openssl \
-	openssl-libs \
-	unzip \
-  git \
-	ca-certificates \
-	cppunit \
-  cppunit-devel \
-	mpich \
-	mpich-devel \
-	hdf5-mpich \
-	hdf5-mpich-devel \
-	sqlite \
-	sqlite-libs \
-	sqlite-devel \
-	cmake \
-	lcov \
-	valgrind \
-	vim \
-	vim-common
+    gcc \
+    gcc-c++ \
+    make \
+    file \
+    diffutils \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    python2 \
+    python2-devel \
+    python2-libs \
+    python2-numpy \
+    python2-setuptools \
+    python2-six \
+    python2-coverage \
+    python2-Cython \
+    zlib \
+    zlib-devel \
+    blas \
+    blas-devel \
+    lapack \
+    lapack-devel \
+    atlas \
+    atlas-devel \
+    openssl \
+    openssl-libs \
+    unzip \
+    git \
+    ca-certificates \
+    cppunit \
+    cppunit-devel \
+    mpich \
+    mpich-devel \
+    hdf5-mpich \
+    hdf5-mpich-devel \
+    sqlite \
+    sqlite-libs \
+    sqlite-devel \
+    cmake \
+    lcov \
+    valgrind \
+    vim \
+    vim-common
 
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 1
 ENV PATH $PATH:/usr/lib64/mpich/bin
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors

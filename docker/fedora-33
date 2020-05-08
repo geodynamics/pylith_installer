@@ -1,44 +1,58 @@
-FROM centos:8
-MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+FROM fedora:33
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 RUN dnf install -y \
-        gcc \
-	gcc-c++ \
-	make \
-        file \
-        automake \
-        autoconf \
-        libtool \
-        curl \
-	openssl \
-	openssl-devel \
-        zlib-devel \
-	unzip \
-        git \
-	ca-certificates \
-	python2 \
-	python2-devel \
-	python2-six \
-	python2-numpy \
-	python2-setuptools \
-	python2-Cython \
-	mpich \
-	mpich-devel \
-	cmake \
-	sqlite \
-	sqlite-devel \
-	valgrind \
-	vim-common \
-	vim-minimal
-    
-RUN alternatives --set python /usr/bin/python2
+    gcc \
+    gcc-c++ \
+    make \
+    file \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    openssh \
+    python2 \
+    python2-devel \
+    python2-numpy \
+    python2-setuptools \
+    python2-six \
+    zlib \
+    zlib-devel \
+    blas \
+    blas-devel \
+    lapack \
+    lapack-devel \
+    atlas \
+    atlas-devel \
+    openssl \
+    openssl-libs \
+    unzip \
+    git \
+    ca-certificates \
+    cppunit \
+    cppunit-devel \
+    openmpi \
+    openmpi-devel \
+    hdf5-openmpi \
+    hdf5-openmpi-devel \
+    sqlite \
+    sqlite-libs \
+    sqlite-devel \
+    cmake \
+    lcov \
+    valgrind \
+    vim \
+    vim-common
+
+ENV PATH $PATH:/usr/lib64/openmpi/bin
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
 
-ENV PATH $PATH:/usr/lib64/mpich/bin
 
 ENV PYTHON_VERSION 2.7
+ENV HDF5_INCDIR /usr/include/openmpi-x86_64
+ENV HDF5_LIBDIR /usr/lib64/openmpi/lib
 
 # Create 'pylith-user' user
 ENV PYLITH_USER pylith-user
@@ -66,34 +80,32 @@ RUN autoreconf --install --verbose
 WORKDIR $BUILD_DIR/build
 RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
+    --disable-mpi \
+    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
-    --disable-setuptools \
     --disable-numpy \
-    --disable-six \
-    --enable-cppunit \
+    --disable-hdf5 \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
-    --enable-cftime \
-    --enable-hdf5 \
+    --enable-cython \
     --enable-h5py \
+    --enable-cftime \
     --enable-netcdf \
     --enable-netcdfpy \
     && make -C dependencies \
     && rm -r $BUILD_DIR/build \
     && unset BUILD_DIR
 
-ENV HDF5_LIBDIR $PREFIX/dependencies/lib
-ENV HDF5_INCIDR $PREFIX/dependencies/include
-
 # Setup user and environment
 WORKDIR /home/$PYLITH_USER
 
 
 
-#RUN dnf clean
+#RUN dnf clean all
 
 
 CMD /bin/bash
