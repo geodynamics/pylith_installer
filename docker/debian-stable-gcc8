@@ -15,6 +15,7 @@ RUN apt-get update \
       python-setuptools \
       python-numpy \
       python-cftime \
+      python-coverage \
       zlib1g-dev \
       unzip \
       git \

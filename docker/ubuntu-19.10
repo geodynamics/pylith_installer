@@ -14,6 +14,7 @@ RUN apt-get update \
       libpython2.7 \
       python-setuptools \
       python-numpy \
+      python-coverage \
       zlib1g-dev \
       unzip \
       git \
@@ -38,6 +39,7 @@ COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 RUN update-alternatives --set mpi /usr/bin/mpicc.mpich
+RUN update-alternatives --set mpirun /usr/bin/mpirun.mpich
 ENV PYTHON_VERSION 2.7
 ENV HDF5_INCDIR /usr/include/hdf5/mpich
 ENV HDF5_LIBDIR /usr/lib/x86_64-linux-gnu/hdf5/mpich

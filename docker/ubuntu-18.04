@@ -10,10 +10,12 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
+      ssh \
       python-dev \
       libpython2.7 \
       python-setuptools \
       python-numpy \
+      python-coverage \
       zlib1g-dev \
       unzip \
       git \

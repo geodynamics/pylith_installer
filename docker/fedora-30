@@ -1,4 +1,4 @@
-30FROM fedora:30
+FROM fedora:30
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN dnf install -y \
@@ -10,12 +10,14 @@ RUN dnf install -y \
   autoconf \
   libtool \
   curl \
+  openssh \
 	python2 \
 	python2-devel \
 	python2-libs \
 	python2-numpy \
   python2-setuptools \
 	python2-six \
+	python2-coverage \
 	python2-Cython \
 	zlib \
   zlib-devel \

@@ -10,6 +10,7 @@ RUN yum install -y \
         autoconf \
         libtool \
         curl \
+	openssh \
 	openssl \
 	openssl-devel \
         zlib-devel \
@@ -78,6 +79,9 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     && make -C dependencies \
     && rm -r $BUILD_DIR/build \
     && unset BUILD_DIR
+
+ENV HDF5_LIBDIR $PREFIX/dependencies/lib
+ENV HDF5_INCIDR $PREFIX/dependencies/include
 
 # Setup user and environment
 WORKDIR /home/$PYLITH_USER

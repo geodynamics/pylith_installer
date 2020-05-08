@@ -10,11 +10,13 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
+      ssh \
       python-dev \
       libpython2.7 \
       python-setuptools \
       python-numpy \
       python-six \
+      python-coverage \
       cython \
       zlib1g-dev \
       unzip \
@@ -25,7 +27,7 @@ RUN apt-get update \
       libopenmpi3 \
       openmpi-bin \
       openmpi-common \
-      libhdf5-openmpi-103 \
+      libhdf5-openmpi-103-1 \
       libhdf5-openmpi-dev \
       sqlite3 \
       libsqlite3-0 \

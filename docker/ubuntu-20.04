@@ -1,4 +1,4 @@
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
 RUN apt-get update \
@@ -12,6 +12,7 @@ RUN apt-get update \
       curl \
       python2-dev \
       libpython2.7 \
+      python-coverage \
       cython \
       zlib1g-dev \
       unzip \
@@ -31,6 +32,8 @@ RUN apt-get update \
       vim-common \
       vim-runtime \
       vim-nox
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python2 1
 
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
