@@ -8,3 +8,5 @@ autom4te.cache
 docs/_site
 *~
 *.pyc
+
+docs/Gemfile.lock
