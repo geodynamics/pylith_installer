@@ -149,7 +149,7 @@ petsc:
 if INSTALL_PETSC
 petsc_options += --with-hdf5=1
 if INSTALL_HDF5
-petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
+petsc_options += --with-zlib=1 --LIBS=-lz
 endif
 if WITH_DEBUGGING
 petsc_options += --with-debugging=1

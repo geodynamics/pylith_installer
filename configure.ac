@@ -663,6 +663,8 @@ if test "$install_hdf5" = yes ; then
   AC_SUBST(existing_hdf5)
   HDF5_INCDIR=$prefix_deps/include
   HDF5_LIBDIR=$prefix_deps/lib
+  HDF5_INCLUDES="-I$with_hdf5_incdir"
+  HDF5_LDFLAGS="-L$with_hdf5_libdir"
 else
   if test "$with_hdf5_incdir" != no; then
     HDF5_INCDIR="$with_hdf5_incdir"
