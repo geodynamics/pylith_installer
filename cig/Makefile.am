@@ -101,7 +101,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_pythia
+spatialdata: installed_pythia installed_git
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
@@ -145,7 +145,7 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc:
+petsc: installed_cmake installed_git installed_hdf5 installed_compilers
 if INSTALL_PETSC
 petsc_options += --with-hdf5=1
 if INSTALL_HDF5
@@ -192,7 +192,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_pythia installed_nemesis installed_spatialdata installed_petsc
+pylith: installed_pythia installed_nemesis installed_spatialdata installed_petsc installed_git
 pylith_options = --enable-netcdf --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing

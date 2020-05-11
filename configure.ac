@@ -231,6 +231,14 @@ AC_ARG_ENABLE([netcdfpy],
 	[install_netcdfpy=yes])
 AM_CONDITIONAL([INSTALL_NETCDFPY], [test "$install_netcdfpy" = yes])
 
+# GIT
+AC_ARG_ENABLE([git],
+    [AC_HELP_STRING([--enable-git],
+        [install Git @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_git=yes; else install_git=no; fi],
+	[install_git=no])
+AM_CONDITIONAL([INSTALL_GIT], [test "$install_git" = yes])
+
 # CMAKE
 AC_ARG_ENABLE([cmake],
     [AC_HELP_STRING([--enable-cmake],
@@ -466,10 +474,15 @@ if test "$pylith_git" != no; then
   else
     AUTORECONF=autoreconf
   fi
-  # GIT
-  AC_PATH_PROG(GIT, git)
-  if test -z "$GIT" ; then
-    AC_MSG_FAILURE([cannot find 'git' program.])
+  if test "$install_git" = no; then
+    # GIT
+    AC_PATH_PROG(GIT, git)
+    if test -z "$GIT" ; then
+      AC_MSG_FAILURE([cannot find 'git' program.])
+    fi
+  else
+    GIT=$prefix_deps/bin/git
+    AC_SUBST(GIT)
   fi
   petsc_git=yes
   petsc_repo="https://gitlab.com/petsc/petsc.git"
@@ -965,7 +978,11 @@ printf "  openssl: $install_openssl (binary package)\n"
 printf "  Python: $install_python\n"
 printf "  mpi: $install_mpi\n"
 printf "  autotools: $install_autotools\n"
+printf "  git: $install_git\n"
+printf "  cmake: $install_cmake\n"
 printf "  setuptools: $install_setuptools\n"
+printf "  pcre: $install_pcre\n"
+printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
 printf "  sqlite: $install_sqlite\n"
 printf "  proj: $install_proj\n"
@@ -973,14 +990,11 @@ printf "  hdf5: $install_hdf5\n"
 printf "  h5py: $install_h5py\n"
 printf "  netcdf: $install_netcdf\n"
 printf "  netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
-printf "  pcre: $install_pcre\n"
-printf "  swig: $install_swig\n"
 printf "  nemesis: $install_nemesis\n"
 printf "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack\n"
 printf "  six: $install_six (required by h5py)\n"
 printf "  cftime: $install_cftime (required by netCDF4)\n"
 printf "  spatialdata: $install_spatialdata\n"
-printf "  cmake: $install_cmake\n"
 printf "  petsc: $install_petsc, options: $petsc_options\n"
 printf "  pyre/pythia: $install_pythia\n"
 printf "  pylith-parameters GUI: $install_parametersgui\n"
