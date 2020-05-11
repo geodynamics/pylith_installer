@@ -39,6 +39,7 @@ noinst_tmp = \
 	installed_h5py \
 	installed_netcdf \
 	installed_netcdfpy \
+	installed_git
 	installed_cmake
 
 
@@ -49,6 +50,7 @@ noinst_builddirs = \
 	automake-build \
 	libtool-build \
 	openssl-build \
+	git-build \
 	python-build \
 	openmpi-build \
 	mpich-build \
@@ -84,12 +86,13 @@ noinst_srcdirs = \
 	h5py-$(H5PY_VER) \
 	netcdf-$(NETCDF_VER) \
 	netCDF4-$(NETCDFPY_VER) \
+	git-$(GIT_VER) \
 	cmake-$(CMAKE_VER)
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -155,6 +158,48 @@ endif
 
 installed_autotools:
 	$(MAKE) $(AM_MAKEFLAGS) autotools
+
+# ----------------------------------------------------------------------
+# git
+# ----------------------------------------------------------------------
+git:
+if INSTALL_GIT
+	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf git-$(GIT_VER).tar.gz
+	cd git-$(GIT_VER) && \
+		../git-$(GIT_VER)/configure \
+			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
+		make -j $(MAKE_THREADS) && \
+		make install && \
+		touch $(abs_builddir)/installed_git
+else
+	@echo "Skipping $@ installation."
+	touch $(abs_builddir)/installed_git
+endif
+
+installed_git:
+	$(MAKE) $(AM_MAKEFLAGS) git
+
+
+# ----------------------------------------------------------------------
+# cmake
+# ----------------------------------------------------------------------
+cmake:
+if INSTALL_CMAKE
+	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
+	cd cmake-$(CMAKE_VER) && \
+		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make && make install && \
+		touch $(abs_builddir)/installed_cmake
+else
+	@echo "Skipping $@ installation."
+	touch $(abs_builddir)/installed_cmake
+endif
+
+installed_cmake:
+	$(MAKE) $(AM_MAKEFLAGS) cmake
+
 
 # ----------------------------------------------------------------------
 # compilers
@@ -624,25 +669,6 @@ endif
 
 installed_cython:
 	$(MAKE) $(AM_MAKEFLAGS) cython
-
-
-# ----------------------------------------------------------------------
-# cmake
-# ----------------------------------------------------------------------
-cmake:
-if INSTALL_CMAKE
-	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
-	cd cmake-$(CMAKE_VER) && \
-		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make && make install && \
-		touch $(abs_builddir)/installed_cmake
-else
-	@echo "Skipping $@ installation."
-	touch $(abs_builddir)/installed_cmake
-endif
-
-installed_cmake:
-	$(MAKE) $(AM_MAKEFLAGS) cmake
 
 
 # ----------------------------------------------------------------------
