@@ -167,10 +167,8 @@ if INSTALL_GIT
 	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf git-$(GIT_VER).tar.gz
 	cd git-$(GIT_VER) && \
-		../git-$(GIT_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) \
-			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
-		make -j $(MAKE_THREADS) && \
+		./configure --prefix=$(prefix_deps) && \
+		make -j $(MAKE_THREADS) all && \
 		make install && \
 		touch $(abs_builddir)/installed_git
 else
