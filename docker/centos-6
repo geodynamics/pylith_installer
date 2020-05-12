@@ -6,10 +6,12 @@ RUN yum install -y \
 	gcc-c++ \
 	make \
         file \
+	gettext \
         automake \
         autoconf \
         libtool \
         curl \
+	curl-devel \
 	openssl \
 	openssl-devel \
         zlib-devel \
