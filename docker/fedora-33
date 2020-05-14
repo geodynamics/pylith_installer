@@ -40,6 +40,7 @@ RUN dnf install -y \
     sqlite-devel \
     cmake \
     lcov \
+    gdb \
     valgrind \
     vim \
     vim-common

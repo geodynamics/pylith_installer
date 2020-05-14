@@ -31,6 +31,7 @@ RUN apt-get update \
       libsqlite3-dev \
       cmake \
       lcov \
+      gdb \
       valgrind \
       vim-common \
       vim-runtime \

@@ -11,41 +11,42 @@ RUN dnf install -y \
   libtool \
   curl \
   openssh \
-	python2 \
-	python2-devel \
-	python2-libs \
-	python2-numpy \
+  python2 \
+  python2-devel \
+  python2-libs \
+  python2-numpy \
   python2-setuptools \
-	python2-six \
-	python2-coverage \
-	python2-Cython \
-	zlib \
+  python2-six \
+  python2-coverage \
+  python2-Cython \
+  zlib \
   zlib-devel \
-	blas \
-	blas-devel \
-	lapack \
-	lapack-devel \
-	atlas \
-	atlas-devel \
-	openssl \
-	openssl-libs \
-	unzip \
+  blas \
+  blas-devel \
+  lapack \
+  lapack-devel \
+  atlas \
+  atlas-devel \
+  openssl \
+  openssl-libs \
+  unzip \
   git \
-	ca-certificates \
-	cppunit \
+  ca-certificates \
+  cppunit \
   cppunit-devel \
-	openmpi \
-	openmpi-devel \
-	hdf5-openmpi \
-	hdf5-openmpi-devel \
-	sqlite \
-	sqlite-libs \
-	sqlite-devel \
-	cmake \
-	lcov \
-	valgrind \
-	vim \
-	vim-common
+  openmpi \
+  openmpi-devel \
+  hdf5-openmpi \
+  hdf5-openmpi-devel \
+  sqlite \
+  sqlite-libs \
+  sqlite-devel \
+  cmake \
+  lcov \
+  gdb \
+  valgrind \
+  vim \
+  vim-common
 
 ENV PATH $PATH:/usr/lib64/openmpi/bin
 
