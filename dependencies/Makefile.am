@@ -268,7 +268,8 @@ if INSTALL_PYTHON
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix_deps) \
-		--enable-shared $(env_flags_deps) $(env_compilers) && \
+		--enable-shared CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		$(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_python
