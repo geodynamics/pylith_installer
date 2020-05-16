@@ -26,7 +26,7 @@ RUN yum install -y \
     
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
-RUN update-ca-trust enable
+RUN update-ca-trust enable && update-ca-trust extract
 
 
 ENV PYTHON_VERSION 2.7
