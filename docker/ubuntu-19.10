@@ -15,6 +15,8 @@ RUN apt-get update \
       python-setuptools \
       python-numpy \
       python-coverage \
+      python-six \
+      cython \
       zlib1g-dev \
       unzip \
       git \
@@ -24,7 +26,6 @@ RUN apt-get update \
       mpich \
       libhdf5-mpich-103 \
       libhdf5-mpich-dev \
-      python-h5py \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \
@@ -80,7 +81,7 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --disable-sqlite \
     --disable-numpy \
     --disable-hdf5 \
-    --disable-h5py \
+    --enable-h5py \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
