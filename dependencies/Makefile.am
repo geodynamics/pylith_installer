@@ -261,14 +261,14 @@ installed_openssl:
 # ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers installed_openssl
+python: installed_compilers installed_openssl installed_sqlite
 if INSTALL_PYTHON
 	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz $(DEPS_URL)
 	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix_deps) \
-		--enable-shared CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		--enable-shared --enable-optimizations CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
 		$(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
