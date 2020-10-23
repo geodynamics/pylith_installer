@@ -39,7 +39,8 @@ noinst_tmp = \
 	installed_h5py \
 	installed_netcdf \
 	installed_netcdfpy \
-	installed_git
+	installed_fiat \
+	installed_git \
 	installed_cmake
 
 
@@ -86,13 +87,15 @@ noinst_srcdirs = \
 	h5py-$(H5PY_VER) \
 	netcdf-$(NETCDF_VER) \
 	netCDF4-$(NETCDFPY_VER) \
+	ScientificPython-$(SCIENTIFICPYTHON_VER) \
+	FIAT-$(FIAT_VER) \
 	git-$(GIT_VER) \
 	cmake-$(CMAKE_VER)
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_compilers installed_openssl installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_six installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_six installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake installed_fiat
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -574,7 +577,7 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		$(PYTHON) setup.py configure --hdf5-libdir=$(HDF5_LIBDIR) --hdf5-includedir=$(HDF5_INCDIR) && \
+		$(PYTHON) setup.py configure --hdf5-libdir=$(HDF5_LIBDIR) --hdf5-includedir=$(HDF5_INCDIR) --hdf5-version=$(HDF5_VER) && \
 		CC=mpicc $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" $(PYTHON) setup.py build && \
 		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_h5py
@@ -632,6 +635,27 @@ endif
 
 installed_netcdfpy:
 	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
+
+
+# ----------------------------------------------------------------------
+# fiat
+# ----------------------------------------------------------------------
+fiat: installed_numpy
+if INSTALL_FIAT
+	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
+	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps)
+	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
+	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
+	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_fiat
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_top_builddir)/installed_fiat
+endif
+
+installed_fiat:
+	$(MAKE) $(AM_MAKEFLAGS) fiat
 
 
 # ----------------------------------------------------------------------

@@ -299,6 +299,14 @@ AC_ARG_ENABLE([nemesis],
 	[install_nemesis=yes])
 AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
 
+# FIAT
+AC_ARG_ENABLE([fiat],
+    [AC_HELP_STRING([--enable-fiat],
+        [install FIAT @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_fiat=yes; else install_fiat=no; fi],
+	[install_fiat=yes])
+AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
+
 # PYTHIA
 AC_ARG_ENABLE([pythia],
     [AC_HELP_STRING([--enable-pythia],
@@ -529,6 +537,10 @@ if test "$install_python" = yes ; then
     AC_MSG_WARN([Incompatible configure options. Building Python requires building numpy as well. Adding installation of numpy.])
   fi
   install_numpy=yes
+  if test "$install_fiat" != yes ; then
+    AC_MSG_WARN([Incompatible configure options. Building Python requires building FIAT as well. Adding installation of FIAT.])
+  fi
+  install_fiat=yes
   if test "$install_nemesis" != yes ; then
     AC_MSG_WARN([Incompatible configure options. Building Python requires building nemesis as well. Adding installation of nemesis.])
   fi
@@ -787,6 +799,13 @@ if test "$install_setuptools" = yes ; then
   fi
 fi
 
+# fiat
+if test "$install_fiat" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  CIT_PYTHON_MODULE([FIAT],[0.9.9])
+fi
+
 # spatialdata
 if test "$install_spatialdata" = yes ; then
   AC_PATH_PROG(existing_spatialdata, gensimpledb.py)
@@ -994,6 +1013,7 @@ printf "  nemesis: $install_nemesis\n"
 printf "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack\n"
 printf "  six: $install_six (required by h5py)\n"
 printf "  cftime: $install_cftime (required by netCDF4)\n"
+printf "  fiat: $install_fiat"
 printf "  spatialdata: $install_spatialdata\n"
 printf "  petsc: $install_petsc, options: $petsc_options\n"
 printf "  pyre/pythia: $install_pythia\n"

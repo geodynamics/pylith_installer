@@ -121,7 +121,7 @@ endif
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
 			--prefix=$(prefix) $(env_flags_cig) $(env_compilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES)" \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) -DACCEPT_USE_OF_DEPRECATED_PROJ_API_H" \
 			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
 		make -j $(make_threads) && \
@@ -168,7 +168,7 @@ else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) $(PETSC_DIR)
 endif
 	cd $(PETSC_DIR) && \
-		python2 ./configure \
+		python${PYTHON_VERSION} ./configure \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
@@ -193,7 +193,7 @@ installed_petsc:
 # pylith
 # ----------------------------------------------------------------------
 pylith: installed_pythia installed_nemesis installed_spatialdata installed_petsc
-pylith_options = --enable-netcdf --enable-hdf5
+pylith_options = --enable-cubit --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing
 endif
@@ -210,7 +210,7 @@ endif
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLDUES) $(NETCDF_INCLUDES)" \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLDUES) $(NETCDF_INCLUDES) -DACCEPT_USE_OF_DEPRECATED_PROJ_API_H" \
 			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
