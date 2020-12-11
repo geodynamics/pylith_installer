@@ -168,7 +168,7 @@ else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) $(PETSC_DIR)
 endif
 	cd $(PETSC_DIR) && \
-		python2 ./configure \
+		python${PYTHON_VERSION} ./configure \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
