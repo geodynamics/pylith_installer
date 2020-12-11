@@ -1,3 +1,4 @@
+# End of life 2020-11-24
 FROM fedora:31
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
