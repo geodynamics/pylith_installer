@@ -31,14 +31,6 @@ AC_ARG_ENABLE([force-install],
 	[if test "$enableval" != no ; then force_install=yes; else force_install=no; fi],
 	[force_install=no])
 
-# AUTOTOOLS
-AC_ARG_ENABLE([autotools],
-    [AC_HELP_STRING([--enable-autotools],
-        [install GNU autotools @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_autotools=yes; else install_autotools=no; fi],
-	[install_autotools=no])
-AM_CONDITIONAL([INSTALL_AUTOTOOLS], [test "$install_autotools" = yes])
-
 # GCC
 AC_ARG_ENABLE([gcc],
     [AC_HELP_STRING([--enable-gcc],
@@ -51,13 +43,13 @@ fi
 AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
 
-# PYTHON
-AC_ARG_ENABLE([python],
-    [AC_HELP_STRING([--enable-python],
-        [install Python @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
-	[install_python=no])
-AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
+# CMAKE
+AC_ARG_ENABLE([cmake],
+    [AC_HELP_STRING([--enable-cmake],
+        [install CMAKE @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cmake=yes; else install_cmake=no; fi],
+	[install_cmake=yes])
+AM_CONDITIONAL([INSTALL_CMAKE], [test "$install_cmake" = yes])
 
 # MPI
 AC_ARG_ENABLE([mpi],
@@ -77,6 +69,50 @@ if test "$install_mpi" = mpich ; then
 fi
 AC_SUBST(mpich_sharedarch)  
 
+# GIT
+AC_ARG_ENABLE([git],
+    [AC_HELP_STRING([--enable-git],
+        [install Git @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_git=yes; else install_git=no; fi],
+	[install_git=no])
+AM_CONDITIONAL([INSTALL_GIT], [test "$install_git" = yes])
+
+# AUTOTOOLS
+AC_ARG_ENABLE([autotools],
+    [AC_HELP_STRING([--enable-autotools],
+        [install GNU autotools @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_autotools=yes; else install_autotools=no; fi],
+	[install_autotools=no])
+AM_CONDITIONAL([INSTALL_AUTOTOOLS], [test "$install_autotools" = yes])
+
+# PCRE
+AC_ARG_ENABLE([pcre],
+    [AC_HELP_STRING([--enable-pcre],
+        [install PCRE @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
+	[install_pcre=no])
+AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
+AC_ARG_WITH([pcre-incdir],
+    [AC_HELP_STRING([--with-pcre-incdir],
+        [location of pcre header files @<:@default=no@:>@])],
+	[with_pcre_incdir=$withval],
+	[with_pcre_incdir=no])
+AC_SUBST(with_pcre_incdir)
+AC_ARG_WITH([pcre-libdir],
+    [AC_HELP_STRING([--with-pcre-libdir],
+        [location of pcre library @<:@default=no@:>@])],
+	[with_pcre_libdir=$withval],
+	[with_pcre_libdir=no])
+AC_SUBST(with_pcre_libdir)
+
+# SWIG
+AC_ARG_ENABLE([swig],
+    [AC_HELP_STRING([--enable-swig],
+        [install SWIG @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
+	[install_swig=no])
+AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
+
 # OPENSSL
 AC_ARG_ENABLE([openssl],
     [AC_HELP_STRING([--enable-openssl],
@@ -85,25 +121,29 @@ AC_ARG_ENABLE([openssl],
 	[install_openssl=no])
 AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
 
-# CPPUNIT
-AC_ARG_ENABLE([cppunit],
-    [AC_HELP_STRING([--enable-cppunit],
-        [install CppUnit @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
-	[install_cppunit=yes])
-AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
-AC_ARG_WITH([cppunit-incdir],
-    [AC_HELP_STRING([--with-cppunit-incdir],
-        [location of cppunit header files @<:@default=no@:>@])],
-	[with_cppunit_incdir=$withval],
-	[with_cppunit_incdir=no])
-AC_SUBST(with_cppunit_incdir)
-AC_ARG_WITH([cppunit-libdir],
-    [AC_HELP_STRING([--with-cppunit-libdir],
-        [location of cppunit library @<:@default=no@:>@])],
-	[with_cppunit_libdir=$withval],
-	[with_cppunit_libdir=no])
-AC_SUBST(with_cppunit_libdir)
+# PYTHON
+AC_ARG_ENABLE([python],
+    [AC_HELP_STRING([--enable-python],
+        [install Python @<:@default=no@:>@])],
+	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
+	[install_python=no])
+AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
+
+# SETUPTOOLS
+AC_ARG_ENABLE([setuptools],
+    [AC_HELP_STRING([--enable-setuptools],
+        [install setuptools @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
+	[install_setuptools=yes])
+AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
+
+# CYTHON
+AC_ARG_ENABLE([cython],
+    [AC_HELP_STRING([--enable-cython],
+        [install cython @<:@default=no@:>@])],
+	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
+	[install_cython=no])
+AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
 
 # NUMPY
 AC_ARG_ENABLE([numpy],
@@ -134,6 +174,26 @@ AC_ARG_ENABLE([cftime],
 	[if test "$enableval" != no ; then install_cftime=yes; else install_cftime=no; fi],
 	[install_cftime=no])
 AM_CONDITIONAL([INSTALL_CFTIME], [test "$install_cftime" = yes])
+
+# CPPUNIT
+AC_ARG_ENABLE([cppunit],
+    [AC_HELP_STRING([--enable-cppunit],
+        [install CppUnit @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
+	[install_cppunit=yes])
+AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
+AC_ARG_WITH([cppunit-incdir],
+    [AC_HELP_STRING([--with-cppunit-incdir],
+        [location of cppunit header files @<:@default=no@:>@])],
+	[with_cppunit_incdir=$withval],
+	[with_cppunit_incdir=no])
+AC_SUBST(with_cppunit_incdir)
+AC_ARG_WITH([cppunit-libdir],
+    [AC_HELP_STRING([--with-cppunit-libdir],
+        [location of cppunit library @<:@default=no@:>@])],
+	[with_cppunit_libdir=$withval],
+	[with_cppunit_libdir=no])
+AC_SUBST(with_cppunit_libdir)
 
 # SQLITE
 AC_ARG_ENABLE([sqlite],
@@ -231,66 +291,6 @@ AC_ARG_ENABLE([netcdfpy],
 	[install_netcdfpy=yes])
 AM_CONDITIONAL([INSTALL_NETCDFPY], [test "$install_netcdfpy" = yes])
 
-# GIT
-AC_ARG_ENABLE([git],
-    [AC_HELP_STRING([--enable-git],
-        [install Git @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_git=yes; else install_git=no; fi],
-	[install_git=no])
-AM_CONDITIONAL([INSTALL_GIT], [test "$install_git" = yes])
-
-# CMAKE
-AC_ARG_ENABLE([cmake],
-    [AC_HELP_STRING([--enable-cmake],
-        [install CMAKE @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_cmake=yes; else install_cmake=no; fi],
-	[install_cmake=yes])
-AM_CONDITIONAL([INSTALL_CMAKE], [test "$install_cmake" = yes])
-
-# SETUPTOOLS
-AC_ARG_ENABLE([setuptools],
-    [AC_HELP_STRING([--enable-setuptools],
-        [install setuptools @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
-	[install_setuptools=yes])
-AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
-
-# CYTHON
-AC_ARG_ENABLE([cython],
-    [AC_HELP_STRING([--enable-cython],
-        [install cython @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
-	[install_cython=no])
-AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
-
-# PCRE
-AC_ARG_ENABLE([pcre],
-    [AC_HELP_STRING([--enable-pcre],
-        [install PCRE @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
-	[install_pcre=no])
-AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
-AC_ARG_WITH([pcre-incdir],
-    [AC_HELP_STRING([--with-pcre-incdir],
-        [location of pcre header files @<:@default=no@:>@])],
-	[with_pcre_incdir=$withval],
-	[with_pcre_incdir=no])
-AC_SUBST(with_pcre_incdir)
-AC_ARG_WITH([pcre-libdir],
-    [AC_HELP_STRING([--with-pcre-libdir],
-        [location of pcre library @<:@default=no@:>@])],
-	[with_pcre_libdir=$withval],
-	[with_pcre_libdir=no])
-AC_SUBST(with_pcre_libdir)
-
-# SWIG
-AC_ARG_ENABLE([swig],
-    [AC_HELP_STRING([--enable-swig],
-        [install SWIG @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
-	[install_swig=no])
-AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
-
 # NEMESIS
 AC_ARG_ENABLE([nemesis],
     [AC_HELP_STRING([--enable-nemesis],
@@ -371,6 +371,7 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # OPTIONS
 # ----------------------------------------------------------------------
 # Separate install location for dependencies
+if test "$prefix" = "NONE" ; then prefix=$ac_default_prefix; fi
 AC_ARG_WITH([deps-prefix],
     [AC_HELP_STRING([--with-deps-prefix],
         [Install dependencies to separate directory from CIG code. @<:@default=no@:>@])],
@@ -504,8 +505,10 @@ AC_PROG_CXXCPP
 # GCC
 if test "$install_gcc" = yes ; then
   if test "$install_mpi" = no ; then
-    AC_MSG_ERROR([Incompatible settings: building gcc but not MPI. If you use --enable-gcc, you should also use --enable-mpi.])
+    AC_MSG_WARN([Building GCC requires building MPI as well. Adding installation of MPICH.])
   fi
+  install_mpi=mpich
+
   if test "$with_fortran" = yes ; then
     FC=gfortran
     AC_SUBST(FC)
@@ -522,20 +525,47 @@ if test "$install_python" = yes ; then
   PYTHON_VERSION=2.7
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
-                AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
+                AC_MSG_ERROR([Building Python requires zlib. Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
                 ])
+  if test "$install_openssl" != yes ; then
+    AC_CHECK_HEADER([openssl/ssl.h], [], [
+                  AC_MSG_ERROR([Building Python requires openssl. Header file 'openssl/ssl.h' not found; maybe you don't have the openssl development package, e.g. 'openssl-dev', installed?])
+                ])
+  fi
 
+  # install setuptools
+  if test "$install_setuptools" != yes ; then
+    AC_MSG_WARN([Building Python requires building setuptools as well. Adding installation of setuptools.])
+  fi
+  install_setuptools=yes
+  
+  # install cython
+  if test "$install_cython" != yes ; then
+    AC_MSG_WARN([Building Python requires building cython as well. Adding installation of cython.])
+  fi
+  install_cython=yes
+  
+  # install numpy
   if test "$install_numpy" != yes ; then
-    AC_MSG_WARN([Incompatible configure options. Building Python requires building numpy as well. Adding installation of numpy.])
+    AC_MSG_WARN([Building Python requires building numpy as well. Adding installation of numpy.])
   fi
   install_numpy=yes
-  if test "$install_nemesis" != yes ; then
-    AC_MSG_WARN([Incompatible configure options. Building Python requires building nemesis as well. Adding installation of nemesis.])
+  
+  # install pythia
+  if test "$install_pythia" != yes ; then
+    AC_MSG_WARN([Building Python requires building pythia/pyre as well. Adding installation of pythia/pyre.])
   fi
   install_pythia=yes
+
+  # install nemesis
+  if test "$install_nemesis" != yes ; then
+    AC_MSG_WARN([Building Python requires building nemesis as well. Adding installation of nemesis.])
+  fi
   install_nemesis=yes
+
+  # install spatialdata
   if test "$install_spatialdata" != yes ; then
-    AC_MSG_WARN([Incompatible configure options. Building Python requires building spatialdata as well. Adding installation of spatialdata.])
+    AC_MSG_WARN([Building Python requires building spatialdata as well. Adding installation of spatialdata.])
   fi
   install_spatialdata=yes
 else
@@ -701,8 +731,11 @@ AC_SUBST(HDF5_LDFLAGS)
 
 # H5PY
 if test "$install_h5py" = yes ; then
-  if test "$install_python" = no ; then
-    AM_PATH_PYTHON([2.7])
+  if test "$install_python" = yes ; then
+    if test "$install_six" != yes ; then
+      AC_MSG_WARN([Building Python requires building six (for h5py) as well. Adding installation of six.])
+    fi
+    install_six=yes
   fi
   if test "$install_six" = no ; then
     CIT_PYTHON_MODULE([six],[1.0.0])
@@ -738,9 +771,13 @@ AC_SUBST(NETCDF_LDFLAGS)
 
 # NETCDF4 (python)
 if test "$install_netcdfpy" = yes ; then
-  if test "$install_cftime" = yes ; then
-    echo "do nothing" >& /dev/null
-  else
+  if test "$install_python" = yes ; then
+    if test "$install_cftime" != yes ; then
+      AC_MSG_WARN([Building Python requires building cftime (for NetCDF4) as well. Adding installation of cftime.])
+    fi
+    install_cftime=yes
+  fi
+  if test "$install_cftime" = !yes ; then
     CIT_PYTHON_MODULE([cftime],[1.0.0])
   fi
 fi
@@ -973,30 +1010,37 @@ else
 fi
 printf "  Debugging: $with_debugging\n\n"
 printf "PyLith dependencies to be installed:\n\n"
-printf "  gcc: $install_gcc, languages: $gcc_languages, flags: $gcc_flags\n"
-printf "  openssl: $install_openssl (binary package)\n"
-printf "  Python: $install_python\n"
-printf "  mpi: $install_mpi\n"
-printf "  autotools: $install_autotools\n"
-printf "  git: $install_git\n"
+printf "  gcc: $install_gcc"
+if test "$install_gcc" = yes ; then
+  printf ", languages: $gcc_languages, flags: $gcc_flags\n"
+else
+  printf "\n"
+fi
 printf "  cmake: $install_cmake\n"
-printf "  setuptools: $install_setuptools\n"
+printf "  mpi: $install_mpi\n"
+printf "  git: $install_git\n"
+printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
+printf "  openssl: $install_openssl\n"
+printf "  Python: $install_python\n"
+printf "  Python packages\n"
+printf "    setuptools: $install_setuptools\n"
+printf "    cython: $install_cython\n"
+printf "    numpy: $install_numpy    w/own blas/lapack: $with_numpy_blaslapack\n"
+printf "    six: $install_six (required by h5py)\n"
+printf "    cftime: $install_cftime (required by netCDF4)\n"
+printf "    h5py: $install_h5py\n"
+printf "    netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
+printf "    pyre/pythia: $install_pythia\n"
+printf "    nemesis: $install_nemesis\n"
 printf "  sqlite: $install_sqlite\n"
 printf "  proj: $install_proj\n"
 printf "  hdf5: $install_hdf5\n"
-printf "  h5py: $install_h5py\n"
 printf "  netcdf: $install_netcdf\n"
-printf "  netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
-printf "  nemesis: $install_nemesis\n"
-printf "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack\n"
-printf "  six: $install_six (required by h5py)\n"
-printf "  cftime: $install_cftime (required by netCDF4)\n"
 printf "  spatialdata: $install_spatialdata\n"
 printf "  petsc: $install_petsc, options: $petsc_options\n"
-printf "  pyre/pythia: $install_pythia\n"
 printf "  pylith-parameters GUI: $install_parametersgui\n"
 printf "\n"
 if test "$pylith_git" != no ; then
