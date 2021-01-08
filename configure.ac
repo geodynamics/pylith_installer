@@ -522,7 +522,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix_deps/bin/python
-  PYTHON_VERSION=2.7
+  PYTHON_VERSION=3.9.1
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Building Python requires zlib. Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
@@ -569,7 +569,7 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([2.7])
+  AM_PATH_PYTHON([3.6])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED

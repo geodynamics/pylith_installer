@@ -574,9 +574,7 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		$(PYTHON) setup.py configure --hdf5-libdir=$(HDF5_LIBDIR) --hdf5-includedir=$(HDF5_INCDIR) && \
-		CC=mpicc $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" $(PYTHON) setup.py build && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -639,8 +637,8 @@ installed_netcdfpy:
 # ----------------------------------------------------------------------
 setuptools: 
 if INSTALL_SETUPTOOLS
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
-	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf setuptools-$(SETUPTOOLS_VER).tar.gz
 	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_builddir)/installed_setuptools
 
 else

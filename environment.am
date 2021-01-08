@@ -32,4 +32,7 @@ env_mpicompilers = CC=mpicc CXX=mpicxx
 endif
 
 
+PYTHON_SITEPKGS=lib/python$(PYTHON_VERSION)/site-packages
+PYTHON64_SITEPKGS=lib64/python$(PYTHON_VERSION)/site-packages
+
 # End of file
