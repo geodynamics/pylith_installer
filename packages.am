@@ -17,6 +17,7 @@
 # Packages URL
 # ----------------------------------------------------------------------
 DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
+GITHUB_URL=https://github.com/geodynamics
 
 # ----------------------------------------------------------------------
 # Package Versions

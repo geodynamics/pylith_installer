@@ -16,6 +16,8 @@
 include $(top_srcdir)/packages.am
 include $(top_srcdir)/environment.am
 
+PYTHONUSERBASE=${prefix}
+
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
@@ -59,12 +61,8 @@ all: installed_pythia installed_nemesis installed_spatialdata installed_petsc in
 # ----------------------------------------------------------------------
 pythia:
 if INSTALL_PYTHIA
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-0.6c11.tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
-	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
-	$(CP) -p setuptools-0.6c11.tar.gz pythia-$(PYTHIA_VER)
-	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_builddir)/installed_pythia
-
+	$(PYTHON) -m pip install --user $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)/pythia-$(PYTHIA_VER).tar.gz && \
+		touch $(abs_builddir)/installed_pythia
 else
 	@echo "$@ already installed. Skipping installation."
 	touch $(abs_builddir)/installed_pythia
@@ -79,7 +77,7 @@ installed_pythia:
 # ----------------------------------------------------------------------
 nemesis: installed_pythia
 if INSTALL_NEMESIS
-	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz https://github.com/geodynamics/nemesis/releases/download/v$(NEMESIS_VER)
+	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz $(GITHUB_URL)/nemesis/releases/download/v$(NEMESIS_VER)
 	$(TAR) -xf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
@@ -114,7 +112,7 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --branch master --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
 	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
@@ -162,7 +160,7 @@ else
 petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz && mv petsc-pylith $(PETSC_DIR)
 else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) $(PETSC_DIR)

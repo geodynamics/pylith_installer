@@ -1,68 +1,57 @@
-FROM fedora:32 as os-update
+FROM debian:testing as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
-RUN dnf install -y \
-    gcc \
-    gcc-c++ \
-    make \
-    file \
-    diffutils \
-    automake \
-    autoconf \
-    libtool \
-    curl \
-    openssh \
-    python3 \
-    python3-devel \
-    python3-pip \
-    python3-setuptools \
-    python3-numpy \
-    python3-cftime \
-    python3-coverage \
-    python3-six \
-    python3-Cython \
-    zlib \
-    zlib-devel \
-    blas \
-    blas-devel \
-    lapack \
-    lapack-devel \
-    atlas \
-    atlas-devel \
-    openssl \
-    openssl-libs \
-    unzip \
-    git \
-    ca-certificates \
-    cppunit \
-    cppunit-devel \
-    openmpi \
-    openmpi-devel \
-    hdf5-openmpi \
-    hdf5-openmpi-devel \
-    sqlite \
-    sqlite-libs \
-    sqlite-devel \
-    proj \
-    proj-devel \
-    proj-datumgrid \
-    cmake \
-    swig \
-    lcov \
-    gdb \
-    valgrind \
-    vim \
-    vim-common
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      ssh \
+      python3-dev \
+      libpython3.9 \
+      python3-pip \
+      python3-setuptools \
+      python3-numpy \
+      python3-cftime \
+      python3-six \
+      python3-coverage \
+      cython3 \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-dev \
+      libopenmpi-dev \
+      libopenmpi3 \
+      openmpi-bin \
+      openmpi-common \
+      libhdf5-openmpi-103-1 \
+      libhdf5-openmpi-dev \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      libproj-dev \
+      proj-bin \
+      proj-data \
+      cmake \
+      swig \
+      lcov \
+      gdb \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
 
-ENV PATH $PATH:/usr/lib64/openmpi/bin
-
-COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
-RUN update-ca-trust enable
+COPY docker/certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
 
-ENV PYTHON_VERSION 3.8
-ENV HDF5_INCDIR=/usr/include/openmpi-x86_64  HDF5_LIBDIR=/usr/lib64/openmpi/lib
-
+ENV PYTHON_VERSION 3.9
+ENV HDF5_INCDIR=/usr/include/hdf5/openmpi  HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 
 # ------------------------------------------------------------------------------
 from os-update as build-deps
@@ -77,8 +66,8 @@ RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
 ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib:$INSTALL_DIR/dependencies/lib64 \
-    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/dependencies/lib64/python${PYTHON_VERSION}/site-packages
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib \
+    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages
 USER ${TEST_USER}
 
 # PyLith installer
@@ -102,9 +91,9 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
     --disable-sqlite \
     --disable-numpy \
     --disable-setuptools \
+    --disable-cftime \
     --disable-hdf5 \
     --disable-proj \
-    --disable-cftime \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \

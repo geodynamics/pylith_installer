@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as os-update
+FROM ubuntu:20.10 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 RUN apt-get update \
@@ -26,11 +26,14 @@ RUN apt-get update \
       libcppunit-dev \
       libmpich-dev \
       mpich \
-      libhdf5-mpich-103 \
+      libhdf5-mpich-103-1 \
       libhdf5-mpich-dev \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \
+      proj-bin \
+      proj-data \
+      libproj-dev \
       proj-bin \
       proj-data \
       libproj-dev \
@@ -45,6 +48,7 @@ RUN apt-get update \
 
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
+
 
 
 ENV PYTHON_VERSION 3.8
@@ -88,11 +92,11 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-numpy \
-    --disable-setuptools \
     --disable-cftime \
+    --disable-setuptools \
     --disable-six \
-    --disable-proj \
     --enable-h5py \
+    --disable-proj \
     --enable-netcdf \
     --enable-netcdfpy \
     && . ./setup.sh \

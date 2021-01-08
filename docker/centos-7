@@ -1,5 +1,5 @@
-FROM centos:7
-MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+FROM centos:7 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 RUN yum install -y \
         gcc \
@@ -7,6 +7,7 @@ RUN yum install -y \
 	make \
         file \
 	which \
+	diffutils \
 	gettext \
         automake \
         autoconf \
@@ -17,6 +18,7 @@ RUN yum install -y \
 	openssl \
 	openssl-devel \
         zlib-devel \
+	libffi-devel \
 	unzip \
 	bzip2 \
         git \
@@ -33,35 +35,39 @@ COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
 
 
-ENV PYTHON_VERSION 2.7
+ENV PYTHON_VERSION 3.9
 
-# Create 'pylith-user' user
-ENV PYLITH_USER pylith-user
-RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+# ------------------------------------------------------------------------------
+from os-update as build-deps
 
-ENV PREFIX_DIR /opt/pylith
-ENV BUILD_DIR /home/pylith-installer
+# Create 'pylith-tester' user
+ENV TEST_USER pylith-tester
+RUN useradd --create-home --shell /bin/bash $TEST_USER
+ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
 
-RUN mkdir $PREFIX_DIR \
-  && chown $PYLITH_USER $PREFIX_DIR \
-  && chgrp $PYLITH_USER $PREFIX_DIR \
-  && mkdir -p $BUILD_DIR/build \
-  && chown -R $PYLITH_USER $BUILD_DIR \
-  && chgrp -R $PYLITH_USER $BUILD_DIR
+RUN mkdir ${INSTALL_DIR} \
+  && chown ${TEST_USER} ${INSTALL_DIR} \
+  && chgrp ${TEST_USER} ${INSTALL_DIR}
+ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib:$INSTALL_DIR/dependencies/lib64 \
+    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/dependencies/lib64/python${PYTHON_VERSION}/site-packages
+USER ${TEST_USER}
 
-USER $PYLITH_USER
-WORKDIR $BUILD_DIR
-ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
-ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$PREFIX_DIR/dependencies/lib64:$LD_LIBRARY_PATH
-ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PREFIX_DIR/dependencies/lib64/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+# PyLith installer
+ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
+RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
 
-COPY --chown=pylith-user:pylith-user . $BUILD_DIR/src
-WORKDIR $BUILD_DIR/src
-RUN autoreconf --install --verbose
-WORKDIR $BUILD_DIR/build
-RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
-    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
-    --with-deps-prefix=$PREFIX_DIR/dependencies \
+COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+RUN mkdir -p ${build_dir}
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-deps-prefix=${INSTALL_DIR}/dependencies \
     --disable-cmake \
     --enable-gcc \
     --enable-mpi=openmpi \
@@ -81,18 +87,11 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-netcdf \
     --enable-netcdfpy \
     && make -C dependencies \
-    && rm -r $BUILD_DIR/build \
-    && unset BUILD_DIR
-
-ENV HDF5_LIBDIR $PREFIX_DIR/dependencies/lib
-ENV HDF5_INCDIR $PREFIX_DIR/dependencies/include
-
-# Setup user and environment
-WORKDIR /home/$PYLITH_USER
+    && rm -r ${build_dir}
+ENV HDF5_LIBDIR=${INSTALL_DIR}/dependencies/lib  HDF5_INCDIR=${INSTALL_DIR}/dependencies/include
 
 
-
-#RUN yum clean
+WORKDIR $HOME
 
 
 CMD /bin/bash

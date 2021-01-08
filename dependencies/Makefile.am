@@ -16,6 +16,8 @@
 include $(top_srcdir)/packages.am
 include $(top_srcdir)/environment.am
 
+PYTHONUSERBASE=${prefix_deps}
+
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
@@ -272,6 +274,7 @@ if INSTALL_PYTHON
 		$(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
+		$(LN_S) $(prefix_deps)/bin/python3 $(prefix_deps)/bin/python && \
 		touch $(abs_builddir)/installed_python
 else
 	@echo "$@ already installed. Skipping installation."
@@ -280,6 +283,96 @@ endif
 
 installed_python:
 	$(MAKE) $(AM_MAKEFLAGS) python
+
+
+# ----------------------------------------------------------------------
+# setuptools
+# ----------------------------------------------------------------------
+setuptools: installed_python
+if INSTALL_SETUPTOOLS
+	$(PYTHON) -m pip install --user $(DEPS_URL)/setuptools-$(SETUPTOOLS_VER).tar.gz && \
+		touch $(abs_builddir)/installed_setuptools
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_setuptools
+endif
+
+installed_setuptools:
+	$(MAKE) $(AM_MAKEFLAGS) setuptools
+
+
+# ----------------------------------------------------------------------
+# cython
+# ----------------------------------------------------------------------
+cython: installed_python installed_setuptools
+if INSTALL_CYTHON
+	$(PYTHON) -m pip install --user $(DEPS_URL)/Cython-$(CYTHON_VER).tar.gz && \
+		touch $(abs_builddir)/installed_cython
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_cython
+endif
+
+installed_cython:
+	$(MAKE) $(AM_MAKEFLAGS) cython
+
+
+# ----------------------------------------------------------------------
+# numpy
+# ----------------------------------------------------------------------
+numpy: installed_python installed_setuptools
+if INSTALL_NUMPY
+	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).zip $(DEPS_URL)
+	$(UNZIP) numpy-$(NUMPY_VER).zip
+if WITH_NUMPY_BLASLAPACK
+	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
+endif
+	cd numpy-$(NUMPY_VER) && \
+		$(PYTHON) -m pip install --user . && \
+		touch $(abs_builddir)/installed_numpy
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_numpy
+endif
+
+installed_numpy:
+	$(MAKE) $(AM_MAKEFLAGS) numpy
+
+
+# ----------------------------------------------------------------------
+# six
+# ----------------------------------------------------------------------
+six: installed_python installed_setuptools
+if INSTALL_SIX
+	$(PYTHON) -m pip install --user $(DEPS_URL)/six-$(SIX_VER).tar.gz && \
+		touch $(abs_builddir)/installed_six
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_six
+endif
+
+installed_six:
+	$(MAKE) $(AM_MAKEFLAGS) six
+
+
+# ----------------------------------------------------------------------
+# cftime
+# ----------------------------------------------------------------------
+cftime: installed_python installed_setuptools installed_numpy
+if INSTALL_CFTIME
+	$(PYTHON) -m pip install --user $(DEPS_URL)/cftime-$(CFTIME_VER).tar.gz && \
+		touch $(abs_builddir)/installed_cftime
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_cftime
+endif
+
+installed_cftime:
+	$(MAKE) $(AM_MAKEFLAGS) cftime
 
 
 # ----------------------------------------------------------------------
@@ -422,69 +515,6 @@ installed_swig:
 
 
 # ----------------------------------------------------------------------
-# numpy
-# ----------------------------------------------------------------------
-numpy: installed_python installed_setuptools
-if INSTALL_NUMPY
-	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf numpy-$(NUMPY_VER).tar.gz
-if WITH_NUMPY_BLASLAPACK
-	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
-endif
-	cd numpy-$(NUMPY_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
-		touch $(abs_builddir)/installed_numpy
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_numpy
-endif
-
-installed_numpy:
-	$(MAKE) $(AM_MAKEFLAGS) numpy
-
-
-# ----------------------------------------------------------------------
-# six
-# ----------------------------------------------------------------------
-six: installed_python installed_setuptools
-if INSTALL_SIX
-	$(FETCH_SCRIPT) "$(downloader)" six-$(SIX_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf six-$(SIX_VER).tar.gz
-	cd six-$(SIX_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
-		touch $(abs_builddir)/installed_six
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_six
-endif
-
-installed_six:
-	$(MAKE) $(AM_MAKEFLAGS) six
-
-
-# ----------------------------------------------------------------------
-# cftime
-# ----------------------------------------------------------------------
-cftime: installed_python installed_numpy
-if INSTALL_CFTIME
-	$(FETCH_SCRIPT) "$(downloader)" cftime-$(CFTIME_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf cftime-$(CFTIME_VER).tar.gz
-	cd cftime-$(CFTIME_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
-		touch $(abs_builddir)/installed_cftime
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_cftime
-endif
-
-installed_cftime:
-	$(MAKE) $(AM_MAKEFLAGS) cftime
-
-
-# ----------------------------------------------------------------------
 # sqlite
 # ----------------------------------------------------------------------
 sqlite: installed_compilers
@@ -571,10 +601,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_numpy installed_six installed_cython
 if INSTALL_H5PY
-	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
-	cd h5py-$(H5PY_VER) && \
-		CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(PYTHON) -m pip install --user $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -615,13 +642,9 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 # netcdfpy
 # ----------------------------------------------------------------------
-netcdfpy: installed_netcdf installed_numpy installed_cftime
+netcdfpy: installed_netcdf installed_numpy installed_cftime installed_cython
 if INSTALL_NETCDFPY
-	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
-	cd netCDF4-$(NETCDFPY_VER) && \
-		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) \
-		NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) -m pip install --user $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."
@@ -630,42 +653,6 @@ endif
 
 installed_netcdfpy:
 	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
-
-
-# ----------------------------------------------------------------------
-# setuptools
-# ----------------------------------------------------------------------
-setuptools: 
-if INSTALL_SETUPTOOLS
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf setuptools-$(SETUPTOOLS_VER).tar.gz
-	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_builddir)/installed_setuptools
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_setuptools
-endif
-
-installed_setuptools:
-	$(MAKE) $(AM_MAKEFLAGS) setuptools
-
-
-# ----------------------------------------------------------------------
-# cython
-# ----------------------------------------------------------------------
-cython: 
-if INSTALL_CYTHON
-	$(FETCH_SCRIPT) "$(downloader)" Cython-$(CYTHON_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf Cython-$(CYTHON_VER).tar.gz
-	cd Cython-$(CYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_builddir)/installed_cython
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_cython
-endif
-
-installed_cython:
-	$(MAKE) $(AM_MAKEFLAGS) cython
 
 
 # ----------------------------------------------------------------------

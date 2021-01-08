@@ -1,9 +1,10 @@
-FROM centos:8
-MAINTAINER Brad Aagaard <baagaard@usgs.gov>
+FROM centos:8 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 RUN dnf install -y \
         gcc \
 	gcc-c++ \
+	redhat-rpm-config \
 	make \
         file \
 	which \
@@ -18,12 +19,14 @@ RUN dnf install -y \
 	unzip \
         git \
 	ca-certificates \
-	python2 \
-	python2-devel \
-	python2-six \
-	python2-numpy \
-	python2-setuptools \
-	python2-Cython \
+	python38 \
+	python38-devel \
+	python38-pip \
+	python38-setuptools \
+	python38-six \
+	python38-numpy \
+	python38-Cython \
+	python3-coverage \
 	mpich \
 	mpich-devel \
 	cmake \
@@ -32,50 +35,57 @@ RUN dnf install -y \
 	gdb \
 	valgrind \
 	vim-common \
-	vim-minimal
+	vim-minimal \
+	dnf-plugins-core
+
+RUN dnf config-manager --set-enabled powertools && dnf install -y cppunit cppunit-devel
     
-RUN alternatives --set python /usr/bin/python2
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
 
 ENV PATH $PATH:/usr/lib64/mpich/bin
 
-ENV PYTHON_VERSION 2.7
+RUN alternatives --set python3 /usr/bin/python3.8
+ENV PYTHON_VERSION 3.8
 
-# Create 'pylith-user' user
-ENV PYLITH_USER pylith-user
-RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+# ------------------------------------------------------------------------------
+from os-update as build-deps
 
-ENV PREFIX_DIR /opt/pylith
-ENV BUILD_DIR /home/pylith-installer
+# Create 'pylith-tester' user
+ENV TEST_USER pylith-tester
+RUN useradd --create-home --shell /bin/bash $TEST_USER
+ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
 
-RUN mkdir $PREFIX_DIR \
-  && chown $PYLITH_USER $PREFIX_DIR \
-  && chgrp $PYLITH_USER $PREFIX_DIR \
-  && mkdir -p $BUILD_DIR/build \
-  && chown -R $PYLITH_USER $BUILD_DIR \
-  && chgrp -R $PYLITH_USER $BUILD_DIR
+RUN mkdir ${INSTALL_DIR} \
+  && chown ${TEST_USER} ${INSTALL_DIR} \
+  && chgrp ${TEST_USER} ${INSTALL_DIR}
+ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib:$INSTALL_DIR/dependencies/lib64 \
+    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/dependencies/lib64/python${PYTHON_VERSION}/site-packages
+USER ${TEST_USER}
 
-USER $PYLITH_USER
-WORKDIR $BUILD_DIR
-ENV PATH $PREFIX_DIR/dependencies/bin:$PATH
-ENV LD_LIBRARY_PATH $PREFIX_DIR/dependencies/lib:$PREFIX_DIR/dependencies/lib64:$LD_LIBRARY_PATH
-ENV PYTHONPATH $PREFIX_DIR/dependencies/lib/python$PYTHON_VERSION/site-packages:$PREFIX_DIR/dependencies/lib64/python$PYTHON_VERSION/site-packages:$PYTHONPATH
+# PyLith installer
+ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
+RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
 
-COPY --chown=pylith-user:pylith-user . $BUILD_DIR/src
-WORKDIR $BUILD_DIR/src
-RUN autoreconf --install --verbose
-WORKDIR $BUILD_DIR/build
-RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
-    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
-    --with-deps-prefix=$PREFIX_DIR/dependencies \
+COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+RUN mkdir -p ${build_dir}
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-deps-prefix=${INSTALL_DIR}/dependencies \
     --disable-cmake \
     --disable-sqlite \
     --disable-setuptools \
     --disable-numpy \
     --disable-six \
-    --enable-cppunit \
+    --disable-cppunit \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
@@ -85,18 +95,11 @@ RUN ../src/configure --prefix=$PREFIX_DIR --with-fetch=curl \
     --enable-netcdf \
     --enable-netcdfpy \
     && make -C dependencies \
-    && rm -r $BUILD_DIR/build \
-    && unset BUILD_DIR
-
-ENV HDF5_LIBDIR $PREFIX_DIR/dependencies/lib
-ENV HDF5_INCDIR $PREFIX_DIR/dependencies/include
-
-# Setup user and environment
-WORKDIR /home/$PYLITH_USER
+    && rm -r ${build_dir}
+ENV HDF5_LIBDIR=${INSTALL_DIR}/dependencies/lib  HDF5_INCDIR=${INSTALL_DIR}/dependencies/include
 
 
-
-#RUN dnf clean
+WORKDIR $HOME
 
 
 CMD /bin/bash
