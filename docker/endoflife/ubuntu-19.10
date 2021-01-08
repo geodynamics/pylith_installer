@@ -1,3 +1,4 @@
+# End of life 2020-07-17
 FROM ubuntu:19.10
 MAINTAINER Brad Aagaard <baagaard@usgs.gov>
 
