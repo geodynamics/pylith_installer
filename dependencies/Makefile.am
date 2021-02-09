@@ -290,7 +290,7 @@ installed_python:
 # ----------------------------------------------------------------------
 setuptools: installed_python
 if INSTALL_SETUPTOOLS
-	$(PYTHON) -m pip install --user $(DEPS_URL)/setuptools-$(SETUPTOOLS_VER).tar.gz && \
+	PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user $(DEPS_URL)/setuptools-$(SETUPTOOLS_VER).tar.gz && \
 		touch $(abs_builddir)/installed_setuptools
 else
 	@echo "$@ already installed. Skipping installation."
@@ -306,7 +306,7 @@ installed_setuptools:
 # ----------------------------------------------------------------------
 cython: installed_python installed_setuptools
 if INSTALL_CYTHON
-	$(PYTHON) -m pip install --user $(DEPS_URL)/Cython-$(CYTHON_VER).tar.gz && \
+	PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user $(DEPS_URL)/Cython-$(CYTHON_VER).tar.gz && \
 		touch $(abs_builddir)/installed_cython
 
 else
@@ -329,7 +329,7 @@ if WITH_NUMPY_BLASLAPACK
 	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
 endif
 	cd numpy-$(NUMPY_VER) && \
-		$(PYTHON) -m pip install --user . && \
+		PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user . && \
 		touch $(abs_builddir)/installed_numpy
 
 else
@@ -346,7 +346,7 @@ installed_numpy:
 # ----------------------------------------------------------------------
 six: installed_python installed_setuptools
 if INSTALL_SIX
-	$(PYTHON) -m pip install --user $(DEPS_URL)/six-$(SIX_VER).tar.gz && \
+	PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user $(DEPS_URL)/six-$(SIX_VER).tar.gz && \
 		touch $(abs_builddir)/installed_six
 
 else
@@ -363,7 +363,7 @@ installed_six:
 # ----------------------------------------------------------------------
 cftime: installed_python installed_setuptools installed_numpy
 if INSTALL_CFTIME
-	$(PYTHON) -m pip install --user $(DEPS_URL)/cftime-$(CFTIME_VER).tar.gz && \
+	PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user $(DEPS_URL)/cftime-$(CFTIME_VER).tar.gz && \
 		touch $(abs_builddir)/installed_cftime
 
 else
@@ -601,7 +601,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_numpy installed_six installed_cython
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(PYTHON) -m pip install --user $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -644,7 +644,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_numpy installed_cftime installed_cython
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) -m pip install --user $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) PYTHONUSERBASE=$(PYTHONUSERBASE) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) -m pip install --user $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."
