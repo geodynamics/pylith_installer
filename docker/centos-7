@@ -17,6 +17,8 @@ RUN yum install -y \
 	openssh \
 	openssl \
 	openssl-devel \
+        sqlite \
+        sqlite-devel \
         zlib-devel \
 	libffi-devel \
 	unzip \
@@ -33,7 +35,6 @@ RUN yum install -y \
 
 COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 RUN update-ca-trust enable
-
 
 ENV PYTHON_VERSION 3.9
 
@@ -59,6 +60,7 @@ ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-in
 RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
 
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+RUN mkdir -p ~/.config/pip && cp ${src_dir}/docker/pip.conf ~/.config/pip/pip.conf
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
@@ -69,10 +71,10 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
     --with-fortran=no --with-make-threads=`nproc` \
     --with-deps-prefix=${INSTALL_DIR}/dependencies \
     --disable-cmake \
+    --disable-sqlite \
     --enable-gcc \
     --enable-mpi=openmpi \
     --enable-cppunit \
-    --enable-sqlite \
     --enable-python \
     --enable-setuptools \
     --enable-cython \

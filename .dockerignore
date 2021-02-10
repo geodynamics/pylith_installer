@@ -5,3 +5,4 @@ autom4te.cache
 aux-config
 docker
 !docker/certs
+!docker/pip.conf
