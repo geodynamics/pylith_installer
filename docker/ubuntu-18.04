@@ -11,8 +11,8 @@ RUN apt-get update \
       libtool \
       curl \
       ssh \
+      libpython3.7 \
       python3-dev \
-      libpython3.6 \
       python3-pip \
       python3-setuptools \
       python3-numpy \
@@ -46,7 +46,7 @@ COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 
-ENV PYTHON_VERSION 3.6
+ENV PYTHON_VERSION 3.7
 ENV HDF5_INCDIR=/usr/include/hdf5/openmpi  HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 
 # ------------------------------------------------------------------------------
