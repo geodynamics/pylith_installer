@@ -68,7 +68,7 @@ class DockerApp(object):
         """
         parser = argparse.ArgumentParser()
         parser.add_argument("--dockerfile", action="store", dest="dockerfile", required=True)
-        parser.add_argument("--prefix", action="store", dest="prefix", default="geodynamics/pylith-testenv")
+        parser.add_argument("--prefix", action="store", dest="prefix", default="registry.gitlab.com/cig-pylith/pylith_installer/testenv")
         parser.add_argument("--build", action="store_true", dest="build")
         parser.add_argument("--push", action="store_true", dest="push")
         return parser.parse_args()
