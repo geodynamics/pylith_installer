@@ -23,7 +23,6 @@ PYTHONUSERBASE=${prefix}
 # ----------------------------------------------------------------------
 noinst_tmp = \
 	installed_pythia \
-	installed_nemesis \
 	installed_spatialdata \
 	installed_petsc \
 	installed_pylith \
@@ -31,7 +30,7 @@ noinst_tmp = \
 
 
 noinst_builddirs = \
-	nemesis-build \
+	pythia-build \
 	spatialdata-build \
 	pylith-build
 
@@ -39,13 +38,12 @@ noinst_builddirs = \
 noinst_srcdirs = \
 	spatialdata-$(SPATIALDATA_VER) \
 	pythia-$(PYTHIA_VER) \
-	nemesis-$(NEMESIS_VER) \
 	pylith-$(PYLITH_VER)
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: installed_pythia installed_nemesis installed_spatialdata installed_petsc installed_pylith installed_parametersgui
+all: installed_pythia installed_spatialdata installed_petsc installed_pylith installed_parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -61,8 +59,21 @@ all: installed_pythia installed_nemesis installed_spatialdata installed_petsc in
 # ----------------------------------------------------------------------
 pythia:
 if INSTALL_PYTHIA
-	$(PYTHON) -m pip install --user $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)/pythia-$(PYTHIA_VER).tar.gz && \
+if USE_PYLITH_GIT
+	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
+	cd pythia-$(PYTHIA_VER) && $(AUTORECONF) -if
+else
+	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)
+	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
+endif
+	$(MKDIR_P) pythia-build
+	cd pythia-build && \
+		../pythia-$(PYTHIA_VER)/configure \
+			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
+		make && \
+		make install && \
 		touch $(abs_builddir)/installed_pythia
+
 else
 	@echo "$@ already installed. Skipping installation."
 	touch $(abs_builddir)/installed_pythia
@@ -70,30 +81,6 @@ endif
 
 installed_pythia:
 	$(MAKE) $(AM_MAKEFLAGS) pythia
-
-
-# ----------------------------------------------------------------------
-# nemesis
-# ----------------------------------------------------------------------
-nemesis: installed_pythia
-if INSTALL_NEMESIS
-	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz $(GITHUB_URL)/nemesis/releases/download/v$(NEMESIS_VER)
-	$(TAR) -xf nemesis-$(NEMESIS_VER).tar.gz
-	$(MKDIR_P) nemesis-build
-	cd nemesis-build && \
-		../nemesis-$(NEMESIS_VER)/configure \
-			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
-		make && \
-		make install && \
-		touch $(abs_builddir)/installed_nemesis
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_nemesis
-endif
-
-installed_nemesis:
-	$(MAKE) $(AM_MAKEFLAGS) nemesis
 
 
 # ----------------------------------------------------------------------
@@ -109,7 +96,7 @@ if WITH_DEBUGGING
 endif
 if USE_PYLITH_GIT
 spatialdata_options += --enable-swig
-	$(GIT) clone --branch master --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
+	$(GIT) clone --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
@@ -190,7 +177,7 @@ installed_petsc:
 # ----------------------------------------------------------------------
 # pylith
 # ----------------------------------------------------------------------
-pylith: installed_pythia installed_nemesis installed_spatialdata installed_petsc
+pylith: installed_pythia installed_spatialdata installed_petsc
 pylith_options = --enable-netcdf --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing

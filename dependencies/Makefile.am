@@ -265,12 +265,15 @@ installed_openssl:
 # ----------------------------------------------------------------------
 python: installed_compilers installed_openssl installed_sqlite
 if INSTALL_PYTHON
+if INSTALL_OPENSSL
+OPENSSL=--with-openssl=$(prefix_deps)
+endif
 	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz $(DEPS_URL)
 	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix_deps) \
-		--enable-shared --enable-optimizations CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		--enable-shared --enable-optimizations $(OPENSSL) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
 		$(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
@@ -325,8 +328,8 @@ numpy: installed_python installed_setuptools
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).zip $(DEPS_URL)
 	$(UNZIP) numpy-$(NUMPY_VER).zip
-if WITH_NUMPY_BLASLAPACK
-	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
+if NUMPY_NOBLASLAPACK
+	$(CP) $(top_srcdir)/dependencies/numpy_noblaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
 endif
 	cd numpy-$(NUMPY_VER) && \
 		PYTHONUSERBASE=$(PYTHONUSERBASE) $(PYTHON) -m pip install --user . && \

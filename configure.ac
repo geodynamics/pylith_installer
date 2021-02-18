@@ -154,10 +154,10 @@ AC_ARG_ENABLE([numpy],
 AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
 AC_ARG_WITH([numpy-blaslapack],
     [AC_HELP_STRING([--with-numpy-blaslapack],
-        [force numpy to build its own BLAS/LAPACK @<:@default=no@:>@])],
-	[if test "$withval" = yes; then with_numpy_blaslapack=yes; else with_numpy_blaslapack=no; fi],
-	[with_numpy_blaslapack=no])
-AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
+        [Numpy w/BLAS/Lapack @<:@default=yes@:>@])],
+	[with_numpy_blaslapack=$withval],
+	[with_numpy_blaslapack=yes])
+AM_CONDITIONAL([NUMPY_NOBLASLAPACK], [test "$with_numpy_blaslapack" = no])
 
 # SIX
 AC_ARG_ENABLE([six],
@@ -290,14 +290,6 @@ AC_ARG_ENABLE([netcdfpy],
 	[if test "$enableval" = yes ; then install_netcdfpy=yes; else install_netcdfpy=no; fi],
 	[install_netcdfpy=yes])
 AM_CONDITIONAL([INSTALL_NETCDFPY], [test "$install_netcdfpy" = yes])
-
-# NEMESIS
-AC_ARG_ENABLE([nemesis],
-    [AC_HELP_STRING([--enable-nemesis],
-        [install nemesis (CIG) @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_nemesis=yes; else install_nemesis=no; fi],
-	[install_nemesis=yes])
-AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
 
 # PYTHIA
 AC_ARG_ENABLE([pythia],
@@ -557,12 +549,6 @@ if test "$install_python" = yes ; then
   fi
   install_pythia=yes
 
-  # install nemesis
-  if test "$install_nemesis" != yes ; then
-    AC_MSG_WARN([Building Python requires building nemesis as well. Adding installation of nemesis.])
-  fi
-  install_nemesis=yes
-
   # install spatialdata
   if test "$install_spatialdata" != yes ; then
     AC_MSG_WARN([Building Python requires building spatialdata as well. Adding installation of spatialdata.])
@@ -802,15 +788,15 @@ else
   CIT_CHECK_LIB_PETSC
 fi
 
-# nemesis
-if test "$install_nemesis" = yes ; then
+# pythia
+if test "$install_pythia" = yes ; then
   AC_PATH_PROG(existing_nemesis, nemesis)
   AC_SUBST(existing_nemesis)
 else
   AC_PATH_PROG(NEMESIS, nemesis)
   if test -z $NEMESIS; then
     AC_MSG_FAILURE([cannot find 'nemesis' program.])
-    NEMESIS=`echo "Error: nemesis is not installed properly." ; false`
+    NEMESIS=`echo "Error: Pythia/pyre is not installed properly." ; false`
   fi
 fi
 
@@ -1028,17 +1014,16 @@ printf "  Python: $install_python\n"
 printf "  Python packages\n"
 printf "    setuptools: $install_setuptools\n"
 printf "    cython: $install_cython\n"
-printf "    numpy: $install_numpy    w/own blas/lapack: $with_numpy_blaslapack\n"
+printf "    numpy: $install_numpy    detect BLAS/Lapack=$with_numpy_blaslapack\n"
 printf "    six: $install_six (required by h5py)\n"
 printf "    cftime: $install_cftime (required by netCDF4)\n"
 printf "    h5py: $install_h5py\n"
 printf "    netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
-printf "    pyre/pythia: $install_pythia\n"
-printf "    nemesis: $install_nemesis\n"
 printf "  sqlite: $install_sqlite\n"
 printf "  proj: $install_proj\n"
 printf "  hdf5: $install_hdf5\n"
 printf "  netcdf: $install_netcdf\n"
+printf "  pythia: $install_pythia\n"
 printf "  spatialdata: $install_spatialdata\n"
 printf "  petsc: $install_petsc, options: $petsc_options\n"
 printf "  pylith-parameters GUI: $install_parametersgui\n"
