@@ -298,6 +298,12 @@ AC_ARG_ENABLE([pythia],
 	[if test "$enableval" = yes ; then install_pythia=yes; else install_pythia=no; fi],
 	[install_pythia=yes])
 AM_CONDITIONAL([INSTALL_PYTHIA], [test "$install_pythia" = yes])
+AC_ARG_WITH([pythia-repo],
+    [AC_HELP_STRING([--with-pythia-repo],
+        [URL for Pythia Git repository @<:@default=https://github.com/geodynamics/pythia.git@:>@])],
+	[pythia_repo="$withval"],
+	[pythia_repo=https://github.com/geodynamics/pythia.git])
+AC_SUBST(pythia_repo)
 
 # SPATIALDATA
 AC_ARG_ENABLE([spatialdata],
@@ -777,7 +783,7 @@ if test "$install_petsc" = yes ; then
 
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
-  PETSC_DIR=$prefix/petsc
+  PETSC_DIR=$prefix
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)

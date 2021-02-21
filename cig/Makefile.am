@@ -133,6 +133,7 @@ installed_spatialdata:
 petsc: 
 if INSTALL_PETSC
 petsc_options += --with-hdf5=1
+PETSC_DIR_BUILD = $(abs_top_builddir)/cig/petsc-pylith
 if INSTALL_HDF5
 petsc_options += --with-zlib=1 --LIBS=-lz
 endif
@@ -148,21 +149,23 @@ petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
-	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz && mv petsc-pylith $(PETSC_DIR)
+	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz
 else
-	git clone --branch knepley/pylith --single-branch $(petsc_repo) $(PETSC_DIR)
+	git clone --branch knepley/pylith --single-branch $(petsc_repo) petsc-pylith
 endif
-	cd $(PETSC_DIR) && \
-		python${PYTHON_VERSION} ./configure \
+	cd petsc-pylith && \
+		$(PYTHON) ./configure \
+			--prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags_cig) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
-			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
-		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) && \
-		make PETSC_DIR=$(PETSC_DIR) test && \
+			PETSC_DIR=$(PETSC_DIR_BUILD)  PETSC_ARCH=$(PETSC_ARCH) && \
+		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH) && \
+		make PETSC_DIR=$(PETSC_DIR_BUILD) install && \
+		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
 else
 	@echo "$@ already installed. Skipping installation."
