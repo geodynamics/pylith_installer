@@ -1,0 +1,47 @@
+toc:
+  - title: Overview
+    subitems:
+      - page: Introduction
+        url: /
+      - page: Requirements
+        url: /overview/requirements.html
+      - page: Use cases
+        url: /overview/use-cases.html
+      - page: Dependencies
+        url: /overview/packages.html
+  - title: Installing PyLith
+    subitems:
+      - page: Overview
+        url: /install/overview.html
+      - page: 1. Download the installer
+        url: /install/download.html
+      - page: 2. Running configure
+        url: /install/configure.html
+      - page: 3. Set up your enviroment
+        url: /install/environment.html
+      - page: 4. Running make
+        url: /install/make.html
+      - page: 5. Verifying the installation
+        url: /install/verify.html
+      - page: Troubleshooting
+        url: /install/troubleshooting.html
+  - title: Common configurations
+    subitems:
+      - page: Clusters
+        url: /configs/clusters.html
+      - page: Ubuntu
+        url: /configs/ubuntu.html
+      - page: Fedora
+        url: /configs/fedora.html
+      - page: CentOS
+        url: /configs/centos.html
+      - page: Debian
+        url: /configs/debian.html
+      - page: MacOS
+        url: /configs/macos.html
+  - title: Developer
+    subitems:
+      - page: Docker images
+        url: /developer/docker.html
+      - page: Binary distribution
+        url: /developer/binary.html

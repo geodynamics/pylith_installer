@@ -1,0 +1,101 @@
+FROM debian:stable as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python3-dev \
+      libpython3.7 \
+      python3-pip \
+      python3-setuptools \
+      python3-numpy \
+      python3-cftime \
+      python3-coverage \
+      python3-h5py \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-dev \
+      libmpich-dev \
+      mpich \
+      libhdf5-mpich-103 \
+      libhdf5-mpich-dev \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      cmake \
+      lcov \
+      gdb \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
+COPY docker/certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+
+ENV PYTHON_VERSION 3.7
+ENV HDF5_INCDIR=/usr/include/hdf5/mpich HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+
+# ------------------------------------------------------------------------------
+from os-update as build-deps
+
+# Create 'pylith-tester' user
+ENV TEST_USER pylith-tester
+RUN useradd --create-home --shell /bin/bash $TEST_USER
+ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
+
+RUN mkdir ${INSTALL_DIR} \
+  && chown ${TEST_USER} ${INSTALL_DIR} \
+  && chgrp ${TEST_USER} ${INSTALL_DIR}
+ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib \
+    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages
+USER ${TEST_USER}
+
+# PyLith installer
+ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
+RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
+
+COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+RUN mkdir -p ${build_dir}
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
+    --with-deps-prefix=${INSTALL_DIR}/dependencies \
+    --disable-mpi \
+    --disable-hdf5 \
+    --disable-h5py \
+    --disable-cppunit \
+    --disable-cmake \
+    --disable-sqlite \
+    --disable-numpy \
+    --disable-setuptools \
+    --disable-cftime \
+    --enable-pcre \
+    --enable-swig \
+    --enable-proj \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    && make -C dependencies \
+    && rm -r ${build_dir}
+
+
+WORKDIR $HOME
+
+
+CMD /bin/bash
