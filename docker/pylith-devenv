@@ -41,6 +41,7 @@ RUN apt-get update \
       gdb \
       valgrind \
       tree \
+      less \
       uncrustify \
       gnupg2 \
       vim-common \
@@ -100,6 +101,12 @@ RUN ${src_dir}/configure --prefix=${DEPS_DIR} --with-fetch=curl \
 ENV  BASE_DIR=/opt/pylith  HOME=/home/${PYLITH_USER}
 ENV  INSTALL_DIR=$BASE_DIR/dest/debug  TOPSRC_DIR=$BASE_DIR/src  TOPBUILD_DIR=$BASE_DIR/build/debug
 ENV  PETSC_DIR=${TOPSRC_DIR}/petsc  PETSC_ARCH=arch-pylith-debug
+ENV  PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
+    CIGDEPS_DIR=${INSTALL_DIR} \
+    PYTHON_INCDIR=/usr/include/python3.8 \
+    MPI_INCDIR=/usr/include/x86_64-linux-gnu/mpich \
+    PROJ_INCDIR=/usr/include \
+    CPPUNIT_INCDIR=/usr/include
 
 ENV PATH=$PATH:$INSTALL_DIR/bin \
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/lib \

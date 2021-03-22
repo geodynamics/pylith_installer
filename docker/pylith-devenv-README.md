@@ -30,7 +30,7 @@ docker volume create pylith-dev
 ### Start PyLith development Docker container
 
 ```
-docker run --name pylith-dev-workspace -d -v pylith-dev:/opt/pylith \
+docker run --name pylith-dev-workspace --rm -t -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
@@ -94,7 +94,7 @@ cd /opt/pylith/src
 git clone --recursive https://github.com/GITHUB_USERNAME/pythia.git
 git clone --recursive https://github.com/GITHUB_USERNAME/spatialdata.git
 git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git
-git clone https://gitlab.com/petsc/petsc.git && git checkout knepley/pylith
+git clone --branch knepley/pylith https://gitlab.com/petsc/petsc.git
 ```
 
 ### Configure and build for development
@@ -153,3 +153,23 @@ ${TOPSRC_DIR}/pylith/configure --prefix=${INSTALL_DIR} \
 make install -j$(nproc)
 make check -j$(nproc)
 ```
+
+### Install Visual Studio Code
+
+Install [VS Code](https://code.visualstudio.com/) for your computer.
+
+Install the following extensions:
+* Remote - Containers
+* C/C++ 
+* Docker
+* Live Share
+* Python
+* Uncrustify
+
+Additionally, we recommend also installing the following extensions:
+* GitHub Pull Requests and Issues
+* GitLens -- Git supercharged
+* Material Icon Theme
+
+Uncrustify path?
+
