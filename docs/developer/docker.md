@@ -1,36 +1,38 @@
 # Docker images
 
-The `docker` directory contains Dockerfiles for building containers for testing PyLith on several different Linux
-distributions. These are used in the CI testing done with Travis CI. After building the containers, push them to Docker
-Hub.
+The `docker` directory contains Dockerfiles for building containers
+for testing PyLith on several different Linux distributions. These are
+used in the CI testing with GitLab Pipelines. After building the
+containers, push them the GitLab registry.
 
 ## Building test environment images
 
-```
-docker build -t $IMAGE_NAME -f docker/$DOCKERFILE .
+```bash
+# From the top-level source directory
+docker/builder.py --dockerfile=$DOCKERFILE --build
 ```
 
-### Debugging
+### Debugging container setup
 
-```
-# Get id of container that failed
+```bash
+# Get id of container ($CONTAINER_ID) that failed
 docker ps -a
 
 # Save container state to 'debug' image
-docker commit debug
+docker commit $CONTAINER_ID debug
 
 # Run debug container
-docker run -ti debug /bin/bash
+docker run --rm -ti debug /bin/bash
 ```
 
 ### Clean up
 
-```
+```bash
 # Remove container
 docker rm $CONTAINER_ID
 
-# Remove image
-docker rmi $IMAGE_ID
+# Remove `debug` image
+docker rmi debug
 
 # Remove stopped containers and orphan images
 docker system prune
