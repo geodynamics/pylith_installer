@@ -1,5 +1,4 @@
-# Configuration on a cluster
-
+# Linux clusters
 
 ## Dependencies already installed
 
@@ -8,14 +7,16 @@ The following software should be installed by the system administrator:
 * C, C++ compilers
 * MPI
 
-**TIP**: We recommend using the environment arguments to configure to use the MPI compilers for all compilation. If the
-MPI compilers are `mpicc` and `mpicxx`, then we use `CC=mpicc CXX=mpicxx` in the call to `configure`.
+:::{danger}
+The `configure` will look for `mpicc` and `mpicxx` for building packages requiring MPI. Do not set `CC=mpicc` or `CXX=mpicxx` as this can lead to packages assuming you are using an Intel compiler. For example, the Python configure detects use of an Intel compiler by comparing `$CC` against the pattern `*icc*`.
+:::
 
 ## Configure
 
-We assume that Python was not built with the same compiler suite as MPI. If it was then you do not need the
-`--enable-python` option. We use 8 threads when building.
+We assume that Python was not built with the same compiler suite as MPI. The `--enable-python` option will also trigger building all of the Python modules needed. We use 8 threads when building.
 
-```
-bash> $HOME/src/pylith/pylith-installer-{{ site.installer-version }}/configure --enable-python --with-make-threads=8 --prefix=$HOME/pylith
+If Python was built with the same compilers used to build MPI, then then you do not need the `--enable-python` option.
+
+```bash
+$HOME/src/pylith/pylith-installer-3.0.0-0/configure --enable-python --with-make-threads=8 --prefix=$HOME/pylith
 ```

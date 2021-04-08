@@ -80,7 +80,7 @@ noinst_srcdirs = \
 	setuptools-$(SETUPTOOLS_VER) \
 	Cython-$(CYTHON_VER) \
 	numpy-$(NUMPY_VER) \
-	size-$(SIX_VER) \
+	six-$(SIX_VER) \
 	cftime-$(CFTIME_VER) \
 	sqlite-$(SQLITE_VER) \
 	proj-$(PROJ4_VER) \

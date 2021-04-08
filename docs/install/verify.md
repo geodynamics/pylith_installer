@@ -4,4 +4,14 @@ Run your favorite PyLith example or test problem to insure that PyLith was insta
 
 The output of running `pylith` with no arguments is.
 
-:TODO: @brad ADD STUFF HERE
+```bash
+ >> {default}::
+ -- pyre.inventory(error)
+ -- meshimporter.meshioascii.filename <- ''
+ -- Filename for ASCII input mesh not specified.  To test PyLith, run an example as discussed in the manual.
+ >> {default}::
+ -- pyre.inventory(error)
+ -- timedependent.problem_defaults.name <- ''
+ -- Missing required property 'name' in default options for problem.
+ pylithapp: configuration error(s)
+ ```

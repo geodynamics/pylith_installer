@@ -1,12 +1,15 @@
-# Binary distribution
+# Binary packages
 
 ## Linux binary
 
-The Linux binary is built in a Docker container.
+The Linux binary is built in a Docker container based on CentOS 7.
+This provides a binary package that run on any Linux system with glibc
+X.X or later.
 
-:TODO: @brad ADD STUFF HERE
+:::{error}
+TODO @brad Add instructions for building Linux binary using Docker
+:::
 
-## MacOS binary
+## macOS binary
 
-The Linux binary is built within MacOS using the PyLith installer. See the [MacOS configuration](../configs/macos.html)
-for the PyLith Installer configuration.
+The macOS binary is built using the PyLith installer. See the [macOS configuration](../configs/macos.md) for the PyLith Installer configuration.
