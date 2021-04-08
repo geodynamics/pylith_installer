@@ -9,6 +9,7 @@ website](https://geodynamics.org).
 ---
 maxdepth: 2
 ---
+release-notes.md
 requirements.md
 use-cases.md
 packages.md
