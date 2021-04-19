@@ -175,6 +175,14 @@ AC_ARG_ENABLE([cftime],
 	[install_cftime=no])
 AM_CONDITIONAL([INSTALL_CFTIME], [test "$install_cftime" = yes])
 
+# SPHINX
+AC_ARG_ENABLE([sphinx],
+    [AC_HELP_STRING([--enable-sphinx],
+        [install sphinx @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_sphinx=yes; else install_sphinx=no; fi],
+	[install_sphinx=no])
+AM_CONDITIONAL([INSTALL_SPHINX], [test "$install_sphinx" = yes])
+
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
     [AC_HELP_STRING([--enable-cppunit],
@@ -1025,6 +1033,7 @@ printf "    six: $install_six (required by h5py)\n"
 printf "    cftime: $install_cftime (required by netCDF4)\n"
 printf "    h5py: $install_h5py\n"
 printf "    netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
+printf "    sphinx: $install_sphinx (optional; generate documentation)\n"
 printf "  sqlite: $install_sqlite\n"
 printf "  proj: $install_proj\n"
 printf "  hdf5: $install_hdf5\n"

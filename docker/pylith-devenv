@@ -19,6 +19,7 @@ RUN apt-get update \
       python3-six \
       python3-coverage \
       python3-autopep8 \
+      python3-matplotlib \
       cython3 \
       zlib1g-dev \
       unzip \
@@ -94,6 +95,7 @@ RUN ${src_dir}/configure --prefix=${DEPS_DIR} --with-fetch=curl \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \
+    --enable-sphinx \
     && make -C dependencies \
     && rm -r /opt/pylith-installer
 
@@ -113,8 +115,7 @@ ENV PATH=$PATH:$INSTALL_DIR/bin \
     PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages
 
 WORKDIR $HOME
-RUN rm -r /opt/pylith-installer \
-  && mkdir -p ${BASE_DIR} \
+RUN mkdir -p ${BASE_DIR} \
   && chown ${PYLITH_USER} ${BASE_DIR} \
   && chgrp ${PYLITH_USER} ${BASE_DIR}
 USER ${PYLITH_USER}
