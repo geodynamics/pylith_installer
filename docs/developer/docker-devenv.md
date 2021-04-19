@@ -67,12 +67,20 @@ docker volume create pylith-dev
 
 ### Start PyLith development Docker container
 
-Start (run) the Docker container using the `pylith-devenv` Docker image and assign it the name `pylith-dev-workspace`. Mount the docker volume with persistent storage at `/opt/pylith`. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
+Running the command below will:
+
+1. Start (run) the Docker container using the `pylith-devenv` Docker image and assign it the name `pylith-dev-workspace`.
+2. Mount the docker volume with persistent storage at `/opt/pylith`. 
+3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
 
 ```bash
 docker run --name pylith-dev-workspace --rm -t -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
+
+:::{warning}
+Closing the `pylith-dev-workspace` Docker container interactive shell (terminal) will stop the container. Simply run the command again to restart the container.
+:::
 
 ### Setup directory structure
 
@@ -223,3 +231,34 @@ We recommend also installing the following extensions:
 * markdownlint
 * MyST-Markdown
 * Remote-SSH
+
+
+## Running
+
+### Start PyLith development Docker container
+
+Whenever you need to restart the `pylith-dev-workspace` Docker container, simply run
+
+```bash
+docker run --name pylith-dev-workspace --rm -t -v pylith-dev:/opt/pylith \
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
+```
+
+:::{tip}
+Make sure Docker is running before you start the container.
+:::
+
+### Attach VS Code to Docker container
+
+1. Start VS Code.
+2. Click on the Docker extension in the Activity Bar on the far left hand side as illustrated in the [screenshot](docker-attach-vscode).
+3. Find the `pylith-dev-workspace` container. Verify that it is running.
+4. Right-click on the container and select `Attach Visual Studio Code`. This will open a new window. You should see `Container registry.gitlab.com/cig-pylith...` at the left side of the status bar at the bottom of the window.
+
+:::{figure-md} docker-attach-vscode
+:class: myclass
+
+<img src="figures/docker-attach-vscode.png" alt="Screenshot" class="bg-primary mb-1">
+
+Screenshot showing how to attach VS Code to a running Docker container. 
+:::
