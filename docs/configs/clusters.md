@@ -1,6 +1,6 @@
 # Linux clusters
 
-## Dependencies already installed
+## Operating system packages
 
 The following software should be installed by the system administrator:
 

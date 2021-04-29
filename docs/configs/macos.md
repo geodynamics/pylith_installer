@@ -31,15 +31,15 @@ ${HOME}/src/pylith/pylith_installer-3.0.0-0/configure  \
     --with-make-threads=4 \
     --with-fortran=no \
     --enable-autotools \
-	--enable-mpi=mpich \
-	--enable-openssl \
-	--with-numpy-blaslapack=no \
-	--enable-sqlite \
-	--enable-python \
-	--enable-swig \
-	--enable-pcre \
-	--enable-force-install \
-	--enable-cmake \
-	--with-petsc-options="${petsc_options}" \
-	CC=clang CXX=clang++
+    --enable-mpi=mpich \
+    --enable-openssl \
+    --with-numpy-blaslapack=no \
+    --enable-sqlite \
+    --enable-python \
+    --enable-swig \
+    --enable-pcre \
+    --enable-force-install \
+    --enable-cmake \
+    --with-petsc-options="${petsc_options}" \
+    CC=clang CXX=clang++
 ```

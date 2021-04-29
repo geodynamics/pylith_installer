@@ -14,18 +14,16 @@ echo $PYTHONPATH
 echo $LD_LIBRARY_PATH
 ```
 
-## Did you change the compiler. environment, or configure options?
+## Did you change the compiler, environment, or configure options?
 
 If you run into an error and change something (compiler, environment variable, etc), you should reconfigure and rebuild.
 
-1. Remove the build and install directories (`$HOME/build/pylith` and
-    `$HOME/pylith`).
+1. Remove the build and install directories (`$HOME/build/pylith` and `$HOME/pylith`).
+2. Try again starting at Step 2 (running configure).
 
 ```bash
 rm -r $HOME/build/pylith and $HOME/pylith
 ```
-
-2. Try again starting at Step 2 (running configure).
 
 ## Error during configure of a dependency
 
@@ -37,6 +35,6 @@ If you get stuck and need help diagnosing a build failure, please use the [CIG c
 
   * Operating system, e.g., CentOS 6, Ubuntu 18.04
   * List system packages you are using
-  * `$HOME/build/pylith/config.log`
-  * `$HOME/build/pylith/make.log`
-  * `config.log` from the build directory in which the failure occurred, e.g., `$HOME/build/pylith/netcdf-build/config.log`.
+  * Attach `$HOME/build/pylith/config.log`
+  * Attach `$HOME/build/pylith/make.log`
+  * Attach `config.log` from the build directory in which the failure occurred, e.g., `$HOME/build/pylith/netcdf-build/config.log`.

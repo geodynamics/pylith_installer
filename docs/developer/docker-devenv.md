@@ -1,6 +1,9 @@
 # PyLith Docker Development Environment
 
-The `pylith-devenv` Docker image provides all of the dependencies and defines the environment for PyLith development. It is built using the Ubuntu 20.04 Linux distribution. It is intended to be read only with a separate Docker volume for persistent storage of the PyLith development workspace. We separate the development "environment" from the "workspace" so that we can update the development environment without affecting the workspace and easily maintain a persistent workspace while starting and stopping the Docker container that holds the development environment.
+The `pylith-devenv` Docker image provides all of the dependencies and defines the environment for PyLith development.
+It is built using the Ubuntu 20.04 Linux distribution.
+It is intended to be read only with a separate Docker volume for persistent storage of the PyLith development workspace.
+We separate the development "environment" from the "workspace" so that we can update the development environment without affecting the workspace and easily maintain a persistent workspace while starting and stopping the Docker container that holds the development environment.
 
 In addition to the PyLith dependencies, the Docker image includes the following development tools:
 
@@ -42,7 +45,7 @@ You only need to run these setup steps once.
 :class: important
 
 1. You need to have [Docker](https://www.docker.com/products/docker-desktop) installed and running on your computer.
-3. You need to have a [GitHub](https://github.com) account.
+2. You need to have a [GitHub](https://github.com) account.
 :::
 
 ### Fork repositories on GitHub
@@ -74,7 +77,7 @@ Running the command below will:
 3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
 
 ```bash
-docker run --name pylith-dev-workspace --rm -t -v pylith-dev:/opt/pylith \
+docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
@@ -117,7 +120,8 @@ We will use the directory following directory structure for the persistent stora
 
 All of the source code will be placed under `/opt/pylith/src`. You only need to create the top-level source directory as the subdirectories will be created when you clone (download) the repositories.
 
-This directory structure is set up for both a debugging version for development (debug directory) and an optimized version for performance testing (opt directory). For now, we will only setup the debugging version.
+This directory structure is set up for both a debugging version for development (debug directory) and an optimized version for performance testing (opt directory).
+For now, we will only setup the debugging version.
 
 ```bash
 cd /opt/pylith
@@ -128,7 +132,8 @@ mkdir -p ${INSTALL_DIR}
 
 ### Clone repositories
 
-This creates a local copy of the repositories in the persistent storage volume of the PyLith development container. These are your working copies of the repositories.
+This creates a local copy of the repositories in the persistent storage volume of the PyLith development container.
+These are your working copies of the repositories.
 
 ```bash
 cd /opt/pylith/src
@@ -150,7 +155,8 @@ We build 3 CIG-related dependencies and PyLith:
 Pythia, Spatialdata, and PETSc are not include in the Docker image, because they may need to be updated as part of PyLith development.
 
 :::{tip}
-To speed up the build process, we set the number of make threads to the number of cores `-j$(nproc)`. You can often find speedup with up to twice as many threads as the number of cores.
+To speed up the build process, we set the number of make threads to the number of cores `-j$(nproc)`.
+You can often find speedup with up to twice as many threads as the number of cores.
 :::
 
 #### Pythia
@@ -240,7 +246,7 @@ We recommend also installing the following extensions:
 Whenever you need to restart the `pylith-dev-workspace` Docker container, simply run
 
 ```bash
-docker run --name pylith-dev-workspace --rm -t -v pylith-dev:/opt/pylith \
+docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
