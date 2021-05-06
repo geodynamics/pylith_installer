@@ -11,29 +11,29 @@ few operating system packages to satisfy PyLith dependency requirements.
 ```bash
 yum install -y \
     gcc \
-	gcc-c++ \
-	make \
-	file \
-	which \
-	diffutils \
-	gettext \
-	automake \
-	autoconf \
-	libtool \
-	curl \
-	curl-devel \
-	openssh \
-	openssl \
-	openssl-devel \
-	sqlite \
-	sqlite-devel \
-	zlib-devel \
-	libffi-devel \
-	unzip \
-	bzip2 \
-	git \
-	ca-certificates \
-	cmake
+    gcc-c++ \
+    make \
+    file \
+    which \
+    diffutils \
+    gettext \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    curl-devel \
+    openssh \
+    openssl \
+    openssl-devel \
+    sqlite \
+    sqlite-devel \
+    zlib-devel \
+    libffi-devel \
+    unzip \
+    bzip2 \
+    git \
+    ca-certificates \
+    cmake
 ```
 
 ### Environment variables
@@ -80,37 +80,37 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
 
 ```bash
 dnf install -y \
-	gcc \
-	gcc-c++ \
-	redhat-rpm-config \
-	make \
-	file \
-	which \
-	diffutils \
-	automake \
-	autoconf \
-	libtool \
-	curl \
-	openssl \
-	openssl-devel \
-	zlib-devel \
-	unzip \
-	git \
-	ca-certificates \
-	python38 \
-	python38-devel \
-	python38-pip \
-	python38-setuptools \
-	python38-six \
-	python38-numpy \
-	python38-Cython \
-	python3-coverage \
-	mpich \
-	mpich-devel \
-	cmake \
-	sqlite \
-	sqlite-devel \
-	dnf-plugins-core
+    gcc \
+    gcc-c++ \
+    redhat-rpm-config \
+    make \
+    file \
+    which \
+    diffutils \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    openssl \
+    openssl-devel \
+    zlib-devel \
+    unzip \
+    git \
+    ca-certificates \
+    python38 \
+    python38-devel \
+    python38-pip \
+    python38-setuptools \
+    python38-six \
+    python38-numpy \
+    python38-Cython \
+    python3-coverage \
+    mpich \
+    mpich-devel \
+    cmake \
+    sqlite \
+    sqlite-devel \
+    dnf-plugins-core
 #
 # Use python3.8 for python3	
 alternatives --set python3 /usr/bin/python3.8

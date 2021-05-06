@@ -7,3 +7,7 @@
 * User developers
 
   Anyone interested in contributing to PyLith development should build PyLith from source using the GitHub repositories. This makes it possible to contribute back to the main PyLith source code.
+
+  :::{tip}
+  The [PyLith Docker Development Environment](/developer/docker-devenv.md) is an easy way to setup the PyLith development environment.
+  :::

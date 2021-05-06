@@ -1,0 +1,122 @@
+FROM ubuntu:20.04 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python3-dev \
+      libpython3.8 \
+      python3-pip \
+      python3-setuptools \
+      python3-numpy \
+      python3-cftime \
+      python3-six \
+      python3-coverage \
+      python3-autopep8 \
+      python3-matplotlib \
+      cython3 \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libcppunit-dev \
+      libmpich-dev \
+      mpich \
+      libhdf5-mpich-103 \
+      libhdf5-mpich-dev \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      proj-bin \
+      proj-data \
+      libproj-dev \
+      cmake \
+      swig \
+      lcov \
+      gdb \
+      valgrind \
+      tree \
+      less \
+      uncrustify \
+      gnupg2 \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
+COPY docker/certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+
+ENV PYTHON_VERSION 3.8
+ENV HDF5_INCDIR=/usr/include/hdf5/mpich  HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+
+# ------------------------------------------------------------------------------
+from os-update as build-deps
+
+# Create 'pylith-dev' user
+ENV PYLITH_USER pylith-dev
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER
+ENV  DEPS_DIR=/opt/dependencies
+
+RUN mkdir ${DEPS_DIR}
+ENV PATH=$PATH:$DEPS_DIR/bin \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DEPS_DIR/lib \
+    PYTHONPATH=${PYTHONPATH}:${DEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
+
+# PyLith installer
+ENV  src_dir=/opt/pylith-installer/src  build_dir=/opt/pylith-installer/build
+RUN mkdir -p /opt/pylith-installer && mkdir -p ${build_dir}
+
+COPY --chown=pylith-dev:pylith-dev . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${DEPS_DIR} --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-cmake \
+    --disable-sqlite \
+    --disable-hdf5 \
+    --disable-numpy \
+    --disable-setuptools \
+    --disable-cftime \
+    --disable-six \
+    --disable-proj \
+    --enable-h5py \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    --enable-sphinx \
+    && make -C dependencies \
+    && rm -r /opt/pylith-installer
+
+
+ENV  BASE_DIR=/opt/pylith  HOME=/home/${PYLITH_USER}
+ENV  INSTALL_DIR=$BASE_DIR/dest/debug  TOPSRC_DIR=$BASE_DIR/src  TOPBUILD_DIR=$BASE_DIR/build/debug
+ENV  PETSC_DIR=${TOPSRC_DIR}/petsc  PETSC_ARCH=arch-pylith-debug
+ENV  PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
+    CIGDEPS_DIR=${INSTALL_DIR} \
+    PYTHON_INCDIR=/usr/include/python3.8 \
+    MPI_INCDIR=/usr/include/x86_64-linux-gnu/mpich \
+    PROJ_INCDIR=/usr/include \
+    CPPUNIT_INCDIR=/usr/include
+
+ENV PATH=$PATH:$INSTALL_DIR/bin \
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/lib \
+    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages
+
+WORKDIR $HOME
+RUN mkdir -p ${BASE_DIR} \
+  && chown ${PYLITH_USER} ${BASE_DIR} \
+  && chgrp ${PYLITH_USER} ${BASE_DIR}
+USER ${PYLITH_USER}
+CMD /bin/bash
