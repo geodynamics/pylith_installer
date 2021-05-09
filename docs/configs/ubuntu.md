@@ -151,7 +151,6 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --disable-numpy \
     --disable-hdf5 \
     --disable-h5py \
-    --enable-cftime \
     --enable-netcdf \
     --enable-netcdfpy
 ```
