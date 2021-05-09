@@ -1,14 +1,13 @@
 # macOS
 
 :::{important}
-You will need to install XCode or XCode command line tools before
-configuring the installer.
+You will need to install XCode or XCode command line tools before configuring the installer.
 :::
 
 ## Mojave (10.14.x)
 
-We use the Apple clang/clang++ compiler. We use the installer to build
-autotools and Python 3.8.
+We use the Apple clang/clang++ compiler.
+We use the installer to build autotools and Python 3.8.
 
 ## Environment variables
 

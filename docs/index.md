@@ -9,5 +9,6 @@ caption: Table of Contents
 overview/index.md
 install/index.md
 configs/index.md
+devenv/index.md
 developer/index.md
 ```

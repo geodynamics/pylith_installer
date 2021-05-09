@@ -1,4 +1,4 @@
-# PyLith Docker Development Environment
+# PyLith development environment Docker image
 
 The `pylith-devenv` Docker image provides all of the dependencies and defines the environment for PyLith development.
 It is built using the Ubuntu 20.04 Linux distribution.
@@ -193,8 +193,9 @@ python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
     --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
     --with-hdf5=1 --download-chaco=1 --download-ml=1 \
-	--download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
-	CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}" LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}"
+    --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
+    CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
+    LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib"
 make 
 make check
 ```
@@ -207,9 +208,9 @@ pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
 ${TOPSRC_DIR}/pylith/configure --prefix=${INSTALL_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
     --enable-test-coverage --with-python-coverage=python3-coverage \
-	CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
-	LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib --coverage" \
-	CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-std=c++11 -g -Wall --coverage"
+    CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
+    LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib --coverage" \
+    CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-std=c++11 -g -Wall --coverage"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
@@ -264,7 +265,7 @@ Make sure Docker is running before you start the container.
 :::{figure-md} docker-attach-vscode
 :class: myclass
 
-<img src="figures/docker-attach-vscode.png" alt="Screenshot" class="bg-primary mb-1">
+<img src="figs/docker-attach-vscode.png" alt="Screenshot" class="bg-primary mb-1">
 
 Screenshot showing how to attach VS Code to a running Docker container. 
 :::

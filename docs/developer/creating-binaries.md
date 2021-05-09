@@ -1,4 +1,4 @@
-# Binary packages
+# Creating binary packages
 
 ## Linux binary
 

@@ -4,7 +4,6 @@
 ---
 maxdepth: 2
 ---
-binary.md
-docker.md
-docker-devenv.md
+creating-binaries.md
+ci-docker.md
 ```
