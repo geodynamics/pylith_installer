@@ -141,12 +141,14 @@ This prevents conflicts between the installed location and the local source file
 PyLith users a different build setup and does not have this problem.
 
 :::{important}
-Set the `PETSC_DIR` environment variable to the location of PETSc.
-You should add this to your `.bashrc` or `setup.sh` file.
+Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `PETSC_ARCH` environment variable to a tag associated with a debugging build. 
+You should add these to your `.bashrc` or `setup.sh` file.
 
 ```bash
 export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley-feature-petsc-fe
+export PETSC_ARCH=arch-pylith-debug
 ```
+
 :::
 
 Manually configure and build PETSc.
@@ -159,12 +161,13 @@ python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-hdf5=1 --download-chaco=1 --download-ml=1 \
     --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITH_DIR}/dest/debug/dependencies/include -I${PYLITH_DIR}/dest/debug/include" \
-    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITH_DIR}/dest/debug/dependencies/lib -L${PYLITH_DIR}/dest/debug/lib"
+    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITH_DIR}/dest/debug/dependencies/lib -L${PYLITH_DIR}/dest/debug/lib" 
 make 
 make check
 ```
 
 Finally, configure and build PyLith.
+
 ```bash
 cd $PYLITH_DIR/build/debug
 make installed_pylith
@@ -230,12 +233,14 @@ This prevents conflicts between the installed location and the local source file
 PyLith users a different build setup and does not have this problem.
 
 :::{important}
-Set the `PETSC_DIR` environment variable to the location of PETSc.
-You should add this to your `.bashrc` or `setup.sh` file.
+Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `PETSC_ARCH` environment variable to a tag associated with a debugging build. 
+You should add these to your `.bashrc` or `setup.sh` file.
 
 ```bash
 export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley-feature-petsc-fe
+export PETSC_ARCH=arch-pylith-debug
 ```
+
 :::
 
 Manually configure and build PETSc.
@@ -255,6 +260,7 @@ make check
 ```
 
 Finally, configure and build PyLith.
+
 ```bash
 cd $PYLITH_DIR/build/debug
 make installed_pylith
