@@ -35,7 +35,7 @@ The Docker image also defines the environment:
 | `PROJ_INCDIR`        |            `/usr/include`             | Directory containing Proj header files [^vscode]        |
 | `CPPUNIT_INCDIR`     |            `/usr/include`             | Directory containing CppUnit header files [^vscode]     |
 
-[^vscode]: Environment variables used in Virtual Studio Code workspace settings.
+[^vscode]: Environment variables used in Visual Studio Code workspace settings.
 
 ## Setup
 
@@ -87,7 +87,7 @@ Closing the `pylith-dev-workspace` Docker container interactive shell (terminal)
 
 ### Setup directory structure
 
-We will use the directory following directory structure for the persistent storage.
+We will use the following directory structure for the persistent storage.
 
 ```bash
 /opt/pylith
@@ -217,7 +217,7 @@ make check -j$(nproc)
 
 ### Install Visual Studio Code
 
-1. Install [Virtual Studio Code](https://code.visualstudio.com/) for your computer.
+1. Install [Visual Studio Code](https://code.visualstudio.com/) for your computer.
 2. Install the following extensions:
     * Remote - Containers
     * C/C++ 

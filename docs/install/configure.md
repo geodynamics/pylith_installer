@@ -3,7 +3,7 @@
 The `configure` script is used to specify which dependencies to build and which ones are already present.
 
 :::{important}
-The output at the end of running  configure lists the packages to be built. Double-check to make sure this matches what you expect.
+The output at the end of running configure lists the packages to be built. Double-check to make sure this matches what you expect.
 :::
 
 ## Speeding up the build process
@@ -15,7 +15,7 @@ On multi-core and multi-processor systems (not clusters but systems with more th
 The default configure options assume you have:
 
 * C and C++ compilers
-* Python 2.7
+* Python 3.6 or later
 * MPI
 
 In this case, you simply specify the number of threads and the destination directory:
@@ -35,3 +35,7 @@ NetCDF depends on HDF5 (we use the parallel version built with MPI) which, in tu
 :::{tip}
 Run `$HOME/src/pylith/configure --help` to see all of the command line arguments and the default values.
 :::
+
+### Resolving incompatibilities
+
+To remedy incompatible compiler suite, MPI, and Python versions, simply use the command line options for the installer `configure` script and request the installer build a new version of the incompatible package (e.g., `--enable-python`, `--enable-mpi=openmpi`).
