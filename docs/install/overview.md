@@ -65,6 +65,4 @@ mpicc -show
 
 clang -Wl,-flat_namespace -I/Users/johndoe/tools/mpich-3.3.2/include -L/Users/johndoe/tools/mpich-3.3.2/lib -lmpi -lpmpi
 ```
-### Resolving incompatibilities
 
-To remedy incompatible compiler suite, MPI, and Python versions, simply use the command line options for the installer `configure` script and request the installer build a new version of the incompatible package (e.g., `--enable-python`, `--enable-mpi=openmpi`).
