@@ -127,6 +127,11 @@ cd $PYLITH_DIR/build/debug
 make -j$(nproc) -C dependencies
 ```
 
+:::{tip}
+Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
+This script and the default configuration file are in the `developer` directory of the PyLith installer source.
+:::
+
 Next, we configure and build pythia and spatialdata.
 
 ```bash
@@ -145,7 +150,7 @@ Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `
 You should add these to your `.bashrc` or `setup.sh` file.
 
 ```bash
-export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley-feature-petsc-fe
+export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley/pylith
 export PETSC_ARCH=arch-pylith-debug
 ```
 
@@ -219,6 +224,11 @@ cd $PYLITH_DIR/build/debug
 make -j$(nproc) -C dependencies
 ```
 
+:::{tip}
+Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
+This script and the default configuration file are in the `developer` directory of the PyLith installer source.
+:::
+
 Next, we configure and build pythia and spatialdata.
 
 ```bash
@@ -237,7 +247,7 @@ Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `
 You should add these to your `.bashrc` or `setup.sh` file.
 
 ```bash
-export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley-feature-petsc-fe
+export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley/pylith
 export PETSC_ARCH=arch-pylith-debug
 ```
 

@@ -67,6 +67,7 @@ class Package():
         lines += self._cd_build()
         configure_fullpath = os.path.join(self.base["src_dir"], self.NAME, "configure")
         lines += [f"{configure_fullpath} {self._configure_args()}"]
+        lines += ["# After running configure, use --build to see the command for building."]
         self._display(lines)
 
     def build(self):
@@ -74,6 +75,7 @@ class Package():
         lines = [f"# Build branch '{branch}' for '{self.NAME}'."]
         lines += self._cd_build()
         lines += [f"make install -j{self.base['build_threads']}"]
+        lines += ["# After building the software, use --test to see the command for testing."]
         self._display(lines)
     
     def test(self):
@@ -92,6 +94,12 @@ class Package():
             cmd += f" --branch {self.config['branch']}"
         cmd += " " + self.config["repo_url"]
         lines += [cmd]
+        lines += [""]
+        lines += ["# When you clone a forked repository, you need to fix the cloning of the m4 submodules."]
+        lines += ["git config submodule.m4.url https://github.com/geodynamics/autoconf_cig.git"]
+        lines += ["# Repeat for any other m4 submodules, for example `templates/friction/m4`"]
+        lines += [""]
+        lines += ["# After running git clone, use --configure to see how to configure."]
         self._display(lines)
     
     def git_set_upstream(self):
@@ -110,6 +118,7 @@ class Package():
             lines = [f"# No upstream repository for '{self.NAME}'."]
         else:
             lines = [f"# Synchronize local branch {branch} for '{self.NAME}.'"]
+            lines += ["# NOTE: You must have set the upstream repository. See --git-set-upstream."]
             lines += self._cd_src()
             lines += ["git fetch upstream"]
             lines += [f"git checkout {branch}"]

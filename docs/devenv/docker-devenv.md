@@ -54,8 +54,8 @@ You only need to run these setup steps once.
 
 2. Fork the following repositories:
 
-* <https://github.com/geodynamics/pythia>
-* <https://github.com/geodynamics/spatialdata>
+* <https://github.com/geodynamics/pythia> (optional, not recommended)
+* <https://github.com/geodynamics/spatialdata> (optional, not recommended)
 * <https://github.com/geodynamics/pylith>
 
 This creates copies of the repositories in your GitHub account.
@@ -135,13 +135,62 @@ mkdir -p ${INSTALL_DIR}
 This creates a local copy of the repositories in the persistent storage volume of the PyLith development container.
 These are your working copies of the repositories.
 
+:::{tip}
+Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
+This script and the default configuration file are in the `/opt/pylith-devenv` directory.
+:::
+
 ```bash
 cd /opt/pylith/src
-git clone --recursive https://github.com/GITHUB_USERNAME/pythia.git
-git clone --recursive https://github.com/GITHUB_USERNAME/spatialdata.git
+git clone --recursive https://github.com/geodynamics/pythia.git
+git clone --recursive https://github.com/geodynamics/spatialdata.git
 git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git
 git clone --branch knepley/pylith https://gitlab.com/petsc/petsc.git
 ```
+
+#### Set the upstream repository
+
+For the PyLith repository and any other repositories that you forked, you should set the upstream repository.
+The upstream repository is the central, community repository from which you will get updates.
+
+```bash
+# PyLith repository (repeat for other repositories you forked)
+cd /opt/pylith/src/pylith
+git remote add upstream https://github.com/geodynamics/pylith.git
+```
+
+(sec-developer-fork-fix-m4-url)=
+#### Fixing path to m4 submodule
+
+For any of the repositories that you forked, you will encounter an error when it tries to clone the `m4` submodule, which has a relative link.
+The error message will be similar to:
+
+```bash
+Cloning into '/opt/pylith/src/pylith/m4'...
+remote: Repository not found.
+fatal: repository 'https://github.com/GITHUB_USERNAME/autoconf_cig.git/' not found
+fatal: clone of 'https://github.com/GITHUB_USERNAME/autoconf_cig.git' into submodule path '/opt/pylith/src/pylith/m4' failed
+Failed to clone 'm4'. Retry scheduled
+```
+
+The best workaround is to redirect your local clone to the geodynamics repository.
+You only need to do this once after cloning.
+
+```bash
+# Set URLs for submodules in `.git/config` to geodynamics repository (PyLith repository).
+cd /opt/pylith/src/pylith
+git config submodule.m4.url https://github.com/geodynamics/autoconf_cig.git
+git config submodule.templates/friction/m4.url https://github.com/geodynamics/autoconf_cig.git
+git config submodule.templates/materials/m4.url https://github.com/geodynamics/autoconf_cig.git
+
+# Update submodules
+git submodule update
+```
+
+:::{note}
+We use a relative link so that the GitLab mirror works correctly in our GitLab CI test runners.
+The consequence of using a relative link is that your local clone will look for a corresponding fork of the `autoconf_cig` repository.
+:::
 
 ### Configure and build PyLith for development
 
