@@ -21,10 +21,8 @@ apt-get install -y --no-install-recommends \
       python3-dev \
       python3-pip \
       python3-setuptools \
-      python3-numpy \
       python3-coverage \
-      python3-h5py \
-      cython3 \
+	  python3-six \
       zlib1g-dev \
       unzip \
       git \
@@ -70,7 +68,10 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --disable-numpy \
     --disable-setuptools \
     --disable-hdf5 \
-    --disable-h5py \
+    --enable-numpy \
+    --enable-cython \
+    --enable-cftime \
+    --enable-h5py \
     --enable-pcre \
     --enable-swig \
     --enable-proj \
