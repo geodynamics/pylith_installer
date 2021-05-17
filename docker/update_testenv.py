@@ -9,13 +9,13 @@ import subprocess
 
 
 ENVS = (
-    ("debian:stable", "debian-stable-gcc8"),
-    ("debian:testing", "debian-testing-gcc9"),
+    ("debian:stable", "debian-stable"),
+    ("debian:testing", "debian-testing"),
     ("ubuntu:18.04", "ubuntu-18.04"),
     ("ubuntu:20.04", "ubuntu-20.04"),
-    ("ubuntu:20.10", "ubuntu-20.10"),
-    ("fedora:32", "fedora-32"),
+    ("ubuntu:21.04", "ubuntu-21.04"),
     ("fedora:33", "fedora-33"),
+    ("fedora:34", "fedora-34"),
     ("centos:7", "centos-7"),
     ("centos:8", "centos-8"),
     )

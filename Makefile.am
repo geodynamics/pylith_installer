@@ -30,29 +30,27 @@ EXTRA_DIST = \
 	README.md \
 	docker/README \
 	docker/README-developer \
-	docker/centos-6 \
+	docker/builder.py \
 	docker/centos-7 \
-	docker/debian-stable-gcc8 \
-	docker/debian-testing-clang8 \
-	docker/debian-testing-clang9 \
-	docker/debian-testing-gcc9 \
-	docker/fedora-30 \
-	docker/fedora-31 \
-	docker/fedora-32 \
+	docker/centos-8 \
+	docker/debian-stable \
+	docker/debian-testing \
+	docker/fedora-33 \
+	docker/fedora-34 \
 	docker/ubuntu-18.04 \
-	docker/ubuntu-19.10 \
 	docker/ubuntu-20.04 \
+	docker/ubuntu-21.04 \
+	developer/developer_helper.cfg \
 	packager/build.py \
 	packager/setup_darwin.sh \
-	packager/setup_linux32.sh \
 	packager/setup_linux64.sh \
 	packager/make_package.py \
-	packager/cygwin.py \
 	packager/make_petscdist.sh \
 	packager/update_darwinlinking.py
 
 
 dist_noinst_SCRIPTS = \
-	bin/fetch.sh
+	bin/fetch.sh \
+	developer/developer_helper.py
 
 # End of file
