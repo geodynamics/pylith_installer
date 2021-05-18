@@ -28,6 +28,7 @@ EXTRA_DIST = \
 	COPYING \
 	NEWS.md \
 	README.md \
+	configure.ac \
 	docker/README \
 	docker/README-developer \
 	docker/builder.py \
