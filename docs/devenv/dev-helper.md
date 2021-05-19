@@ -45,7 +45,7 @@ upstream = False
 branch = main
 
 [spatialdata]
-repo_url = https://github.com/spatialdata/spatialdata.git
+repo_url = https://github.com/geodynamics/spatialdata.git
 upstream = False
 branch = main
 

@@ -32,14 +32,16 @@ class Package():
     def _display(lines):
         print("\n".join(lines))
 
-    def _cd_src(self, top=False):
-        fullpath = os.path.join(self.base["src_dir"], self.NAME) if not top else self.base["src_dir"]
-        return [f"cd {fullpath}"]
+    def _get_src_dir(self, top=False):
+        return os.path.join(self.base["src_dir"], self.NAME) if not top else self.base["src_dir"]
 
-    def _cd_build(self):
+    def _get_build_dir(self):
         build_arch = "debug" if self.base["debug"] else "opt"
-        fullpath = os.path.join(self.base["build_dir"], build_arch, self.NAME)
-        return [f"cd {fullpath}"]
+        return os.path.join(self.base["build_dir"], build_arch, self.NAME)
+
+    def _get_install_dir(self):
+        build_arch = "debug" if self.base["debug"] else "opt"
+        return os.path.join(self.base["install_dir"], build_arch)
 
     def _git_current_branch(self):
         """Get current git branch.
@@ -59,13 +61,13 @@ class Package():
         lines = [f"# Configure '{self.NAME}''."]
 
         lines += ["# Generate the configure script using autoreconf."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += ["autoreconf -if"]
         lines += [""]
 
         lines += ["# Run configure."]
-        lines += self._cd_build()
-        configure_fullpath = os.path.join(self.base["src_dir"], self.NAME, "configure")
+        lines += ["cd " + self._get_build_dir()]
+        configure_fullpath = os.path.join(self._get_src_dir(), "configure")
         lines += [f"{configure_fullpath} {self._configure_args()}"]
         lines += ["# After running configure, use --build to see the command for building."]
         self._display(lines)
@@ -73,20 +75,20 @@ class Package():
     def build(self):
         branch = self._git_current_branch()
         lines = [f"# Build branch '{branch}' for '{self.NAME}'."]
-        lines += self._cd_build()
+        lines += ["cd " + self._get_build_dir()]
         lines += [f"make install -j{self.base['build_threads']}"]
         lines += ["# After building the software, use --test to see the command for testing."]
         self._display(lines)
     
     def test(self):
         lines = [f"# Test '{self.NAME}'."]
-        lines += self._cd_build()
+        lines += ["cd " + self._get_build_dir()]
         lines += [f"make check -j{self.base['build_threads']}"]
         self._display(lines)
 
     def git_clone(self):
         lines = [f"# Clone '{self.NAME}'."]
-        lines += self._cd_src(top=True)
+        lines += ["cd " + self._get_src_dir(top=True)]
         cmd = "git clone "
         if self.CLONE_RECURSIVE:
             cmd += " --recursive"
@@ -98,6 +100,7 @@ class Package():
         lines += ["# When you clone a forked repository, you need to fix the cloning of the m4 submodules."]
         lines += ["git config submodule.m4.url https://github.com/geodynamics/autoconf_cig.git"]
         lines += ["# Repeat for any other m4 submodules, for example `templates/friction/m4`"]
+        lines += ["git submodule update"]
         lines += [""]
         lines += ["# After running git clone, use --configure to see how to configure."]
         self._display(lines)
@@ -107,7 +110,7 @@ class Package():
             lines = [f"# No upstream repository for '{self.NAME}'."]
         else:
             lines = [f"# Set upstream repository for '{self.NAME}.'"]
-            lines += self._cd_src()
+            lines += ["cd " + self._get_src_dir()]
             lines += ["git remote -v # Show current remote repositories."]
             lines += [f"git remote add upstream {self.config['upstream']}"]
             lines += ["git remote -v # Verify new upstream"]
@@ -119,7 +122,7 @@ class Package():
         else:
             lines = [f"# Synchronize local branch {branch} for '{self.NAME}.'"]
             lines += ["# NOTE: You must have set the upstream repository. See --git-set-upstream."]
-            lines += self._cd_src()
+            lines += ["cd " + self._get_src_dir()]
             lines += ["git fetch upstream"]
             lines += [f"git checkout {branch}"]
             lines += [f"git merge upstream/{branch}"]
@@ -127,7 +130,7 @@ class Package():
 
     def git_fetch(self):
         lines = [f"# Update local clone for '{self.NAME}'."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"git fetch -p"]
         self._display(lines)
         return
@@ -135,7 +138,7 @@ class Package():
     def git_set_branch(self, branch):
         current_branch = self._git_current_branch()
         lines = [f"# Change from branch '{current_branch}' to branch '{branch}' for '{self.NAME}'."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"git checkout {branch}"]
         self._display(lines)
         return
@@ -143,14 +146,14 @@ class Package():
     def git_new_branch(self, branch):
         current_branch = self._git_current_branch()
         lines = [f"# Create new branch '{branch}' from branch '{current_branch}' for '{self.NAME}'."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"git checkout -b {branch}"]
         self._display(lines)
         return
 
     def git_delete_branch(self, branch):
         lines = [f"# Delete local branch '{branch}' from '{self.NAME}'."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"git branch -D {branch}"]
         self._display(lines)
         return
@@ -191,7 +194,7 @@ class Pythia(Package):
 
     def _configure_args(self):
         args = [
-            f"--prefix={self.base['install_dir']}",
+            f"--prefix={self._get_install_dir()}",
             "--enable-testing",
             "CC=mpicc",
             "CXX=mpicxx",
@@ -215,14 +218,15 @@ class Spatialdata(Package):
     CLONE_RECURSIVE = True
 
     def _configure_args(self):
+        install_dir = self._get_install_dir()
         args = [
-            f"--prefix={self.base['install_dir']}",
+            f"--prefix={install_dir}",
             "--enable-swig",
             "--enable-testing",
             "CC=mpicc",
             "CXX=mpicxx",
-            f"CPPFLAGS=\"-I{self.base['deps_dir']}/include -I{self.base['install_dir']}/include\"",
-            f"LDFLAGS=\"-L{self.base['deps_dir']}/lib -L{self.base['install_dir']}/lib\"",
+            f"CPPFLAGS=\"-I{self.base['deps_dir']}/include -I{install_dir}/include\"",
+            f"LDFLAGS=\"-L{self.base['deps_dir']}/lib -L{install_dir}/lib\"",
         ]
         if self.base["debug"]:
             args += [
@@ -252,17 +256,24 @@ class Petsc(Package):
         lines = [f"# Configure '{self.NAME}''."]
 
         lines += ["# Run configure."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"python3 ./configure {self._configure_args()}"]
         self._display(lines)
 
     def build(self):
         lines = [f"# Build '{self.NAME}'."]
-        lines += self._cd_src()
+        lines += ["cd " + self._get_src_dir()]
         lines += [f"make -j{self.base['build_threads']} PETSC_DIR={self.petsc_dir} PETSC_ARCH={self.petsc_arch}"]
         self._display(lines)
     
+    def test(self):
+        lines = [f"# Test '{self.NAME}'."]
+        lines += ["cd " + self._get_src_dir()]
+        lines += [f"make check -j{self.base['build_threads']} PETSC_DIR={self.petsc_dir} PETSC_ARCH={self.petsc_arch}"]
+        self._display(lines)
+    
     def _configure_args(self):
+        install_dir = self._get_install_dir()
         args = [
             "--with-c2html=0",
             "--with-lgrind=0",
@@ -289,8 +300,8 @@ class Petsc(Package):
                 "CFLAGS='-g -O3 -DNDEBUG'",
                 ]
         args += [
-            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include -I{self.base['install_dir']}/include\"",
-            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib -L{self.base['install_dir']}/lib\"",
+            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include -I{install_dir}/include\"",
+            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib -L{install_dir}/lib\"",
             f"PETSC_DIR={self.petsc_dir}",
             f"PETSC_ARCH={self.petsc_arch}",
         ]
@@ -304,16 +315,17 @@ class PyLith(Package):
     CLONE_RECURSIVE = True
 
     def _configure_args(self):
+        install_dir = self._get_install_dir()
         args = [
-            f"--prefix={self.base['install_dir']}",
-            "--enable-cubit"
+            f"--prefix={install_dir}",
+            "--enable-cubit",
             "--enable-hdf5",
             "--enable-swig",
             "--enable-testing",
             "CC=mpicc",
             "CXX=mpicxx",
-            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include -I{self.base['install_dir']}/include\"",
-            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib -L{self.base['install_dir']}/lib\"",
+            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include -I{install_dir}/include\"",
+            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib -L{install_dir}/lib\"",
         ]
         if self.base["debug"]:
             args += [
