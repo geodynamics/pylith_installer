@@ -45,6 +45,8 @@ RUN apt-get update \
       less \
       uncrustify \
       gnupg2 \
+      ssh \
+      linux-tools-common \
       vim-common \
       vim-runtime \
       vim-nox
@@ -74,6 +76,8 @@ ENV  src_dir=/opt/pylith-installer/src  build_dir=/opt/pylith-installer/build
 RUN mkdir -p /opt/pylith-installer && mkdir -p ${build_dir}
 
 COPY --chown=pylith-dev:pylith-dev . ${src_dir}
+COPY --chown=pylith-dev:pylith-dev ./developer/developer_helper.py ./developer/developer_helper.cfg /opt/pylith-devenv/
+
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force

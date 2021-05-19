@@ -41,7 +41,8 @@ EXTRA_DIST = \
 	docker/ubuntu-18.04 \
 	docker/ubuntu-20.04 \
 	docker/ubuntu-21.04 \
-	developer/developer_helper.cfg \
+	developer/developer-helper.py \
+	developer/developer-helper.cfg \
 	packager/build.py \
 	packager/setup_darwin.sh \
 	packager/setup_linux64.sh \
