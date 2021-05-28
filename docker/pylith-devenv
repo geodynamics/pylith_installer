@@ -53,6 +53,7 @@ RUN apt-get update \
 
 COPY docker/certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
+RUN echo "kernel.yama.ptrace_scope = 0" > /etc/sysctl.d/10-ptrace.conf
 
 
 ENV PYTHON_VERSION 3.8
