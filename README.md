@@ -1,6 +1,6 @@
 # PyLith Installer
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/geodynamics/pylith_installer/blob/master/COPYING) \
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/geodynamics/pylith_installer/blob/main/LICENSE.md) \
 [![Documentation Status](https://readthedocs.org/projects/pylith-installer/badge/?version=latest)](https://pylith-installer.readthedocs.io/en/latest/?badge=latest)
 
 ## Description

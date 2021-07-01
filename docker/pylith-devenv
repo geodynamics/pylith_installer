@@ -30,6 +30,7 @@ RUN apt-get update \
       mpich \
       libhdf5-mpich-103 \
       libhdf5-mpich-dev \
+      hdf5-tools \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \

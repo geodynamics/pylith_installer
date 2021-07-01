@@ -25,7 +25,7 @@ SUBDIRS = \
 EXTRA_DIST = \
 	AUTHORS \
 	CHANGES.md \
-	COPYING \
+	LICENSE.md \
 	NEWS.md \
 	README.md \
 	configure.ac \
