@@ -126,3 +126,6 @@ RUN mkdir -p ${BASE_DIR} \
   && chgrp ${PYLITH_USER} ${BASE_DIR}
 USER ${PYLITH_USER}
 CMD /bin/bash
+
+# docker run -ti --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+# service procps restart
