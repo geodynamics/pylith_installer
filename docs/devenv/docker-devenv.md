@@ -264,6 +264,38 @@ make install -j$(nproc)
 make check -j$(nproc)
 ```
 
+### Reset `ptrace` Flag
+
+Attaching the debugger to a forked process can result in the following error:
+
+```{code-block}
+Could not attach to process. If your uid matches the uid of the target process, check the setting of /proc/sys/kernel/yama/ptrace_scope, or try again as the root user. For more details, see /etc/sysctl.d/10-ptrace.conf
+ptrace: Operation not permitted.
+```
+
+The PyLith development environment Docker container sets up `/etc/sysctl.d/10-ptrace.conf` correctly, but the `ptrace_scope` variable is still usually `1`.
+The fix is to run the container in privileged mode as root and restart the `procps` service.
+
+```{code-block} bash
+# Run docker image in privileged mode as root.
+docker run -ti --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+
+# Verify ptrace setting needs updating
+cat /proc/sys/kernel/yama/ptrace_scope
+# If output is 1, then continue, if 0 then no need to change anything.
+
+# Verify ptrace setting is correct.
+cat /etc/sysctl.d/10-ptrace.conf
+# Output should be 0
+
+# Restart the procps service.
+service procps restart
+
+# Verify ptrace setting has changed
+cat /proc/sys/kernel/yama/ptrace_scope
+# Output should be 0
+```
+
 ### Install Visual Studio Code
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/) for your computer.
