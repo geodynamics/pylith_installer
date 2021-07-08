@@ -14,9 +14,6 @@ Consult the [CIG community forum](https://community.geodynamics.org/c/pylith/) f
 :::
 
 ```{toctree}
----
-maxdepth: 2
----
 release-notes.md
 requirements.md
 use-cases.md
