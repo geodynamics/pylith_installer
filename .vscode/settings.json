@@ -1,0 +1,10 @@
+{
+    "editor.formatOnSave": true,
+    "telemetry.enableTelemetry": false,
+    "telemetry.enableCrashReporter": false,
+    "python.formatting.autopep8Args": [
+        "-max-line-length",
+        "100"
+    ],
+    "cSpell.enabled": true
+}
