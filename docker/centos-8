@@ -1,5 +1,9 @@
+ARG BUILD_ENV=nocerts
 FROM centos:8 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
 
 RUN dnf install -y \
         gcc \
@@ -12,7 +16,8 @@ RUN dnf install -y \
         automake \
         autoconf \
         libtool \
-        curl \
+	curl \
+	libcurl-devel \
 	openssl \
 	openssl-devel \
         zlib-devel \
@@ -22,69 +27,72 @@ RUN dnf install -y \
 	python38 \
 	python38-devel \
 	python38-pip \
-	python38-setuptools \
-	python38-six \
-	python38-numpy \
-	python38-Cython \
-	python3-coverage \
 	mpich \
 	mpich-devel \
 	cmake \
 	sqlite \
 	sqlite-devel \
+	libtiff \
+	libtiff-devel \
 	gdb \
 	valgrind \
 	vim-common \
 	vim-minimal \
 	dnf-plugins-core
 
-RUN dnf config-manager --set-enabled powertools && dnf install -y cppunit cppunit-devel
+RUN dnf config-manager --set-enabled powertools && \
+    dnf install -y cppunit cppunit-devel && \
+    alternatives --set python3 /usr/bin/python3.8
     
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
 
-COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
-RUN update-ca-trust enable
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
 
-ENV PATH $PATH:/usr/lib64/mpich/bin
-
-RUN alternatives --set python3 /usr/bin/python3.8
-ENV PYTHON_VERSION 3.8
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from os-update as build-deps
+from build-${BUILD_ENV} as build-deps
+
+ENV TEST_USER=pylith-tester \
+    INSTALL_DIR=/opt/pylith \
+    PYTHON_VERSION=3.8 \
+    HDF5_LIBDIR=${INSTALL_DIR}/lib \
+    HDF5_INCDIR=${INSTALL_DIR}/include    
 
 # Create 'pylith-tester' user
-ENV TEST_USER pylith-tester
 RUN useradd --create-home --shell /bin/bash $TEST_USER
-ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
-ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
-
+ENV  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=${HOME}/src \
+     TOPBUILD_DIR=${HOME}/build \
+     PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
-ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib:$INSTALL_DIR/dependencies/lib64 \
-    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/dependencies/lib64/python${PYTHON_VERSION}/site-packages
+
+# ------------------------------------------------------------------------------
 USER ${TEST_USER}
-
-# PyLith installer
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
-RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
-
+RUN mkdir -p ${TOPSRC_DIR} && \
+    mkdir -p ${TOPBUILD_DIR} && \
+    mkdir -p ${build_dir}
+    
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
 
-RUN mkdir -p ${build_dir}
 WORKDIR ${build_dir}
-RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --with-make-threads=`nproc` \
-    --with-deps-prefix=${INSTALL_DIR}/dependencies \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-cmake \
     --disable-sqlite \
-    --disable-setuptools \
-    --disable-numpy \
-    --disable-six \
     --disable-cppunit \
     --enable-pcre \
     --enable-swig \
@@ -96,7 +104,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
     --enable-netcdfpy \
     && make -C dependencies \
     && rm -r ${build_dir}
-ENV HDF5_LIBDIR=${INSTALL_DIR}/dependencies/lib  HDF5_INCDIR=${INSTALL_DIR}/dependencies/include
 
 
 WORKDIR $HOME

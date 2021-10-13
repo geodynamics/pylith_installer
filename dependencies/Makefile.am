@@ -28,10 +28,6 @@ noinst_tmp = \
 	installed_cppunit \
 	installed_pcre \
 	installed_swig \
-	installed_setuptools \
-	installed_cython \
-	installed_numpy \
-	installed_cftime \
 	installed_sqlite \
 	installed_tiff \
 	installed_proj \
@@ -39,7 +35,6 @@ noinst_tmp = \
 	installed_h5py \
 	installed_netcdf \
 	installed_netcdfpy \
-	installed_sphinx \
 	installed_git
 	installed_cmake
 
@@ -77,10 +72,6 @@ noinst_srcdirs = \
 	cppunit-$(CPPUNIT_VER) \
 	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
-	setuptools-$(SETUPTOOLS_VER) \
-	Cython-$(CYTHON_VER) \
-	numpy-$(NUMPY_VER) \
-	cftime-$(CFTIME_VER) \
 	sqlite-$(SQLITE_VER) \
 	proj-$(PROJ4_VER) \
 	hdf5-$(HDF5_VER) \
@@ -93,7 +84,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_sphinx installed_git installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -286,80 +277,14 @@ endif
 installed_python:
 	$(MAKE) $(AM_MAKEFLAGS) python
 	python3 -m venv $(prefix)
-	python3 -m pip install --upgrade pip
-
-
-# ----------------------------------------------------------------------
-# setuptools
-# ----------------------------------------------------------------------
-setuptools: installed_python
-if INSTALL_SETUPTOOLS
-	$(PYTHON) -m pip install $(DEPS_URL)/setuptools-$(SETUPTOOLS_VER).tar.gz && \
-		touch $(abs_builddir)/installed_setuptools
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_setuptools
+	$(env_flags_python) $(PYTHON) -m pip install --upgrade pip setuptools certifi
+	$(env_flags_python) $(PYTHON) -m pip install numpy
+if INSTALL_NETCDFPY
+	$(env_flags_python) $(PYTHON) -m pip install cftime
 endif
-
-installed_setuptools:
-	$(MAKE) $(AM_MAKEFLAGS) setuptools
-
-
-# ----------------------------------------------------------------------
-# cython
-# ----------------------------------------------------------------------
-cython: installed_python installed_setuptools
-if INSTALL_CYTHON
-	$(PYTHON) -m pip install $(DEPS_URL)/Cython-$(CYTHON_VER).tar.gz && \
-		touch $(abs_builddir)/installed_cython
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_cython
+if INSTALL_SPHINX
+	$(env_flags_deps) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif
-
-installed_cython:
-	$(MAKE) $(AM_MAKEFLAGS) cython
-
-
-# ----------------------------------------------------------------------
-# numpy
-# ----------------------------------------------------------------------
-numpy: installed_python installed_setuptools
-if INSTALL_NUMPY
-	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).zip $(DEPS_URL)
-	$(UNZIP) numpy-$(NUMPY_VER).zip
-if NUMPY_NOBLASLAPACK
-	$(CP) $(top_srcdir)/dependencies/numpy_noblaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
-endif
-	cd numpy-$(NUMPY_VER) && \
-		$(PYTHON) -m pip install . && \
-		touch $(abs_builddir)/installed_numpy
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_numpy
-endif
-
-installed_numpy:
-	$(MAKE) $(AM_MAKEFLAGS) numpy
-
-
-# ----------------------------------------------------------------------
-# cftime
-# ----------------------------------------------------------------------
-cftime: installed_python installed_setuptools installed_numpy
-if INSTALL_CFTIME
-	$(PYTHON) -m pip install $(DEPS_URL)/cftime-$(CFTIME_VER).tar.gz && \
-		touch $(abs_builddir)/installed_cftime
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_cftime
-endif
-
-installed_cftime:
-	$(MAKE) $(AM_MAKEFLAGS) cftime
 
 
 # ----------------------------------------------------------------------
@@ -565,6 +490,7 @@ if INSTALL_PROJ
 			$(env_flags_deps) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
+		projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
 
 else
@@ -607,9 +533,9 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_numpy installed_cython
+h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -650,9 +576,9 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 # netcdfpy
 # ----------------------------------------------------------------------
-netcdfpy: installed_netcdf installed_numpy installed_cftime installed_cython
+netcdfpy: installed_netcdf installed_python
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."
@@ -661,24 +587,6 @@ endif
 
 installed_netcdfpy:
 	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
-
-
-# ----------------------------------------------------------------------
-# sphinx
-# ----------------------------------------------------------------------
-sphinx: installed_python installed_setuptools
-if INSTALL_SPHINX
-	$(PYTHON) -m pip install $(DEPS_URL)/Sphinx-$(SPHINX_VER).tar.gz && \
-	$(PYTHON) -m pip install $(DEPS_URL)/myst-parser-$(MYSTPARSER_VER).tar.gz && \
-	$(PYTHON) -m pip install $(DEPS_URL)/pydata-sphinx-theme-$(PYDATATHEME_VER).tar.gz && \
-		touch $(abs_builddir)/installed_sphinx
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_sphinx
-endif
-
-installed_sphinx:
-	$(MAKE) $(AM_MAKEFLAGS) sphinx
 
 
 # ----------------------------------------------------------------------

@@ -1,5 +1,9 @@
+ARG BUILD_ENV=nocerts
 FROM ubuntu:20.04 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
@@ -12,13 +16,9 @@ RUN apt-get update \
       curl \
       python3-dev \
       libpython3.8 \
+      python3-venv \
       python3-pip \
-      python3-setuptools \
-      python3-numpy \
-      python3-cftime \
-      python3-six \
       python3-coverage \
-      cython3 \
       zlib1g-dev \
       unzip \
       git \
@@ -43,54 +43,59 @@ RUN apt-get update \
       vim-runtime \
       vim-nox
 
-COPY docker/certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
 
+ONBUILD COPY docker/certs/ /usr/local/share/ca-certificates
+ONBUILD RUN update-ca-certificates
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=DOIRootCA2.pem
 
-ENV PYTHON_VERSION 3.8
-ENV HDF5_INCDIR=/usr/include/hdf5/mpich  HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from os-update as build-deps
+from build-${BUILD_ENV} as build-deps
+
+ENV TEST_USER=pylith-tester \
+    INSTALL_DIR=/opt/pylith \
+    PYTHON_VERSION=3.8 \
+    HDF5_INCDIR=/usr/include/hdf5/mpich \
+    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 
 # Create 'pylith-tester' user
-ENV TEST_USER pylith-tester
 RUN useradd --create-home --shell /bin/bash $TEST_USER
-ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
-ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
-
+ENV  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=${HOME}/src \
+     TOPBUILD_DIR=${HOME}/build \
+     PATH=${INSTALL_DIR}/bin:$PATH \
+     LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
-ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib \
-    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages
+
+# ------------------------------------------------------------------------------
 USER ${TEST_USER}
-
-# PyLith installer
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
-RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
-
+RUN mkdir -p ${TOPSRC_DIR} && \
+    mkdir -p ${TOPBUILD_DIR} && \
+    mkdir -p ${build_dir}
+    
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
 
-RUN mkdir -p ${build_dir}
 WORKDIR ${build_dir}
-RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
-    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
-    --with-deps-prefix=${INSTALL_DIR}/dependencies \
+    --with-hdf5-incdir=${HDF5_INCDIR} --with-hdf5-libdir=${HDF5_LIBDIR} \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
-    --disable-numpy \
-    --disable-setuptools \
-    --disable-cftime \
-    --disable-six \
     --disable-proj \
     --enable-h5py \
     --enable-netcdf \

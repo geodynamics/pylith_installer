@@ -23,6 +23,19 @@ AM_INIT_AUTOMAKE([foreign tar-pax])
 # ----------------------------------------------------------------------
 # SOFTWARE TO INSTALL
 # ----------------------------------------------------------------------
+AC_ARG_WITH([cert-path],
+    [AC_HELP_STRING([--with-cert-path],
+        [absolute path to SSL certificates @<:@default=no@:>@])],
+	[cert_path=$withval],
+	[cert_path=no])
+AC_SUBST(cert_path)
+AC_ARG_WITH([cert-file],
+    [AC_HELP_STRING([--with-cert-file],
+        [name of SSL certificate file @<:@default=no@:>@])],
+	[cert_file=$withval],
+	[cert_file=no])
+AC_SUBST(cert_file)
+AM_CONDITIONAL([WITH_CERT], [test "$cert_path" != no])
 
 # FORCE INSTALLATION
 AC_ARG_ENABLE([force-install],
@@ -128,44 +141,6 @@ AC_ARG_ENABLE([python],
 	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
 	[install_python=no])
 AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
-
-# SETUPTOOLS
-AC_ARG_ENABLE([setuptools],
-    [AC_HELP_STRING([--enable-setuptools],
-        [install setuptools @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
-	[install_setuptools=yes])
-AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
-
-# CYTHON
-AC_ARG_ENABLE([cython],
-    [AC_HELP_STRING([--enable-cython],
-        [install cython @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
-	[install_cython=no])
-AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
-
-# NUMPY
-AC_ARG_ENABLE([numpy],
-    [AC_HELP_STRING([--enable-numpy],
-        [install numpy @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
-	[install_numpy=yes])
-AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
-AC_ARG_WITH([numpy-blaslapack],
-    [AC_HELP_STRING([--with-numpy-blaslapack],
-        [Numpy w/BLAS/Lapack @<:@default=yes@:>@])],
-	[with_numpy_blaslapack=$withval],
-	[with_numpy_blaslapack=yes])
-AM_CONDITIONAL([NUMPY_NOBLASLAPACK], [test "$with_numpy_blaslapack" = no])
-
-# CFTIME
-AC_ARG_ENABLE([cftime],
-    [AC_HELP_STRING([--enable-cftime],
-        [install cftime @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_cftime=yes; else install_cftime=no; fi],
-	[install_cftime=no])
-AM_CONDITIONAL([INSTALL_CFTIME], [test "$install_cftime" = yes])
 
 # SPHINX
 AC_ARG_ENABLE([sphinx],
@@ -542,24 +517,6 @@ if test "$install_python" = yes ; then
                 ])
   fi
 
-  # install setuptools
-  if test "$install_setuptools" != yes ; then
-    AC_MSG_WARN([Building Python requires building setuptools as well. Adding installation of setuptools.])
-  fi
-  install_setuptools=yes
-  
-  # install cython
-  if test "$install_cython" != yes ; then
-    AC_MSG_WARN([Building Python requires building cython as well. Adding installation of cython.])
-  fi
-  install_cython=yes
-  
-  # install numpy
-  if test "$install_numpy" != yes ; then
-    AC_MSG_WARN([Building Python requires building numpy as well. Adding installation of numpy.])
-  fi
-  install_numpy=yes
-  
   # install pythia
   if test "$install_pythia" != yes ; then
     AC_MSG_WARN([Building Python requires building pythia/pyre as well. Adding installation of pythia/pyre.])
@@ -572,11 +529,14 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([3.6])
+  AM_PATH_PYTHON([3.7])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED
   CIT_PYTHON_MODULE([zlib])
+  # Python will be installed as virtual environment to $prefix
+  PYTHON=$prefix/bin/python3
+  AC_SUBST(PYTHON)
 fi
 AC_CHECK_LIB([z], [deflate], 
   [],
@@ -652,14 +612,6 @@ else
   fi
 fi
 
-# numpy
-if test "$install_numpy" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  CIT_NUMPY_PYTHON_MODULE
-  CIT_NUMPY_INCDIR
-fi
-
 # sqlite
 if test "$install_sqlite" = yes ; then
   AC_PATH_PROG(existing_sqlite, sqlite)
@@ -679,35 +631,29 @@ fi
 AC_SUBST(SQLITE3_INCLUDES)
 AC_SUBST(SQLITE3_LDFLAGS)
 
-# tiff
-if test "$install_tiff" = yes ; then
-  AC_PATH_PROG(existing_tiff, tiff)
-  AC_SUBST(existing_tiff)
-  TIFF_INCLUDES="-I$prefix/include"
-  TIFF_LDFLAGS="-L$prefix/lib"
-else
-  if test "$with_tiff_incdir" != no; then
-    TIFF_INCLUDES="-I$with_tiff_incdir"
-  fi
-  if test "$with_tiff_libdir" != no; then
-    TIFF_LDFLAGS="-L$with_tiff_libdir"
-  fi
-  CIT_TIFF_HEADER
-  CIT_TIFF_LIB
-fi
-AC_SUBST(TIFF3_INCLUDES)
-AC_SUBST(TIFF3_LDFLAGS)
-
 # proj
 if test "$install_proj" = yes ; then
   AC_PATH_PROG(existing_proj, proj)
   AC_SUBST(existing_proj)
-  # Installing datums requires unzip
-  AC_PATH_PROG(UNZIP, unzip)
-  if test -z "$UNZIP" ; then
-    AC_MSG_FAILURE([cannot find 'unzip' program.])
-    UNZIP=`echo "Error: unzip is not installed." ; false`
+
+  # Installing Proj requires tiff
+  if test "$install_tiff" = yes ; then
+    AC_PATH_PROG(existing_tiff, tiff)
+    AC_SUBST(existing_tiff)
+    TIFF_INCLUDES="-I$prefix/include"
+    TIFF_LDFLAGS="-L$prefix/lib"
+  else
+    if test "$with_tiff_incdir" != no; then
+      TIFF_INCLUDES="-I$with_tiff_incdir"
+    fi
+    if test "$with_tiff_libdir" != no; then
+      TIFF_LDFLAGS="-L$with_tiff_libdir"
+    fi
+    CIT_TIFF_HEADER
+    CIT_TIFF_LIB
   fi
+  AC_SUBST(TIFF_INCLUDES)
+  AC_SUBST(TIFF_LDFLAGS)
 else
   if test "$with_proj_incdir" != no; then
     PROJ_INCLUDES="-I$with_proj_incdir"
@@ -825,16 +771,6 @@ else
   if test -z $NEMESIS; then
     AC_MSG_FAILURE([cannot find 'nemesis' program.])
     NEMESIS=`echo "Error: Pythia/pyre is not installed properly." ; false`
-  fi
-fi
-
-# setuptools
-if test "$install_setuptools" = yes ; then
-  # Installing setuptools requires unzip
-  AC_PATH_PROG(UNZIP, unzip)
-  if test -z "$UNZIP" ; then
-    AC_MSG_FAILURE([cannot find 'unzip' program.])
-    UNZIP=`echo "Error: unzip is not installed." ; false`
   fi
 fi
 
@@ -1023,10 +959,6 @@ printf "  cppunit: $install_cppunit\n"
 printf "  openssl: $install_openssl\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
-printf "    setuptools: $install_setuptools\n"
-printf "    cython: $install_cython\n"
-printf "    numpy: $install_numpy    detect BLAS/Lapack=$with_numpy_blaslapack\n"
-printf "    cftime: $install_cftime (required by netCDF4)\n"
 printf "    h5py: $install_h5py\n"
 printf "    netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
 printf "    sphinx: $install_sphinx (optional; generate documentation)\n"
