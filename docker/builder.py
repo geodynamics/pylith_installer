@@ -46,7 +46,7 @@ class DockerApp(object):
         """Initialize builder.
         """
         self.docker_filename = args.dockerfile
-	if not args.prefix.endswith("/"):
+        if not args.prefix.endswith("/"):
             self.tag = "-".join([args.prefix, os.path.split(args.dockerfile)[-1]])
         else:
             self.tag = args.prefix + os.path.split(args.dockerfile)[-1]
