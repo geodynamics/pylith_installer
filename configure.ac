@@ -142,6 +142,14 @@ AC_ARG_ENABLE([python],
 	[install_python=no])
 AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
 
+# COVERAGE
+AC_ARG_ENABLE([coverage],
+    [AC_HELP_STRING([--enable-coverage],
+        [install Python coverage @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_coverage=yes; else install_coverage=no; fi],
+	[install_coverage=no])
+AM_CONDITIONAL([INSTALL_COVERAGE], [test "$install_coverage" = yes])
+
 # SPHINX
 AC_ARG_ENABLE([sphinx],
     [AC_HELP_STRING([--enable-sphinx],

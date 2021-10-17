@@ -20,7 +20,6 @@ RUN dnf install -y \
     python3 \
     python3-devel \
     python3-pip \
-    python3-coverage \
     zlib \
     zlib-devel \
     blas \

@@ -282,6 +282,9 @@ installed_python:
 if INSTALL_NETCDFPY
 	$(env_flags_python) $(PYTHON) -m pip install cftime
 endif
+if INSTALL_COVERAGE
+	$(env_flags_python) $(PYTHON) -m pip install coverage
+endif
 if INSTALL_SPHINX
 	$(env_flags_deps) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif

@@ -13,11 +13,6 @@ RUN apt-get update \
       python3-dev \
       libpython3.8 \
       python3-pip \
-      python3-setuptools \
-      python3-numpy \
-      python3-cftime \
-      python3-six \
-      python3-coverage \
       python3-autopep8 \
       python3-matplotlib \
       cython3 \
@@ -93,14 +88,11 @@ RUN ${src_dir}/configure --prefix=${DEPS_DIR} --with-fetch=curl \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
-    --disable-numpy \
-    --disable-setuptools \
-    --disable-cftime \
-    --disable-six \
     --disable-proj \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \
+    --enable-coverage \
     --enable-sphinx \
     && make -C dependencies \
     && rm -r /opt/pylith-installer

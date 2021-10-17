@@ -19,7 +19,6 @@ RUN apt-get update \
       libpython3.9 \
       python3-venv \
       python3-pip \
-      python3-coverage \
       zlib1g-dev \
       unzip \
       git \
