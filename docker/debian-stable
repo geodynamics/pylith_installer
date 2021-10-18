@@ -38,6 +38,7 @@ RUN apt-get update \
       lcov \
       gdb \
       valgrind \
+      gnupg2 \
       vim-common \
       vim-runtime \
       vim-nox
