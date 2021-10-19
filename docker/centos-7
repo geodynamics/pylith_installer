@@ -52,9 +52,7 @@ from build-${BUILD_ENV} as build-deps
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.9 \
-    HDF5_LIBDIR=${INSTALL_DIR}/lib \
-    HDF5_INCDIR=${INSTALL_DIR}/include    
+    PYTHON_VERSION=3.9
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
@@ -63,7 +61,9 @@ ENV  TOPSRC_DIR=${HOME}/src \
      TOPBUILD_DIR=${HOME}/build \
      PATH=${INSTALL_DIR}/bin:$PATH \
      LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
+     HDF5_LIBDIR=${INSTALL_DIR}/lib \
+     HDF5_INCDIR=${INSTALL_DIR}/include    
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
