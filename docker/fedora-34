@@ -1,6 +1,10 @@
 # libz does not appear to be compatible.
+ARG BUILD_ENV=nocerts
 FROM fedora:34 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
 
 RUN dnf install -y \
     gcc \
@@ -16,12 +20,6 @@ RUN dnf install -y \
     python3 \
     python3-devel \
     python3-pip \
-    python3-setuptools \
-    python3-numpy \
-    python3-cftime \
-    python3-coverage \
-    python3-six \
-    python3-Cython \
     zlib \
     zlib-devel \
     blas \
@@ -46,7 +44,6 @@ RUN dnf install -y \
     sqlite-devel \
     proj \
     proj-devel \
-    proj-data-north-america \
     cmake \
     swig \
     lcov \
@@ -55,53 +52,58 @@ RUN dnf install -y \
     vim \
     vim-common
 
-ENV PATH $PATH:/usr/lib64/openmpi/bin
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
 
-COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
-RUN update-ca-trust enable
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt 
 
-
-ENV PYTHON_VERSION 3.9
-ENV HDF5_INCDIR=/usr/include/openmpi-x86_64  HDF5_LIBDIR=/usr/lib64/openmpi/lib
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from os-update as build-deps
+from build-${BUILD_ENV} as build-deps
+
+ENV TEST_USER=pylith-tester \
+    INSTALL_DIR=/opt/pylith \
+    PYTHON_VERSION=3.9 \
+    HDF5_INCDIR=/usr/include/openmpi-x86_64 \
+    HDF5_LIBDIR=/usr/lib64/openmpi/lib
 
 # Create 'pylith-tester' user
-ENV TEST_USER pylith-tester
 RUN useradd --create-home --shell /bin/bash $TEST_USER
-ENV  INSTALL_DIR=/opt/pylith  HOME=/home/$TEST_USER
-ENV  TOPSRC_DIR=$HOME/src  TOPBUILD_DIR=$HOME/build
-
+ENV  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=${HOME}/src \
+     TOPBUILD_DIR=${HOME}/build \
+     PATH=${INSTALL_DIR}/bin:/usr/lib64/openmpi/bin:$PATH \
+     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
-ENV PATH=$PATH:$INSTALL_DIR/dependencies/bin \
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INSTALL_DIR/dependencies/lib:$INSTALL_DIR/dependencies/lib64 \
-    PYTHONPATH=${PYTHONPATH}:${INSTALL_DIR}/dependencies/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/dependencies/lib64/python${PYTHON_VERSION}/site-packages
+
+# ------------------------------------------------------------------------------
 USER ${TEST_USER}
-
-# PyLith installer
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
-RUN mkdir -p ${TOPSRC_DIR} && mkdir -p ${TOPBUILD_DIR}
-
+RUN mkdir -p ${TOPSRC_DIR} && \
+    mkdir -p ${TOPBUILD_DIR} && \
+    mkdir -p ${build_dir}
+    
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
 
-RUN mkdir -p ${build_dir}
 WORKDIR ${build_dir}
-RUN ${src_dir}/configure --prefix=${INSTALL_DIR}/cig --with-fetch=curl \
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --with-make-threads=`nproc` \
     --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
-    --with-deps-prefix=${INSTALL_DIR}/dependencies \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
-    --disable-setuptools \
-    --disable-numpy \
     --disable-hdf5 \
     --disable-proj \
     --enable-h5py \

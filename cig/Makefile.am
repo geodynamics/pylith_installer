@@ -16,8 +16,6 @@
 include $(top_srcdir)/packages.am
 include $(top_srcdir)/environment.am
 
-PYTHONUSERBASE=${prefix}
-
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
@@ -68,7 +66,7 @@ else
 endif
 	$(MKDIR_P) pythia-build
 	cd pythia-build && \
-		../pythia-$(PYTHIA_VER)/configure \
+		../pythia-$(PYTHIA_VER)/configure --enable-testing \
 			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
 		make && \
 		make install && \
@@ -109,11 +107,11 @@ endif
 			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
-		make -j $(make_threads) && \
+		make -j$(make_threads) && \
 		make install
 if WITH_TESTING
 	cd spatialdata-build && \
-		make -j $(make_threads) check && \
+		make -j$(make_threads) check && \
 		touch $(abs_builddir)/installed_spatialdata
 else
 	touch $(abs_builddir)/installed_spatialdata
@@ -181,7 +179,7 @@ installed_petsc:
 # pylith
 # ----------------------------------------------------------------------
 pylith: installed_pythia installed_spatialdata installed_petsc
-pylith_options = --enable-netcdf --enable-hdf5
+pylith_options = --enable-cubit --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing
 endif

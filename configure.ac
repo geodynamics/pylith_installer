@@ -23,6 +23,19 @@ AM_INIT_AUTOMAKE([foreign tar-pax])
 # ----------------------------------------------------------------------
 # SOFTWARE TO INSTALL
 # ----------------------------------------------------------------------
+AC_ARG_WITH([cert-path],
+    [AC_HELP_STRING([--with-cert-path],
+        [absolute path to SSL certificates @<:@default=no@:>@])],
+	[cert_path=$withval],
+	[cert_path=no])
+AC_SUBST(cert_path)
+AC_ARG_WITH([cert-file],
+    [AC_HELP_STRING([--with-cert-file],
+        [name of SSL certificate file @<:@default=no@:>@])],
+	[cert_file=$withval],
+	[cert_file=no])
+AC_SUBST(cert_file)
+AM_CONDITIONAL([WITH_CERT], [test "$cert_path" != no])
 
 # FORCE INSTALLATION
 AC_ARG_ENABLE([force-install],
@@ -129,51 +142,13 @@ AC_ARG_ENABLE([python],
 	[install_python=no])
 AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
 
-# SETUPTOOLS
-AC_ARG_ENABLE([setuptools],
-    [AC_HELP_STRING([--enable-setuptools],
-        [install setuptools @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
-	[install_setuptools=yes])
-AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
-
-# CYTHON
-AC_ARG_ENABLE([cython],
-    [AC_HELP_STRING([--enable-cython],
-        [install cython @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
-	[install_cython=no])
-AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
-
-# NUMPY
-AC_ARG_ENABLE([numpy],
-    [AC_HELP_STRING([--enable-numpy],
-        [install numpy @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
-	[install_numpy=yes])
-AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
-AC_ARG_WITH([numpy-blaslapack],
-    [AC_HELP_STRING([--with-numpy-blaslapack],
-        [Numpy w/BLAS/Lapack @<:@default=yes@:>@])],
-	[with_numpy_blaslapack=$withval],
-	[with_numpy_blaslapack=yes])
-AM_CONDITIONAL([NUMPY_NOBLASLAPACK], [test "$with_numpy_blaslapack" = no])
-
-# SIX
-AC_ARG_ENABLE([six],
-    [AC_HELP_STRING([--enable-six],
-        [install six @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_six=yes; else install_six=no; fi],
-	[install_six=no])
-AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
-
-# CFTIME
-AC_ARG_ENABLE([cftime],
-    [AC_HELP_STRING([--enable-cftime],
-        [install cftime @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_cftime=yes; else install_cftime=no; fi],
-	[install_cftime=no])
-AM_CONDITIONAL([INSTALL_CFTIME], [test "$install_cftime" = yes])
+# COVERAGE
+AC_ARG_ENABLE([coverage],
+    [AC_HELP_STRING([--enable-coverage],
+        [install Python coverage @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_coverage=yes; else install_coverage=no; fi],
+	[install_coverage=no])
+AM_CONDITIONAL([INSTALL_COVERAGE], [test "$install_coverage" = yes])
 
 # SPHINX
 AC_ARG_ENABLE([sphinx],
@@ -222,6 +197,26 @@ AC_ARG_WITH([sqlite-libdir],
 	[with_sqlite_libdir=$withval],
 	[with_sqlite_libdir=no])
 AC_SUBST(with_sqlite_libdir)
+
+# TIFF
+AC_ARG_ENABLE([tiff],
+    [AC_HELP_STRING([--enable-tiff],
+        [install Tiff @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_tiff=yes; else install_tiff=no; fi],
+	[install_tiff=no])
+AM_CONDITIONAL([INSTALL_TIFF], [test "$install_tiff" = yes])
+AC_ARG_WITH([tiff-incdir],
+    [AC_HELP_STRING([--with-tiff-incdir],
+        [location of tiff header files @<:@default=no@:>@])],
+	[with_tiff_incdir=$withval],
+	[with_tiff_incdir=no])
+AC_SUBST(with_tiff_incdir)
+AC_ARG_WITH([tiff-libdir],
+    [AC_HELP_STRING([--with-tiff-libdir],
+        [location of tiff library @<:@default=no@:>@])],
+	[with_tiff_libdir=$withval],
+	[with_tiff_libdir=no])
+AC_SUBST(with_tiff_libdir)
 
 # PROJ
 AC_ARG_ENABLE([proj],
@@ -330,10 +325,10 @@ AC_SUBST(spatialdata_repo)
 # pylith git
 AC_ARG_WITH([pylith-git],
     [AC_HELP_STRING([--with-pylith-git],
-        [use PyLith from GitHub repository (master, maint, BRANCH) @<:@default=no@:>@])],
+        [use PyLith from GitHub repository (main, BRANCH) @<:@default=no@:>@])],
 	[pylith_git=$withval],
 	[pylith_git=no])
-if test "$pylith_git" = yes ; then pylith_git="master"; fi
+if test "$pylith_git" = yes ; then pylith_git="main"; fi
 AC_SUBST(pylith_git)
 AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
 AC_ARG_WITH([pylith-repo],
@@ -376,15 +371,6 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------
-# Separate install location for dependencies
-if test "$prefix" = "NONE" ; then prefix=$ac_default_prefix; fi
-AC_ARG_WITH([deps-prefix],
-    [AC_HELP_STRING([--with-deps-prefix],
-        [Install dependencies to separate directory from CIG code. @<:@default=no@:>@])],
-	[if test "$withval" = no; then prefix_deps=$prefix; else prefix_deps=$withval; fi],
-	[prefix_deps=$prefix])
-AC_SUBST(prefix_deps)
-
 # Debugging
 AC_ARG_WITH([debugging],
     [AC_HELP_STRING([--with-debugging],
@@ -488,7 +474,7 @@ if test "$pylith_git" != no; then
       AC_MSG_FAILURE([cannot find 'git' program.])
     fi
   else
-    GIT=$prefix_deps/bin/git
+    GIT=$prefix/bin/git
     AC_SUBST(GIT)
   fi
   petsc_git=yes
@@ -527,7 +513,7 @@ fi
 
 # Python
 if test "$install_python" = yes ; then
-  PYTHON=$prefix_deps/bin/python
+  PYTHON=$prefix/bin/python3
   PYTHON_VERSION=3.9.1
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
@@ -539,24 +525,6 @@ if test "$install_python" = yes ; then
                 ])
   fi
 
-  # install setuptools
-  if test "$install_setuptools" != yes ; then
-    AC_MSG_WARN([Building Python requires building setuptools as well. Adding installation of setuptools.])
-  fi
-  install_setuptools=yes
-  
-  # install cython
-  if test "$install_cython" != yes ; then
-    AC_MSG_WARN([Building Python requires building cython as well. Adding installation of cython.])
-  fi
-  install_cython=yes
-  
-  # install numpy
-  if test "$install_numpy" != yes ; then
-    AC_MSG_WARN([Building Python requires building numpy as well. Adding installation of numpy.])
-  fi
-  install_numpy=yes
-  
   # install pythia
   if test "$install_pythia" != yes ; then
     AC_MSG_WARN([Building Python requires building pythia/pyre as well. Adding installation of pythia/pyre.])
@@ -569,11 +537,14 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([3.6])
+  AM_PATH_PYTHON([3.7])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED
   CIT_PYTHON_MODULE([zlib])
+  # Python will be installed as virtual environment to $prefix
+  PYTHON=$prefix/bin/python3
+  AC_SUBST(PYTHON)
 fi
 AC_CHECK_LIB([z], [deflate], 
   [],
@@ -649,20 +620,12 @@ else
   fi
 fi
 
-# numpy
-if test "$install_numpy" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  CIT_NUMPY_PYTHON_MODULE
-  CIT_NUMPY_INCDIR
-fi
-
 # sqlite
 if test "$install_sqlite" = yes ; then
   AC_PATH_PROG(existing_sqlite, sqlite)
   AC_SUBST(existing_sqlite)
-  SQLITE3_INCLUDES="-I$prefix_deps/include"
-  SQLITE3_LDFLAGS="-L$prefix_deps/lib"
+  SQLITE3_INCLUDES="-I$prefix/include"
+  SQLITE3_LDFLAGS="-L$prefix/lib"
 else
   if test "$with_sqlite_incdir" != no; then
     SQLITE3_INCLUDES="-I$with_sqlite_incdir"
@@ -680,12 +643,25 @@ AC_SUBST(SQLITE3_LDFLAGS)
 if test "$install_proj" = yes ; then
   AC_PATH_PROG(existing_proj, proj)
   AC_SUBST(existing_proj)
-  # Installing datums requires unzip
-  AC_PATH_PROG(UNZIP, unzip)
-  if test -z "$UNZIP" ; then
-    AC_MSG_FAILURE([cannot find 'unzip' program.])
-    UNZIP=`echo "Error: unzip is not installed." ; false`
+
+  # Installing Proj requires tiff
+  if test "$install_tiff" = yes ; then
+    AC_PATH_PROG(existing_tiff, tiff)
+    AC_SUBST(existing_tiff)
+    TIFF_INCLUDES="-I$prefix/include"
+    TIFF_LDFLAGS="-L$prefix/lib"
+  else
+    if test "$with_tiff_incdir" != no; then
+      TIFF_INCLUDES="-I$with_tiff_incdir"
+    fi
+    if test "$with_tiff_libdir" != no; then
+      TIFF_LDFLAGS="-L$with_tiff_libdir"
+    fi
+    CIT_TIFF_HEADER
+    CIT_TIFF_LIB
   fi
+  AC_SUBST(TIFF_INCLUDES)
+  AC_SUBST(TIFF_LDFLAGS)
 else
   if test "$with_proj_incdir" != no; then
     PROJ_INCLUDES="-I$with_proj_incdir"
@@ -704,10 +680,10 @@ if test "$install_hdf5" = yes ; then
   # Need to account for PETSc option --download-hdf5=1.
   AC_PATH_PROG(existing_hdf5, h5dump)
   AC_SUBST(existing_hdf5)
-  HDF5_INCDIR=$prefix_deps/include
-  HDF5_LIBDIR=$prefix_deps/lib
-  HDF5_INCLUDES="-I$prefix_deps/include"
-  HDF5_LDFLAGS="-L$prefix_deps/lib"
+  HDF5_INCDIR=$prefix/include
+  HDF5_LIBDIR=$prefix/lib
+  HDF5_INCLUDES="-I$prefix/include"
+  HDF5_LDFLAGS="-L$prefix/lib"
 else
   if test "$with_hdf5_incdir" != no; then
     HDF5_INCDIR="$with_hdf5_incdir"
@@ -731,15 +707,7 @@ AC_SUBST(HDF5_LDFLAGS)
 
 # H5PY
 if test "$install_h5py" = yes ; then
-  if test "$install_python" = yes ; then
-    if test "$install_six" != yes ; then
-      AC_MSG_WARN([Building Python requires building six (for h5py) as well. Adding installation of six.])
-    fi
-    install_six=yes
-  fi
-  if test "$install_six" = no ; then
-    CIT_PYTHON_MODULE([six],[1.0.0])
-  fi
+  x=1
 else
   if test "$with_h5py" = yes ; then
     CIT_PYTHON_MODULE([h5py],[2.0.0])
@@ -750,8 +718,8 @@ fi
 if test "$install_netcdf" = yes ; then
   AC_PATH_PROG(existing_netcdf, ncdump)
   AC_SUBST(existing_netcdf)
-  NETCDF_INCDIR="$prefix_deps/include"
-  NETCDF_LIBDIR="$prefix_deps/lib"
+  NETCDF_INCDIR="$prefix/include"
+  NETCDF_LIBDIR="$prefix/lib"
 else
   if test "$with_netcdf_incdir" != no; then
     NETCDF_INCDIR="$with_netcdf_incdir"
@@ -814,16 +782,6 @@ else
   fi
 fi
 
-# setuptools
-if test "$install_setuptools" = yes ; then
-  # Installing setuptools requires unzip
-  AC_PATH_PROG(UNZIP, unzip)
-  if test -z "$UNZIP" ; then
-    AC_MSG_FAILURE([cannot find 'unzip' program.])
-    UNZIP=`echo "Error: unzip is not installed." ; false`
-  fi
-fi
-
 # spatialdata
 if test "$install_spatialdata" = yes ; then
   AC_PATH_PROG(existing_spatialdata, gensimpledb.py)
@@ -854,6 +812,14 @@ fi
 # SQLITE
 if test -n "$existing_sqlite"; then
   printf "WARNING: Existing version of SQLITE installed. Found $existing_sqlite\n"
+  if test "$force_install" != yes ; then
+    existing_fail=yes
+  fi
+fi
+
+# TIFF
+if test -n "$existing_tiff"; then
+  printf "WARNING: Existing version of TIFF installed. Found $existing_tiff\n"
   if test "$force_install" != yes ; then
     existing_fail=yes
   fi
@@ -924,26 +890,14 @@ fi
 # ----------------------------------------------------------------------
 AC_CANONICAL_HOST
 # Setup environment so dependencies are used in build
-if test "X${prefix_deps}" = "X${prefix}" ; then
-  CPPFLAGS="-I$prefix/include $CPPFLAGS"
-else
-  CPPFLAGS="-I$prefix_deps/include -I$prefix/include $CPPFLAGS"
-fi
+CPPFLAGS="-I$prefix/include $CPPFLAGS"
 
 case $host_os in
   darwin*)
-    if test "X${prefix_deps}" = "X${prefix}" ; then
-      LDFLAGS="-L$prefix/lib $LDFLAGS"
-    else
-      LDFLAGS="-L$prefix_deps/lib -L$prefix/lib $LDFLAGS"
-    fi
+    LDFLAGS="-L$prefix/lib $LDFLAGS"
     ;;
   *)
-    if test "X${prefix_deps}" = "X${prefix}" ; then
-      LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
-    else
-      LDFLAGS="-L$prefix_deps/lib -L$prefix_deps/lib64 -L$prefix/lib -L$prefix/lib64 $LDFLAGS"
-    fi
+    LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
   ;;
 esac
 AC_SUBST(CPPFLAGS)
@@ -957,20 +911,12 @@ if test "X${PATH}" = X ; then
 else
   echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
 fi
-if test "X${prefix_deps}" != "X${prefix}"; then
-  TEMPVAR="$prefix_deps/bin"
-  echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
-fi
 
 case $host_os in
   darwin*)
     ;;
   *)
-    if test "X${prefix_deps}" = "X${prefix}"; then
-      TEMPVAR="$prefix/lib:$prefix/lib64"
-    else
-      TEMPVAR="$prefix_deps/lib:$prefix_deps/lib64:$prefix/lib:$prefix/lib64"
-    fi
+    TEMPVAR="$prefix/lib:$prefix/lib64"
     if test "X${LD_LIBRARY_PATH}" = X ; then
       echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
     else
@@ -979,12 +925,7 @@ case $host_os in
     ;;
 esac
 
-if test "X${prefix_deps}" = "X${prefix}"; then
-  TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
-else
-  TEMPVAR="$prefix_deps/lib/python$PYTHON_VERSION/site-packages:$prefix_deps/lib64/python$PYTHON_VERSION/site-packages"
-  TEMPVAR="$TEMPVAR:$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
-fi
+TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
 if test "X$PYTHONPATH" = X ; then
   echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
 else
@@ -1026,15 +967,11 @@ printf "  cppunit: $install_cppunit\n"
 printf "  openssl: $install_openssl\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
-printf "    setuptools: $install_setuptools\n"
-printf "    cython: $install_cython\n"
-printf "    numpy: $install_numpy    detect BLAS/Lapack=$with_numpy_blaslapack\n"
-printf "    six: $install_six (required by h5py)\n"
-printf "    cftime: $install_cftime (required by netCDF4)\n"
 printf "    h5py: $install_h5py\n"
 printf "    netCDF4 (python): $install_netcdfpy (optional; post-processing)\n"
 printf "    sphinx: $install_sphinx (optional; generate documentation)\n"
 printf "  sqlite: $install_sqlite\n"
+printf "  tiff: $install_tiff\n"
 printf "  proj: $install_proj\n"
 printf "  hdf5: $install_hdf5\n"
 printf "  netcdf: $install_netcdf\n"
@@ -1066,9 +1003,7 @@ printf "  build PyLith and it dependencies or add these settings to your \n"
 printf "  .bashrc or equivalent file and open a new terminal (i.e., shell).\n"
 printf "\n"
 printf "  Step 2\n"
-printf "  Running \"make\" will install\n"
-printf "      PyLith dependencies to $prefix_deps.\n"
-printf "      PyLith to $prefix.\n"
+printf "  Running \"make\" will install PyLith to $prefix.\n"
 printf "\n"
 printf "  Step 3\n"
 printf "  If you did not setup your .bashrc with the environment variables, be sure \n"
