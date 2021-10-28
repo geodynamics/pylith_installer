@@ -29,7 +29,8 @@ The Docker image also defines the environment:
 | `PETSC_DIR`          |         `${TOPSRC_DIR}/petsc`         | Directory for PETSc                                     |
 | `PETSC_ARCH`         |          `arch-pylith-debug`          | Build label for PETSc debugging configuration           |
 | `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith`        | Top-level directory where we build PyLith [^vscode]     |
-| `CIGDEPS_DIR`        |           `${INSTALL_DIR}`            | Directory containing CIG-related dependencies [^vscode] |
+| `PYLITH_DIR`        |           `${INSTALL_DIR}`            | Directory containing CIG-related dependencies [^vscode] |
+| `PYLITHDEPS_DIR`        |           `/opt/dependencies`            | Directory containing external dependencies [^vscode] |
 | `PYTHON_INCDIR`      |       `/usr/include/python3.8`        | Directory containing Python header files [^vscode]      |
 | `MPI_INCDIR`         | `/usr/include/x86_64-linux-gnu/mpich` | Directory containing MPI header files [^vscode]         |
 | `PROJ_INCDIR`        |            `/usr/include`             | Directory containing Proj header files [^vscode]        |
@@ -64,7 +65,7 @@ This creates copies of the repositories in your GitHub account.
 
 On your local machine, create a Docker volume for persistent storage.
 
-```bash
+```{code-block} bash
 docker volume create pylith-dev
 ```
 
@@ -76,7 +77,7 @@ Running the command below will:
 2. Mount the docker volume with persistent storage at `/opt/pylith`. 
 3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
 
-```bash
+```{code-block} bash
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
@@ -89,7 +90,7 @@ Closing the `pylith-dev-workspace` Docker container interactive shell (terminal)
 
 We will use the following directory structure for the persistent storage.
 
-```bash
+```{code-block} bash
 /opt/pylith
     ├── src
     │    ├── pythia
@@ -123,7 +124,7 @@ All of the source code will be placed under `/opt/pylith/src`. You only need to 
 This directory structure is set up for both a debugging version for development (debug directory) and an optimized version for performance testing (opt directory).
 For now, we will only setup the debugging version.
 
-```bash
+```{code-block} bash
 cd /opt/pylith
 mkdir src
 mkdir -p ${TOPBUILD_DIR} && pushd ${TOPBUILD_DIR} && mkdir pythia spatialdata pylith && popd
@@ -140,7 +141,7 @@ Starting at this step, you can use the `developer-helper.py` Python script (see 
 This script and the default configuration file are in the `/opt/pylith-devenv` directory.
 :::
 
-```bash
+```{code-block} bash
 cd /opt/pylith/src
 git clone --recursive https://github.com/geodynamics/pythia.git
 git clone --recursive https://github.com/geodynamics/spatialdata.git
@@ -153,7 +154,7 @@ git clone --branch knepley/pylith https://gitlab.com/petsc/petsc.git
 For the PyLith repository and any other repositories that you forked, you should set the upstream repository.
 The upstream repository is the central, community repository from which you will get updates.
 
-```bash
+```{code-block} bash
 # PyLith repository (repeat for other repositories you forked)
 cd /opt/pylith/src/pylith
 git remote add upstream https://github.com/geodynamics/pylith.git
@@ -165,7 +166,7 @@ git remote add upstream https://github.com/geodynamics/pylith.git
 For any of the repositories that you forked, you will encounter an error when it tries to clone the `m4` submodule, which has a relative link.
 The error message will be similar to:
 
-```bash
+```{code-block} bash
 Cloning into '/opt/pylith/src/pylith/m4'...
 remote: Repository not found.
 fatal: repository 'https://github.com/GITHUB_USERNAME/autoconf_cig.git/' not found
@@ -176,7 +177,7 @@ Failed to clone 'm4'. Retry scheduled
 The best workaround is to redirect your local clone to the geodynamics repository.
 You only need to do this once after cloning.
 
-```bash
+```{code-block} bash
 # Set URLs for submodules in `.git/config` to geodynamics repository (PyLith repository).
 cd /opt/pylith/src/pylith
 git config submodule.m4.url https://github.com/geodynamics/autoconf_cig.git
@@ -188,9 +189,18 @@ git submodule update
 ```
 
 :::{note}
-We use a relative link so that the GitLab mirror works correctly in our GitLab CI test runners.
+We use a relative link so that the GitLab mirror works correctly.
 The consequence of using a relative link is that your local clone will look for a corresponding fork of the `autoconf_cig` repository.
 :::
+
+### Setup Python virtual environment
+
+We use a Python virtual environment, so that we can install Python modules using the Pip module.
+The Docker container explicitly sets the environment variables to make use of this virtual environment, so you do not need to manually activate it.
+
+```{code-block} bash
+python3 -m venv ${PYLITH_DIR}
+```
 
 ### Configure and build PyLith for development
 
@@ -210,56 +220,56 @@ You can often find speedup with up to twice as many threads as the number of cor
 
 #### Pythia
 
-```bash
+```{code-block} bash
 cd ${TOPBUILD_DIR}/pythia
 pushd ${TOPSRC_DIR}/pythia && autoreconf -if && popd
-${TOPSRC_DIR}/pythia/configure --prefix=${INSTALL_DIR} --enable-testing \
-    CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-std=c++11 -g -Wall"
+${TOPSRC_DIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
+    CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
 make install
 make check
 ```
 
 #### Spatialdata
 
-```bash
+```{code-block} bash
 cd ${TOPBUILD_DIR}/spatialdata
 pushd ${TOPSRC_DIR}/spatialdata && autoreconf -if && popd
-${TOPSRC_DIR}/spatialdata/configure --prefix=${INSTALL_DIR} \
+${TOPSRC_DIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
     --enable-swig --enable-testing --enable-test-coverage \
-    --with-python-coverage=python3-coverage \
-	CPPFLAGS="-I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
-	LDFLAGS="-L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib --coverage" \
-	CXX=mpicxx CXXFLAGS="-std=c++11 -g -Wall --coverage"
+    --with-python-coverage=coverage3 \
+	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
+	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
+	CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
 
 #### PETSc
 
-```bash
+```{code-block} bash
 cd ${TOPSRC_DIR}/petsc
 python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
     --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
     --with-hdf5=1 --download-chaco=1 --download-ml=1 \
     --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
-    CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
-    LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib"
+    CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include" \
+    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib"
 make 
 make check
 ```
 
 #### PyLith
 
-```bash
+```{code-block} bash
 cd ${TOPBUILD_DIR}/pylith
 pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
-${TOPSRC_DIR}/pylith/configure --prefix=${INSTALL_DIR} \
+${TOPSRC_DIR}/pylith/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
-    --enable-test-coverage --with-python-coverage=python3-coverage \
-    CPPFLAGS="-I${HDF5_INCDIR} -I${DEPS_DIR}/include -I${INSTALL_DIR}/include" \
-    LDFLAGS="-L${HDF5_LIBDIR} -L${DEPS_DIR}/lib -L${INSTALL_DIR}/lib --coverage" \
-    CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-std=c++11 -g -Wall --coverage"
+    --enable-test-coverage --with-python-coverage=coverage3 \
+    CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
+    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
+    CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
@@ -278,7 +288,7 @@ The fix is to run the container in privileged mode as root and restart the `proc
 
 ```{code-block} bash
 # Run docker image in privileged mode as root.
-docker run -ti --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
 
 # Verify ptrace setting needs updating
 cat /proc/sys/kernel/yama/ptrace_scope
@@ -327,7 +337,7 @@ We recommend also installing the following extensions:
 
 Whenever you need to restart the `pylith-dev-workspace` Docker container, simply run
 
-```bash
+```{code-block} bash
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```

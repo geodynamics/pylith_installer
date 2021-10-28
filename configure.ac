@@ -142,21 +142,13 @@ AC_ARG_ENABLE([python],
 	[install_python=no])
 AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
 
-# COVERAGE
-AC_ARG_ENABLE([coverage],
-    [AC_HELP_STRING([--enable-coverage],
-        [install Python coverage @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_coverage=yes; else install_coverage=no; fi],
-	[install_coverage=no])
-AM_CONDITIONAL([INSTALL_COVERAGE], [test "$install_coverage" = yes])
-
-# SPHINX
-AC_ARG_ENABLE([sphinx],
-    [AC_HELP_STRING([--enable-sphinx],
-        [install sphinx @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_sphinx=yes; else install_sphinx=no; fi],
-	[install_sphinx=no])
-AM_CONDITIONAL([INSTALL_SPHINX], [test "$install_sphinx" = yes])
+# DEVELOPER
+AC_ARG_ENABLE([developer],
+    [AC_HELP_STRING([--enable-developer],
+        [install Python packages for PyLith development @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_developer=yes; else install_developer=no; fi],
+	[install_developer=no])
+AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
