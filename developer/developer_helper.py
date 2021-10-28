@@ -46,11 +46,11 @@ class Package():
     def _git_current_branch(self):
         """Get current git branch.
         """
-        src_dir = self.base["src_dir"]
+        src_dir = self._get_src_dir()
         if not os.path.exists(src_dir):
             return None
-        proc = subprocess.run("git branch", cwd=self.base["src_dir"])
-        lines = proc.stdout.splitlines()
+        proc = subprocess.run(["git", "branch"], cwd=src_dir, capture_output=True)
+        lines = proc.stdout.decode("utf-8").splitlines()
         for line in lines:
             if line.startswith("* "):
                 branch = line[2:].strip()
@@ -300,8 +300,8 @@ class Petsc(Package):
                 "CFLAGS='-g -O3 -DNDEBUG'",
                 ]
         args += [
-            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include -I{install_dir}/include\"",
-            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib -L{install_dir}/lib\"",
+            f"CPPFLAGS=\"-I$HDF5_INCDIR -I{self.base['deps_dir']}/include\"",
+            f"LDFLAGS=\"-L$HDF5_LIBDIR -L{self.base['deps_dir']}/lib\"",
             f"PETSC_DIR={self.petsc_dir}",
             f"PETSC_ARCH={self.petsc_arch}",
         ]
