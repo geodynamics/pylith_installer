@@ -23,8 +23,22 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
 
 # ----------------------------------------------------------------------
-# SOFTWARE TO INSTALL
+# SETUP
 # ----------------------------------------------------------------------
+AC_ARG_WITH([cert-path],
+    [AC_HELP_STRING([--with-cert-path],
+        [absolute path to SSL certificates @<:@default=no@:>@])],
+	[cert_path=$withval],
+	[cert_path=no])
+AC_SUBST(cert_path)
+AC_ARG_WITH([cert-file],
+    [AC_HELP_STRING([--with-cert-file],
+        [name of SSL certificate file @<:@default=no@:>@])],
+	[cert_file=$withval],
+	[cert_file=no])
+AC_SUBST(cert_file)
+AM_CONDITIONAL([WITH_CERT], [test "$cert_path" != no])
+
 
 # FORCE INSTALLATION
 AC_ARG_ENABLE([force-install],
@@ -33,6 +47,10 @@ AC_ARG_ENABLE([force-install],
 	[if test "$enableval" != no ; then force_install=yes; else force_install=no; fi],
 	[force_install=no])
 
+
+# ----------------------------------------------------------------------
+# SOFTWARE TO INSTALL
+# ----------------------------------------------------------------------
 # AUTOTOOLS
 AC_ARG_ENABLE([autotools],
     [AC_HELP_STRING([--enable-autotools],
@@ -40,6 +58,16 @@ AC_ARG_ENABLE([autotools],
 	[if test "$enableval" != no ; then install_autotools=yes; else install_autotools=no; fi],
 	[install_autotools=no])
 AM_CONDITIONAL([INSTALL_AUTOTOOLS], [test "$install_autotools" = yes])
+
+
+# CMAKE
+AC_ARG_ENABLE([cmake],
+    [AC_HELP_STRING([--enable-cmake],
+        [install CMAKE @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cmake=yes; else install_cmake=no; fi],
+	[install_cmake=yes])
+AM_CONDITIONAL([INSTALL_CMAKE], [test "$install_cmake" = yes])
+
 
 # GCC
 AC_ARG_ENABLE([gcc],
@@ -52,6 +80,7 @@ if test "$gcc_languages" = yes ; then
 fi
 AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
+
 
 # MPI
 AC_ARG_ENABLE([mpi],
@@ -71,37 +100,36 @@ if test "$install_mpi" = mpich ; then
 fi
 AC_SUBST(mpich_sharedarch)  
 
-# CPPUNIT
-AC_ARG_ENABLE([cppunit],
-    [AC_HELP_STRING([--enable-cppunit],
-        [install CppUnit @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
-	[install_cppunit=yes])
-AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
 
-# PROJ4
-AC_ARG_ENABLE([proj4],
-    [AC_HELP_STRING([--enable-proj4],
-        [install Proj4 @<:@default=yes@:>@])],
-	[if test "$enableval" = "yes" ; then install_proj4=yes; else install_proj4=no; fi],
-	[install_proj4=yes])
-AM_CONDITIONAL([INSTALL_PROJ4], [test "$install_proj4" = yes])
+# PCRE
+AC_ARG_ENABLE([pcre],
+    [AC_HELP_STRING([--enable-pcre],
+        [install PCRE @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
+	[install_pcre=no])
+AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
+AC_ARG_WITH([pcre-incdir],
+    [AC_HELP_STRING([--with-pcre-incdir],
+        [location of pcre header files @<:@default=no@:>@])],
+	[with_pcre_incdir=$withval],
+	[with_pcre_incdir=no])
+AC_SUBST(with_pcre_incdir)
+AC_ARG_WITH([pcre-libdir],
+    [AC_HELP_STRING([--with-pcre-libdir],
+        [location of pcre library @<:@default=no@:>@])],
+	[with_pcre_libdir=$withval],
+	[with_pcre_libdir=no])
+AC_SUBST(with_pcre_libdir)
 
-# HDF5
-AC_ARG_ENABLE([hdf5],
-    [AC_HELP_STRING([--enable-hdf5],
-        [install HDF5 @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
-	[install_hdf5=yes])
-AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
-# NETCDF
-AC_ARG_ENABLE([netcdf],
-    [AC_HELP_STRING([--enable-netcdf],
-        [install NetCDF @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
-	[install_netcdf=yes])
-AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
+# SWIG
+AC_ARG_ENABLE([swig],
+    [AC_HELP_STRING([--enable-swig],
+        [install SWIG @<:@default=no@:>@])],
+	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
+	[install_swig=no])
+AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
+
 
 # OPENSSL
 AC_ARG_ENABLE([openssl],
@@ -111,6 +139,7 @@ AC_ARG_ENABLE([openssl],
 	[install_openssl=no])
 AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
 
+
 # PYTHON
 AC_ARG_ENABLE([python],
     [AC_HELP_STRING([--enable-python],
@@ -118,6 +147,7 @@ AC_ARG_ENABLE([python],
 	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
 	[install_python=yes])
 AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
+
 
 # SETUPTOOLS
 AC_ARG_ENABLE([setuptools],
@@ -127,6 +157,7 @@ AC_ARG_ENABLE([setuptools],
 	[install_setuptools=yes])
 AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
 
+
 # CYTHON
 AC_ARG_ENABLE([cython],
     [AC_HELP_STRING([--enable-cython],
@@ -134,6 +165,7 @@ AC_ARG_ENABLE([cython],
 	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
 	[install_cython=yes])
 AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
+
 
 # PKGCONFIG
 AC_ARG_ENABLE([pkgconfig],
@@ -143,6 +175,7 @@ AC_ARG_ENABLE([pkgconfig],
 	[install_pkgconfig=yes])
 AM_CONDITIONAL([INSTALL_PKGCONFIG], [test "$install_pkgconfig" = yes])
 
+
 # SIX
 AC_ARG_ENABLE([six],
     [AC_HELP_STRING([--enable-six],
@@ -150,6 +183,7 @@ AC_ARG_ENABLE([six],
 	[if test "$enableval" != no ; then install_six=yes; else install_six=no; fi],
 	[install_six=yes])
 AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
+
 
 # NUMPY
 AC_ARG_ENABLE([numpy],
@@ -165,6 +199,7 @@ AC_ARG_WITH([numpy-blaslapack],
 	[with_numpy_blaslapack=no])
 AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
 
+
 # H5PY
 AC_ARG_ENABLE([h5py],
     [AC_HELP_STRING([--enable-h5py],
@@ -172,6 +207,7 @@ AC_ARG_ENABLE([h5py],
 	[if test "$enableval" = yes ; then install_h5py=yes; else install_h5py=no; fi],
 	[install_h5py=yes])
 AM_CONDITIONAL([INSTALL_H5PY], [test "$install_h5py" = yes])
+
 
 # NETCDFPY
 AC_ARG_ENABLE([netcdfpy],
@@ -181,13 +217,107 @@ AC_ARG_ENABLE([netcdfpy],
 	[install_netcdfpy=yes])
 AM_CONDITIONAL([INSTALL_NETCDFPY], [test "$install_netcdfpy" = yes])
 
-# CMAKE
-AC_ARG_ENABLE([cmake],
-    [AC_HELP_STRING([--enable-cmake],
-        [install CMAKE @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_cmake=yes; else install_cmake=no; fi],
-	[install_cmake=yes])
-AM_CONDITIONAL([INSTALL_CMAKE], [test "$install_cmake" = yes])
+
+# CPPUNIT
+AC_ARG_ENABLE([cppunit],
+    [AC_HELP_STRING([--enable-cppunit],
+        [install CppUnit @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
+	[install_cppunit=yes])
+AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
+AC_ARG_WITH([cppunit-incdir],
+    [AC_HELP_STRING([--with-cppunit-incdir],
+        [location of cppunit header files @<:@default=no@:>@])],
+	[with_cppunit_incdir=$withval],
+	[with_cppunit_incdir=no])
+AC_SUBST(with_cppunit_incdir)
+AC_ARG_WITH([cppunit-libdir],
+    [AC_HELP_STRING([--with-cppunit-libdir],
+        [location of cppunit library @<:@default=no@:>@])],
+	[with_cppunit_libdir=$withval],
+	[with_cppunit_libdir=no])
+AC_SUBST(with_cppunit_libdir)
+
+
+# PROJ
+AC_ARG_ENABLE([proj],
+    [AC_HELP_STRING([--enable-proj],
+        [install Proj @<:@default=yes@:>@])],
+	[if test "$enableval" = "yes" ; then install_proj=yes; else install_proj=no; fi],
+	[install_proj=yes])
+AM_CONDITIONAL([INSTALL_PROJ], [test "$install_proj" = yes])
+AC_ARG_WITH([proj-incdir],
+    [AC_HELP_STRING([--with-proj-incdir],
+        [location of proj header files @<:@default=no@:>@])],
+	[with_proj_incdir=$withval],
+	[with_proj_incdir=no])
+AC_SUBST(with_proj_incdir)
+AC_ARG_WITH([proj-libdir],
+    [AC_HELP_STRING([--with-proj-libdir],
+        [location of proj library @<:@default=no@:>@])],
+	[with_proj_libdir=$withval],
+	[with_proj_libdir=no])
+AC_SUBST(with_proj_libdir)
+
+
+# HDF5
+AC_ARG_ENABLE([hdf5],
+    [AC_HELP_STRING([--enable-hdf5],
+        [install HDF5 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_hdf5=yes; else install_hdf5=no; fi],
+	[install_hdf5=yes])
+AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
+AC_ARG_WITH([hdf5-incdir],
+    [AC_HELP_STRING([--with-hdf5-incdir],
+        [location of hdf5 header files @<:@default=no@:>@])],
+	[with_hdf5_incdir=$withval],
+	[with_hdf5_incdir=no])
+AC_SUBST(with_hdf5_incdir)
+AC_ARG_WITH([hdf5-libdir],
+    [AC_HELP_STRING([--with-hdf5-libdir],
+        [location of hdf5 library @<:@default=no@:>@])],
+	[with_hdf5_libdir=$withval],
+	[with_hdf5_libdir=no])
+AC_SUBST(with_hdf5_libdir)
+
+
+# NETCDF
+AC_ARG_ENABLE([netcdf],
+    [AC_HELP_STRING([--enable-netcdf],
+        [install NetCDF @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
+	[install_netcdf=yes])
+AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
+AC_ARG_WITH([netcdf-incdir],
+    [AC_HELP_STRING([--with-netcdf-incdir],
+        [location of netcdf header files @<:@default=no@:>@])],
+	[with_netcdf_incdir=$withval],
+	[with_netcdf_incdir=no])
+AC_SUBST(with_netcdf_incdir)
+AC_ARG_WITH([netcdf-libdir],
+    [AC_HELP_STRING([--with-netcdf-libdir],
+        [location of netcdf library @<:@default=no@:>@])],
+	[with_netcdf_libdir=$withval],
+	[with_netcdf_libdir=no])
+AC_SUBST(with_netcdf_libdir)
+
+
+# pylith git
+AC_ARG_WITH([pylith-git],
+    [AC_HELP_STRING([--with-pylith-git],
+        [use PyLith from GitHub repository (main, BRANCH) @<:@default=no@:>@])],
+	[pylith_git=$withval],
+	[pylith_git=no])
+if test "$pylith_git" = yes ; then pylith_git="main"; fi
+AC_SUBST(pylith_git)
+AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
+AC_ARG_WITH([pylith-repo],
+    [AC_HELP_STRING([--with-pylith-repo],
+        [URL for PyLith Git repository @<:@default=https://github.com/geodynamics/pylith.git@:>@])],
+	[pylith_repo="$withval"],
+	[pylith_repo=https://github.com/geodynamics/pylith.git])
+AC_SUBST(pylith_repo)
+
 
 # PETSC
 AC_ARG_ENABLE([petsc],
@@ -197,6 +327,7 @@ AC_ARG_ENABLE([petsc],
 	[install_petsc=yes])
 AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
 
+
 # SPATIALDATA
 AC_ARG_ENABLE([spatialdata],
     [AC_HELP_STRING([--enable-spatialdata],
@@ -204,6 +335,7 @@ AC_ARG_ENABLE([spatialdata],
 	[if test "$enableval" = yes ; then install_spatialdata=yes; else install_spatialdata=no; fi],
 	[install_spatialdata=yes])
 AM_CONDITIONAL([INSTALL_SPATIALDATA], [test "$install_spatialdata" = yes])
+
 
 # NEMESIS
 AC_ARG_ENABLE([nemesis],
@@ -213,6 +345,7 @@ AC_ARG_ENABLE([nemesis],
 	[install_nemesis=yes])
 AM_CONDITIONAL([INSTALL_NEMESIS], [test "$install_nemesis" = yes])
 
+
 # FIAT
 AC_ARG_ENABLE([fiat],
     [AC_HELP_STRING([--enable-fiat],
@@ -221,21 +354,6 @@ AC_ARG_ENABLE([fiat],
 	[install_fiat=yes])
 AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
 
-# PCRE
-AC_ARG_ENABLE([pcre],
-    [AC_HELP_STRING([--enable-pcre],
-        [install PCRE @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_pcre=yes; else install_pcre=no; fi],
-	[install_pcre=no])
-AM_CONDITIONAL([INSTALL_PCRE], [test "$install_pcre" = yes])
-
-# SWIG
-AC_ARG_ENABLE([swig],
-    [AC_HELP_STRING([--enable-swig],
-        [install SWIG @<:@default=no@:>@])],
-	[if test "$enableval" = "yes" ; then install_swig=yes; else install_swig=no; fi],
-	[install_swig=no])
-AM_CONDITIONAL([INSTALL_SWIG], [test "$install_swig" = yes])
 
 # PYTHIA
 install_pythia=no
@@ -246,6 +364,7 @@ if test "$install_spatialdata" = yes; then
   install_pythia=yes
 fi
 AM_CONDITIONAL([INSTALL_PYTHIA], [test "$install_pythia" = yes])
+
 
 # PARAMTERSGUI (PYLITH-PARAMETERS)
 AC_ARG_ENABLE([parametersgui],
@@ -259,14 +378,6 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------
-# Separate install location for dependencies
-AC_ARG_WITH([deps-prefix],
-    [AC_HELP_STRING([--with-deps-prefix],
-        [Install dependencies to separate directory from CIG code. @<:@default=no@:>@])],
-	[if test "$withval" = no; then prefix_deps=$prefix; else prefix_deps=$withval; fi],
-	[prefix_deps=$prefix])
-AC_SUBST(prefix_deps)
-
 # Debugging
 AC_ARG_WITH([debugging],
     [AC_HELP_STRING([--with-debugging],
@@ -274,6 +385,7 @@ AC_ARG_WITH([debugging],
 	[if test "$withval" = yes; then with_debugging=yes; else with_debugging=no; fi],
 	[with_debugging=no])
 AM_CONDITIONAL([WITH_DEBUGGING], [test "$with_debugging" = yes])
+
 
 # TESTING
 if test "$install_cppunit" = yes ; then
@@ -286,6 +398,7 @@ AC_ARG_WITH([testing],
 	[with_testing=yes])
 AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
 
+
 # FORTRAN
 AC_ARG_WITH([fortran],
     [AC_HELP_STRING([--with-fortran],
@@ -294,92 +407,6 @@ AC_ARG_WITH([fortran],
 	[with_fortran=no])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
-# HDF5
-if test "$install_hdf5" = "yes"; then
-  with_hdf5=yes
-fi
-AC_ARG_WITH([hdf5],
-    [AC_HELP_STRING([--with-hdf5],
-        [enable HDF5 options for PyLith @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_hdf5=yes; else with_hdf5=no; fi],
-	[with_hdf5=yes])
-AM_CONDITIONAL([WITH_HDF5], [test "$with_hdf5" = yes])
-
-# H5PY
-if test "$install_h5py" = "yes"; then
-  with_h5py=yes
-fi
-AC_ARG_WITH([h5py],
-    [AC_HELP_STRING([--with-h5py],
-        [enable H5PY options for PyLith @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_h5py=yes; else with_h5py=no; fi],
-	[with_h5py=no])
-AM_CONDITIONAL([WITH_H5PY], [test "$with_h5py" = yes])
-
-# NetCDF
-if test "$install_netcdf" = yes ; then
-  with_netcdf=yes
-fi
-AC_ARG_WITH([netcdf],
-    [AC_HELP_STRING([--with-netcdf],
-        [enable NetCDF (CUBIT) options for PyLith @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_netcdf=yes; else with_netcdf=no; fi],
-	[with_netcdf=yes])
-AM_CONDITIONAL([WITH_NETCDF], [test "$with_netcdf" = yes])
-
-# netCDF (python)
-if test "$install_netcdfpy" = yes ; then
-  with_netcdfpy=yes
-fi
-AC_ARG_WITH([netcdfpy],
-    [AC_HELP_STRING([--with-netcdfpy],
-        [enable netCDF4 (python) @<:@default=yes@:>@])],
-	[if test "$withval" = yes; then with_netcdfpy=yes; else with_netcdfpy=no; fi],
-	[with_netcdfpy=yes])
-AM_CONDITIONAL([WITH_NETCDFPY], [test "$with_netcdfpy" = yes])
-
-# PETSC options
-AC_ARG_WITH([petsc-options],
-    [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1@:>@])],
-	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1"])
-AC_SUBST(petsc_options)
-
-# pylith git
-AC_ARG_WITH([pylith-git],
-    [AC_HELP_STRING([--with-pylith-git],
-        [use PyLith from GitHub repository (master, maint, BRANCH) @<:@default=no@:>@])],
-	[pylith_git=$withval],
-	[pylith_git=no])
-if test "$pylith_git" = yes ; then pylith_git="master"; fi
-AC_SUBST(pylith_git)
-AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
-
-# Force use of PETSc tarbarll
-AC_ARG_WITH([petsc-tarball],
-    [AC_HELP_STRING([--with-petsc-tarball],
-        [Force use of PETSc tarball even if using PyLith from repository @<:@default=no@:>@])],
-	[force_petsc_tarball=$withval],
-	[force_petsc_tarball=no])
-AC_SUBST(force_petsc_tarball)
-AM_CONDITIONAL([PETSC_TARBALL], [test "$pylith_git" = no || test "$force_petsc_tarball" = yes])
-
-# Spatialdata repository
-AC_ARG_WITH([spatialdata-repo],
-    [AC_HELP_STRING([--with-spatialdata-repo],
-        [URL for Spatialdata Git repository @<:@default=https://github.com/geodynamics/spatialdata.git@:>@])],
-	[spatialdata_repo="$withval"],
-	[spatialdata_repo=https://github.com/geodynamics/spatialdata.git])
-AC_SUBST(spatialdata_repo)
-
-# PyLith repository
-AC_ARG_WITH([pylith-repo],
-    [AC_HELP_STRING([--with-pylith-repo],
-        [URL for PyLith Git repository @<:@default=https://github.com/geodynamics/pylith.git@:>@])],
-	[pylith_repo="$withval"],
-	[pylith_repo=https://github.com/geodynamics/pylith.git])
-AC_SUBST(pylith_repo)
 
 # fetch tool
 AC_ARG_WITH([fetch],
@@ -387,6 +414,7 @@ AC_ARG_WITH([fetch],
         [set tool for downloading tarballs @<:@default=wget@:>@])],
 	[with_fetch=$withval],
 	[with_fetch=wget])
+
 
 # parallel builds
 AC_ARG_WITH([make-threads],
@@ -396,12 +424,14 @@ AC_ARG_WITH([make-threads],
 	[make_threads=1])
 AC_SUBST(make_threads)
 
+
 # ----------------------------------------------------------------------
 # BASIC TOOLS
 # ----------------------------------------------------------------------
 AC_PROG_LIBTOOL
 AC_PROG_MKDIR_P
 AC_PROG_LN_S
+
 
 # cp
 AC_PATH_PROG(CP, cp)
@@ -410,12 +440,14 @@ if test -z "$CP" ; then
   CP=`echo "Error: cp is not installed." ; false`
 fi
 
+
 # tar
 AC_PATH_PROG(TAR, tar)
 if test -z "$TAR" ; then
   AC_MSG_FAILURE([cannot find 'tar' program.])
   TAR=`echo "Error: tar is not installed." ; false`
 fi
+
 
 # wget/curl
 downloader=none
@@ -437,6 +469,7 @@ else
   AC_MSG_FAILURE([Error in configure logic for downloader.])
 fi
 AC_SUBST(downloader)
+
 
 # autoreconf/git
 petsc_git=no
@@ -460,19 +493,23 @@ fi
 AM_CONDITIONAL([WITH_SWIG], [test "$pylith_git" != no])
 AC_SUBST(petsc_git)
 
+
 # ----------------------------------------------------------------------
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
-
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
+
 
 # GCC
 if test "$install_gcc" = yes ; then
   if test "$install_mpi" = no ; then
-    AC_MSG_ERROR([Incompatible settings: building gcc but not MPI. If you use --enable-gcc, you should also use --enable-mpi.])
+    AC_MSG_WARN([Building GCC requires building MPI as well. Adding installation of MPICH.])
   fi
+  install_mpi=mpich
+
   if test "$with_fortran" = yes ; then
     FC=gfortran
     AC_SUBST(FC)
@@ -483,9 +520,10 @@ else
   fi
 fi
 
-# Python
+
+# PYTHON
 if test "$install_python" = yes ; then
-  PYTHON=$prefix/bin/python
+  PYTHON=$prefix/bin/python2
   PYTHON_VERSION=2.7
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
@@ -525,6 +563,7 @@ AC_CHECK_LIB([z], [deflate],
   [AC_MSG_ERROR([Compression library '-lz' not found; maybe you don't have the zlib development package, e.g., 'zlib-dev', installed])
 ])dnl
 
+
 # MPI
 if test "$install_mpi" != no ; then
   if test "$install_python" != yes ; then
@@ -552,38 +591,44 @@ else
   fi
 fi
 
-# cppunit
+
+# CPPUNIT
 if test "$install_cppunit" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$with_testing" = yes ; then
+    if test "$with_cppunit_incdir" != no; then
+      CPPUNIT_INCLUDES="-I$with_cppunit_incdir"
+    fi
+    if test "$with_cppunit_libdir" != no; then
+      CPPUNIT_LDFLAGS="-L$with_cppunit_libdir"
+    fi
     CIT_CPPUNIT_HEADER
     CIT_CPPUNIT_LIB
   fi
 fi
+AC_SUBST(CPPUNIT_INCLUDES)
+AC_SUBST(CPPUNIT_LDFLAGS)
+
 
 # PCRE
 if test "$install_pcre" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$install_swig" = yes ; then
-    AC_LANG(C++)
-    AC_CHECK_HEADER([pcre.h], [], [
-      AC_MSG_ERROR([pcre header not found; try CPPFLAGS="-I<pcre include dir>"])
-    ])dnl
-    AC_LANG(C++)
-    AC_MSG_CHECKING([for real_pcre in -lpcre])
-    AC_REQUIRE_CPP
-    AC_COMPILE_IFELSE(
-      [AC_LANG_PROGRAM([[#include <pcre.h>]],
-                       [[real_pcre value;]])],
-      [AC_MSG_RESULT(yes)],
-      [AC_MSG_RESULT(no)
-      AC_MSG_ERROR([pcre library not found; try LDFLAGS="-L<pcre lib dir>"])
-    ])dnl
-    AC_PATH_PROG(PCRETEST, pcretest)
+    if test "$with_pcre_incdir" != no; then
+      PCRE_INCLUDES="-I$with_pcre_incdir"
+    fi
+    if test "$with_pcre_libdir" != no; then
+      PCRE_LDFLAGS="-L$with_pcre_libdir"
+    fi
+    CIT_PCRE_HEADER
+    CIT_PCRE_LIB
   fi
 fi
+AC_SUBST(PCRE_INCLUDES)
+AC_SUBST(PCRE_LDFLAGS)
+
 
 # SWIG
 if test "$install_swig" = yes ; then
@@ -594,18 +639,11 @@ else
   fi
 fi
 
-# numpy
-if test "$install_numpy" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  CIT_NUMPY_PYTHON_MODULE
-  CIT_NUMPY_INCDIR
-fi
 
-# proj4
-if test "$install_proj4" = yes ; then
-  AC_PATH_PROG(existing_proj4, proj)
-  AC_SUBST(existing_proj4)
+# PROJ
+if test "$install_proj" = yes ; then
+  AC_PATH_PROG(existing_proj, proj)
+  AC_SUBST(existing_proj)
   # Installing datums requires unzip
   AC_PATH_PROG(UNZIP, unzip)
   if test -z "$UNZIP" ; then
@@ -613,34 +651,52 @@ if test "$install_proj4" = yes ; then
     UNZIP=`echo "Error: unzip is not installed." ; false`
   fi
 else
+  if test "$with_proj_incdir" != no; then
+    PROJ_INCLUDES="-I$with_proj_incdir"
+  fi
+  if test "$with_proj_libdir" != no; then
+    PROJ_LDFLAGS="-L$with_proj_libdir"
+  fi
   CIT_PROJ4_HEADER
   CIT_PROJ4_LIB
 fi
+AC_SUBST(PROJ_INCLUDES)
+AC_SUBST(PROJ_LDFLAGS)
+
 
 # HDF5
 if test "$install_hdf5" = yes ; then
   # Need to account for PETSc option --download-hdf5=1.
   AC_PATH_PROG(existing_hdf5, h5dump)
   AC_SUBST(existing_hdf5)
+  HDF5_INCDIR=$prefix/include
+  HDF5_LIBDIR=$prefix/lib
+  HDF5_INCLUDES="-I$prefix/include"
+  HDF5_LDFLAGS="-L$prefix/lib"
 else
-  if test "$with_hdf5" = yes ; then
-    CIT_HDF5_HEADER
-    CIT_HDF5_LIB
-    CIT_HDF5_LIB_PARALLEL
+  if test "$with_hdf5_incdir" != no; then
+    HDF5_INCDIR="$with_hdf5_incdir"
+    HDF5_INCLUDES="-I$with_hdf5_incdir"
   fi
+  if test "$with_hdf5_libdir" != no; then
+    HDF5_LIBDIR="$with_hdf5_libdir"
+    HDF5_LDFLAGS="-L$with_hdf5_libdir"
+  fi
+  CC_SAVE=$CC
+  CC=mpicc
+  CIT_HDF5_HEADER
+  CIT_HDF5_LIB
+  CIT_HDF5_LIB_PARALLEL
+  CC=$CC_SAVE
 fi
+AC_SUBST(HDF5_INCDIR)
+AC_SUBST(HDF5_LIBDIR)
+AC_SUBST(HDF5_INCLUDES)
+AC_SUBST(HDF5_LDFLAGS)
+
 
 # H5PY
 if test "$install_h5py" = yes ; then
-   if test "$install_hdf5" = yes; then
-      echo "do nothing" >& /dev/null
-   else
-     if test "$with_hdf5" = yes; then
-       echo "do nothing" >& /dev/null
-     else
-       AC_MSG_ERROR([h5py requires HDF5.])
-     fi
-   fi
   if test "$install_python" = yes ; then
     if test "$install_six" != yes ; then
       AC_MSG_WARN([Building Python requires building six (for h5py) as well. Adding installation of six.])
@@ -667,33 +723,33 @@ else
   fi
 fi
 
-# NETCDF
+
+# NetCDF
 if test "$install_netcdf" = yes ; then
   AC_PATH_PROG(existing_netcdf, ncdump)
   AC_SUBST(existing_netcdf)
+  NETCDF_INCDIR="$prefix/include"
+  NETCDF_LIBDIR="$prefix/lib"
 else
-  if test "$with_netcdf" = yes ; then
-    CIT_NETCDF_HEADER
-    CIT_NETCDF_LIB
+  if test "$with_netcdf_incdir" != no; then
+    NETCDF_INCDIR="$with_netcdf_incdir"
+    NETCDF_INCLUDES="-I$with_netcdf_incdir"
   fi
+  if test "$with_netcdf_libdir" != no; then
+    NETCDF_LIBDIR="$with_netcdf_libdir"
+    NETCDF_LDFLAGS="-L$with_netcdf_libdir"
+  fi
+  CIT_NETCDF_HEADER
+  CIT_NETCDF_LIB
 fi
+AC_SUBST(NETCDF_INCDIR)
+AC_SUBST(NETCDF_LIBDIR)
+AC_SUBST(NETCDF_INCLUDES)
+AC_SUBST(NETCDF_LDFLAGS)
+
 
 # NETCDF4 (python)
 if test "$install_netcdfpy" = yes ; then
-   if test "$install_netcdf" = yes; then
-      echo "do nothing" >& /dev/null
-     if test "$with_hdf5" = yes; then
-       echo "do nothing" >& /dev/null
-     else
-       AC_MSG_ERROR([netCDF4 requires HDF5.])
-     fi
-   else
-     if test "$with_netcdf" = yes && test "$with_hdf5" = yes; then
-       echo "do nothing" >& /dev/null
-     else
-       AC_MSG_ERROR([netCDF4 requires NetCDF and HDF5.])
-     fi
-   fi
   if test "$install_python" = yes ; then
     if test "$install_cftime" != yes ; then
       AC_MSG_WARN([Building Python requires building cftime (for NetCDF4) as well. Adding installation of cftime.])
@@ -705,6 +761,63 @@ else
     CIT_PYTHON_MODULE([netCDF4],[1.0])
   fi
 fi
+
+
+# PETSC options
+AC_ARG_WITH([petsc-options],
+    [AC_HELP_STRING([--with-petsc-options],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1@:>@])],
+	[petsc_options=$withval],
+	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1"])
+AC_SUBST(petsc_options)
+
+
+# pylith git
+AC_ARG_WITH([pylith-git],
+    [AC_HELP_STRING([--with-pylith-git],
+        [use PyLith from GitHub repository (master, maint, BRANCH) @<:@default=no@:>@])],
+	[pylith_git=$withval],
+	[pylith_git=no])
+if test "$pylith_git" = yes ; then pylith_git="master"; fi
+AC_SUBST(pylith_git)
+AM_CONDITIONAL([USE_PYLITH_GIT], [test "$pylith_git" != no])
+
+
+# Force use of PETSc tarbarll
+AC_ARG_WITH([petsc-tarball],
+    [AC_HELP_STRING([--with-petsc-tarball],
+        [Force use of PETSc tarball even if using PyLith from repository @<:@default=no@:>@])],
+	[force_petsc_tarball=$withval],
+	[force_petsc_tarball=no])
+AC_SUBST(force_petsc_tarball)
+AM_CONDITIONAL([PETSC_TARBALL], [test "$pylith_git" = no || test "$force_petsc_tarball" = yes])
+
+
+# Spatialdata repository
+AC_ARG_WITH([spatialdata-repo],
+    [AC_HELP_STRING([--with-spatialdata-repo],
+        [URL for Spatialdata Git repository @<:@default=https://github.com/geodynamics/spatialdata.git@:>@])],
+	[spatialdata_repo="$withval"],
+	[spatialdata_repo=https://github.com/geodynamics/spatialdata.git])
+AC_SUBST(spatialdata_repo)
+
+
+# PyLith repository
+AC_ARG_WITH([pylith-repo],
+    [AC_HELP_STRING([--with-pylith-repo],
+        [URL for PyLith Git repository @<:@default=https://github.com/geodynamics/pylith.git@:>@])],
+	[pylith_repo="$withval"],
+	[pylith_repo=https://github.com/geodynamics/pylith.git])
+AC_SUBST(pylith_repo)
+
+# numpy
+if test "$install_numpy" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  CIT_NUMPY_PYTHON_MODULE
+  CIT_NUMPY_INCDIR
+fi
+
 
 # PETSC
 if test "$install_petsc" = yes ; then
@@ -782,9 +895,9 @@ if test -n "$existing_mpi"; then
   fi
 fi
 
-# PROJ4
-if test -n "$existing_proj4"; then
-  echo "WARNING: Existing version of PROJ4 installed. Found $existing_proj4"
+# PROJ
+if test -n "$existing_proj"; then
+  echo "WARNING: Existing version of PROJ installed. Found $existing_proj"
   if test "$force_install" != yes ; then
     existing_fail=yes
   fi
@@ -846,15 +959,15 @@ fi
 
 # ----------------------------------------------------------------------
 # Setup environment so dependencies are used in build
-CPPFLAGS="-I$prefix_deps/include -I$prefix/include $CPPFLAGS"
-LDFLAGS="-L$prefix_deps/lib -L$prefix_deps/lib64 -L$prefix/lib -L$prefix/lib64 $LDFLAGS"
+CPPFLAGS="-I$prefix/include $CPPFLAGS"
+LDFLAGS="-L$prefix/lib -L$prefix/lib64 $LDFLAGS"
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
 
-TEMPVAR="$prefix_deps/bin:$prefix/bin"
+TEMPVAR="$prefix/bin"
 if test "X${PATH}" = X ; then
   echo "export PATH=$TEMPVAR" >> setup.sh
 else
@@ -866,7 +979,7 @@ case $host_os in
   darwin*)
     ;;
   *)
-    TEMPVAR="$prefix_deps/lib:$prefix_deps/lib64:$prefix/lib:$prefix/lib64"
+    TEMPVAR="$prefix/lib:$prefix/lib64"
     if test "X${LD_LIBRARY_PATH}" = X ; then
       echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
     else
@@ -875,8 +988,7 @@ case $host_os in
     ;;
 esac
 
-TEMPVAR="$prefix_deps/lib/python$PYTHON_VERSION/site-packages:$prefix_deps/lib64/python$PYTHON_VERSION/site-packages"
-TEMPVAR="$TEMPVAR:$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
 if test "X$PYTHONPATH" = X ; then
   echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
 else
@@ -884,7 +996,7 @@ else
 fi
 
 # ----------------------------------------------------------------------
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile docs/Makefile])
 
 AC_OUTPUT
 
@@ -906,10 +1018,10 @@ echo "PyLith dependencies to be installed:"
 echo ""
 echo "  autotools: $install_autotools"
 echo "  gcc: $install_gcc, languages: $gcc_languages"
-echo "  openssl: $install_openssl (binary package)"
+echo "  openssl: $install_openssl"
 echo "  mpi: $install_mpi"
 echo "  cppunit: $install_cppunit"
-echo "  proj4: $install_proj4"
+echo "  proj: $install_proj"
 echo "  hdf5: $install_hdf5"
 echo "  netcdf: $install_netcdf"
 echo "  cmake: $install_cmake"
@@ -955,9 +1067,7 @@ echo "  build PyLith and it dependencies or add these settings to your "
 echo "  .bashrc or equivalent file and open a new terminal (i.e., shell)."
 echo ""
 echo "  Step 2"
-echo "  Running \"make\" will install"
-echo "      PyLith dependencies to $prefix_deps."
-echo "      PyLith to $prefix."
+echo "  Running \"make\" will install PyLith and its dependencies to $prefix."
 echo ""
 echo "  Step 3"
 echo "  If you did not setup your .bashrc with the environment variables, be sure "

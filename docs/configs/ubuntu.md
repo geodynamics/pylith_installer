@@ -20,13 +20,12 @@ apt-get install -y --no-install-recommends \
       unzip \
       git \
       ca-certificates \
+	  libssl-dev \
       libcppunit-dev \
       libmpich-dev \
       mpich \
       libhdf5-mpich-103 \
       libhdf5-mpich-dev \
-      proj-bin \
-      proj-data \
       libproj-dev \
       cmake
 ```
@@ -43,7 +42,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-2.2.2-2/configure \
+$HOME/pylith/src/pylith-installer-2.2.2-2/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -53,5 +52,5 @@ $HOME/src/pylith/pylith-installer-2.2.2-2/configure \
     --disable-mpi \
     --disable-cppunit \
     --disable-cmake \
-    --disable-hdf5 \
+    --disable-hdf5
 ```

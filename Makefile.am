@@ -54,11 +54,11 @@ PKGCONFIG_VER=1.5.2
 SIX_VER=1.12.0
 CFTIME_VER=1.1.1
 
-PROJ4_VER=5.0.1
-PROJ4_DATUM_VER=1.7
+PROJ_VER=5.0.1
+PROJ_DATUM_VER=1.7
 
 HDF5_VER=1.10.8p1
-H5PY_VER=2.10.0
+H5PY_VER=2.10.1
 
 NETCDF_VER=4.6.3
 NETCDFPY_VER=1.5.0.1
@@ -90,9 +90,11 @@ PARAMETERSGUI_VER=1.1.0
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
+SUBDIRS = docs
+
 EXTRA_DIST = \
 	AUTHORS \
-	CHANGES \
+	CHANGES.md \
 	COPYING \
 	INSTALL \
 	NEWS \
@@ -100,9 +102,9 @@ EXTRA_DIST = \
 	numpy_blaslapack.cfg \
 	docker/README \
 	docker/README-developer \
-	docker/debian-buildenv \
+	docker/debian-baseenv \
 	docker/debian-data \
-	docker/debian-install \
+	docker/debian-binary \
 	docker/build.py \
 	packager/build.py \
 	packager/setup_darwin.sh \
@@ -126,7 +128,7 @@ noinst_tmp = \
 	installed_six \
 	installed_cython \
 	installed_cftime \
-	installed_proj4 \
+	installed_proj \
 	installed_netcdf \
 	installed_netcdfpy \
 	installed_hdf5 \
@@ -149,7 +151,7 @@ noinst_builddirs = \
 	mpich-build \
 	cppunit-build \
 	swig-build \
-	proj4-build \
+	proj-build \
 	netcdf-build \
 	hdf5-build \
 	nemesis-build \
@@ -177,7 +179,7 @@ noinst_srcdirs = \
 	pkgconfig-$(PKGCONFIG_VER) \
 	six-$(SIX_VER) \
 	cftime-$(CFTIME_VER) \
-	proj-$(PROJ4_VER) \
+	proj-$(PROJ_VER) \
 	hdf5-$(HDF5_VER) \
 	h5py-$(H5PY_VER) \
 	netcdf-$(NETCDF_VER) \
@@ -189,8 +191,7 @@ noinst_srcdirs = \
 	cmake-$(CMAKE_VER) \
 	pylith-$(PYLITH_VER)
 
-dist_noinst_SCRIPTS = \
-	bin/fetch.sh
+dist_noinst_SCRIPTS = bin/fetch.sh
 
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 
@@ -219,13 +220,13 @@ endif
 # ----------------------------------------------------------------------
 all: installed_pylith installed_parametersgui
 
-external_deps: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_netcdfpy installed_cmake installed_proj4
+external_deps: installed_autotools installed_compilers installed_mpi installed_openssl installed_python installed_cppunit installed_swig installed_setuptools installed_cython installed_numpy installed_pkgconfig installed_six installed_cftime installed_hdf5 installed_netcdf installed_h5py installed_netcdfpy installed_fiat installed_cmake installed_proj
 
 cig_deps: installed_nemesis installed_pythia
 
 deps: external_deps cig_deps
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy pkgconfig six proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy pkgconfig six proj netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -240,7 +241,6 @@ rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy pkgconfig s
 # setup
 # ----------------------------------------------------------------------
 mkdest:
-	$(MKDIR_P) $(prefix_deps)/include $(prefix_deps)/lib $(prefix_deps)/bin $(prefix_deps)/$(PYTHON_SITEPKGS)
 	$(MKDIR_P) $(prefix)/include $(prefix)/lib $(prefix)/bin $(prefix)/$(PYTHON_SITEPKGS)
 
 finished_mkdest:
@@ -259,31 +259,31 @@ if INSTALL_AUTOTOOLS
 	$(TAR) -xf make-$(MAKE_VER).tar.gz
 	mkdir -p make-build
 	cd make-build && \
-		../make-$(MAKE_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
+		../make-$(MAKE_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
 		make && \
 		make install
 	$(TAR) -xf m4-$(M4_VER).tar.gz
 	mkdir -p m4-build
 	cd m4-build && \
-		../m4-$(M4_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
+		../m4-$(M4_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
 		make -j$(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf autoconf-$(AUTOCONF_VER).tar.gz
 	mkdir -p autoconf-build
 	cd autoconf-build && \
-		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
+		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
 		make -j$(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf automake-$(AUTOMAKE_VER).tar.gz
 	mkdir -p automake-build
 	cd automake-build && \
-		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
+		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
 		make -j$(MAKE_THREADS) && \
 		make install
 	$(TAR) -xf libtool-$(LIBTOOL_VER).tar.gz
 	mkdir -p libtool-build
 	cd libtool-build && \
-		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix_deps)  $(env_flags_deps) && \
+		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix)  $(env_flags_deps) && \
 		make -j$(MAKE_THREADS) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_autotools
@@ -314,7 +314,7 @@ if INSTALL_GCC
 		ln -sf mpfr-$(MPFR_VER)/ mpfr
 	$(MKDIR_P) gcc-build
 	cd gcc-build && \
-		../gcc-$(GCC_VER)/configure --prefix=$(prefix_deps) \
+		../gcc-$(GCC_VER)/configure --prefix=$(prefix) \
 			--disable-multilib \
 			--enable-languages=$(gcc_languages) \
 			$(env_flags_deps) && \
@@ -340,7 +340,7 @@ if INSTALL_OPENSSL
 	$(TAR) -xf openssl-$(OPENSSL_VER).tar.gz
 	cd openssl-$(OPENSSL_VER) && \
 		$(env_compilers) ./config \
-			--prefix=$(prefix_deps) --openssldir=$(prefix_deps)/share/openssl  shared; \
+			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl  shared; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_openssl
@@ -363,7 +363,7 @@ if INSTALL_PYTHON
 	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
-		../Python-$(PYTHON_VER)/configure --prefix=$(prefix_deps) \
+		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
 		--enable-shared $(env_flags_deps) $(env_compilers) && \
 		make -j $(make_threads) && \
 		make install && \
@@ -408,11 +408,11 @@ openmpi: installed_compilers
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(OPENMPI_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers); \
+			--prefix=$(prefix) $(env_flags_deps) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_mpi
-	if [ ! -x $(prefix_deps)/bin/mpirun ]; then cd $(prefix_deps)/bin && $(LN_S) mpiexec mpirun; fi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -433,12 +433,12 @@ mpich: installed_compilers
 			--enable-shared \
 			--enable-sharedlibs=$(mpich_sharedarch) \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix_deps) \
+			--prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) $(mpich_options) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_mpi
-	if [ ! -x $(prefix_deps)/bin/mpirun ]; then cd $(prefix_deps)/bin && $(LN_S) mpiexec mpirun; fi
+	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
 
 # ----------------------------------------------------------------------
@@ -451,7 +451,7 @@ if INSTALL_CPPUNIT
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
 		../cppunit-$(CPPUNIT_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers); \
+			--prefix=$(prefix) $(env_flags_deps) $(env_compilers); \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_cppunit
@@ -475,7 +475,7 @@ if INSTALL_PCRE
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
 		../pcre-$(PCRE_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) ; \
+			--prefix=$(prefix) $(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_pcre
@@ -498,7 +498,7 @@ if INSTALL_SWIG
 	$(MKDIR_P) swig-build
 	cd swig-build && \
 		../swig-$(SWIG_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_compilers) ; \
+			--prefix=$(prefix) $(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_swig
@@ -522,7 +522,7 @@ setuptools: installed_python
 if INSTALL_SETUPTOOLS
 	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
 	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
-	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_setuptools
+	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_setuptools
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -539,7 +539,7 @@ installed_setuptools:
 cython: installed_python
 	$(FETCH_SCRIPT) "$(downloader)" Cython-$(CYTHON_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf Cython-$(CYTHON_VER).tar.gz
-	cd Cython-$(CYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_cython
+	cd Cython-$(CYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_cython
 
 
 installed_cython:
@@ -557,7 +557,7 @@ if WITH_NUMPY_BLASLAPACK
 	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
 endif
 	cd numpy-$(NUMPY_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_numpy
 
 else
@@ -577,7 +577,7 @@ if INSTALL_PKGCONFIG
 	$(FETCH_SCRIPT) "$(downloader)" pkgconfig-$(PKGCONFIG_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf pkgconfig-$(PKGCONFIG_VER).tar.gz
 	cd pkgconfig-$(PKGCONFIG_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_pkgconfig
 
 else
@@ -597,7 +597,7 @@ if INSTALL_SIX
 	$(FETCH_SCRIPT) "$(downloader)" six-$(SIX_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf six-$(SIX_VER).tar.gz
 	cd six-$(SIX_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_six
 
 else
@@ -616,7 +616,7 @@ cftime: installed_python installed_setuptools installed_numpy
 	$(FETCH_SCRIPT) "$(downloader)" cftime-$(CFTIME_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf cftime-$(CFTIME_VER).tar.gz
 	cd cftime-$(CFTIME_VER) && \
-		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		$(PYTHON) setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_cftime
 
 installed_cftime:
@@ -624,30 +624,30 @@ installed_cftime:
 
 
 # ----------------------------------------------------------------------
-# proj4
+# proj
 # ----------------------------------------------------------------------
-proj4: installed_compilers
-if INSTALL_PROJ4
-	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ4_DATUM_VER).zip $(DEPS_URL)
-	$(TAR) -xf proj-$(PROJ4_VER).tar.gz
-	$(MKDIR_P) proj4-build
-	cd proj4-build && \
-		../proj-$(PROJ4_VER)/configure \
-			--prefix=$(prefix_deps) --with-jni=no $(env_flags_deps) $(env_compilers) ; \
+proj: installed_compilers
+if INSTALL_PROJ
+	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ_DATUM_VER).zip $(DEPS_URL)
+	$(TAR) -xf proj-$(PROJ_VER).tar.gz
+	$(MKDIR_P) proj-build
+	cd proj-build && \
+		../proj-$(PROJ_VER)/configure \
+			--prefix=$(prefix) --with-jni=no $(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
-		cd $(prefix_deps)/share/proj && \
-		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ4_DATUM_VER).zip && \
-		touch $(abs_top_builddir)/installed_proj4
+		cd $(prefix)/share/proj && \
+		$(UNZIP) $(abs_top_builddir)/proj-datumgrid-$(PROJ_DATUM_VER).zip && \
+		touch $(abs_top_builddir)/installed_proj
 
 else
 	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_proj4
+	touch $(abs_top_builddir)/installed_proj
 endif
 
-installed_proj4:
-	$(MAKE) $(AM_MAKEFLAGS) proj4
+installed_proj:
+	$(MAKE) $(AM_MAKEFLAGS) proj
 
 
 # ----------------------------------------------------------------------
@@ -664,19 +664,13 @@ if INSTALL_HDF5
 	cd hdf5-build && \
 		../hdf5-$(HDF5_VER)/configure \
 			--enable-parallel --enable-shared --enable-unsupported \
-			--disable-static --prefix=$(prefix_deps) $(hdf5_options) \
+			--disable-static --prefix=$(prefix) $(hdf5_options) \
 			$(env_flags_deps) $(env_mpicompilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_hdf5
 else
-if WITH_HDF5
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "hdf5 option not requested. To enable HDF5 option, "
-	@echo "reconfigure with --enable-hdf5 (to install HDF5) or "
-	@echo "--with-hdf5 (to use an existing installation)."
-endif
 	touch $(abs_top_builddir)/installed_hdf5
 endif
 
@@ -692,17 +686,12 @@ if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
-		python setup.py configure --hdf5=$(prefix_deps) && \
+		HDF5_INCLUDEDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) python setup.py configure && \
 		CC=mpicc $(env_flags_deps) python setup.py build && \
-		python setup.py install --prefix=$(prefix_deps) && \
+		python setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_h5py
 else
-if WITH_H5PY
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "h5py option not requested. To enable h5py option, "
-	@echo "reconfigure with --enable-h5py (to install H5PY)."
-endif
 	touch $(abs_top_builddir)/installed_h5py
 endif
 
@@ -715,31 +704,21 @@ installed_h5py:
 # ----------------------------------------------------------------------
 netcdf: installed_compilers installed_hdf5
 if INSTALL_NETCDF
-if WITH_HDF5
-netcdf_4_options = --enable-netcdf-4
-else
-netcdf_4_options = --disable-netcdf-4
-endif
 	$(FETCH_SCRIPT) "$(downloader)" netcdf-c-$(NETCDF_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
 		../netcdf-c-$(NETCDF_VER)/configure \
-			--prefix=$(prefix_deps) $(env_flags_deps) $(env_mpicompilers) \
-			--enable-shared --disable-static $(netcdf_4_options) --disable-dap ; \
+			--prefix=$(prefix) $(env_flags_deps) $(env_mpicompilers) \
+			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
+			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_netcdf
 
 else
-if WITH_NETCDF
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "netcdf option not requested. To enable NetCDF option, "
-	@echo "reconfigure with --enable-netcdf (to install NetCDF) or "
-	@echo "--with-netcdf (to use an existing installation)."
-endif
 	touch $(abs_top_builddir)/installed_netcdf
 endif
 
@@ -755,15 +734,10 @@ if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
-		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc python setup.py install --prefix=$(prefix_deps) && \
+		HDF5_DIR=$(prefix) NETCDF4_DIR=$(prefix) $(env_flags_deps) CC=mpicc python setup.py install --prefix=$(prefix) && \
 		touch $(abs_top_builddir)/installed_netcdfpy
 else
-if WITH_NETCDFPY
 	@echo "$@ already installed. Skipping installation."
-else
-	@echo "netCDF4 option not requested. To enable netCDF4 option, "
-	@echo "reconfigure with --enable-netcdfpy (to install netCDF4)."
-endif
 	touch $(abs_top_builddir)/installed_netcdfpy
 endif
 
@@ -778,10 +752,10 @@ fiat: installed_numpy
 if INSTALL_FIAT
 	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
-	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps)
+	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix)
 	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf FIAT-$(FIAT_VER).tar.gz
-	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_fiat
+	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_fiat
 
 else
 	@echo "$@ already installed. Skipping installation."
@@ -839,7 +813,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_compilers installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit
+spatialdata: installed_compilers installed_numpy installed_pythia installed_proj installed_swig installed_cppunit
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
@@ -886,7 +860,7 @@ if INSTALL_CMAKE
 	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
-		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make -j$(MAKE_THREADS) && make install && \
+		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix) && make -j$(MAKE_THREADS) && make install && \
 		touch $(abs_top_builddir)/installed_cmake
 else
 	@echo "Skipping $@ installation."
@@ -902,11 +876,9 @@ installed_cmake:
 # ----------------------------------------------------------------------
 petsc: installed_mpi installed_hdf5 installed_cmake
 if INSTALL_PETSC
-if WITH_HDF5
 petsc_options += --with-hdf5=1
-endif
 if INSTALL_HDF5
-petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
+petsc_options += --with-zlib=1 --LIBS=-lz
 endif
 if WITH_DEBUGGING
 petsc_options += --with-debugging=1
@@ -928,13 +900,15 @@ else
 	git clone --branch knepley/pylith --single-branch https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
 	cd petsc-pylith && \
-		./configure --prefix=$(prefix) \
+		./configure \
+			--prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-packages-download-dir=$(abs_top_builddir) \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags_cig) \
+			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make -j$(make_threads) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
@@ -954,13 +928,7 @@ installed_petsc:
 # pylith
 # ----------------------------------------------------------------------
 pylith: installed_cppunit installed_swig installed_netcdf installed_hdf5 installed_h5py installed_fiat installed_nemesis installed_pythia installed_spatialdata installed_petsc installed_netcdfpy installed_autotools
-pylith_options = 
-if WITH_NETCDF
-pylith_options += --enable-cubit
-endif
-if WITH_HDF5
-pylith_options += --enable-hdf5
-endif
+pylith_options = --enable-cubit --enable-hdf5
 if WITH_TESTING
 pylith_options += --enable-testing
 endif
@@ -977,6 +945,8 @@ endif
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install
