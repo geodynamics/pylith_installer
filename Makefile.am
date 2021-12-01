@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2021 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -25,6 +25,7 @@ DEPS_URL=http://geoweb.cse.ucdavis.edu/~buildbot/deps
 # ----------------------------------------------------------------------
 # Package Versions
 # ----------------------------------------------------------------------
+MAKE_VER=4.3
 M4_VER=1.4.17
 AUTOCONF_VER=2.69
 AUTOMAKE_VER=1.15
@@ -35,8 +36,8 @@ MPC_VER=1.0.3
 GMP_VER=6.1.0
 MPFR_VER=3.1.4
 
-OPENSSL_VER=1.0.2l
-PYTHON_VER=2.7.15
+OPENSSL_VER=1.1.1l
+PYTHON_VER=2.7.18
 PYTHON_SITEPKGS=lib/python2.7/site-packages
 
 MPICH_VER=3.2.1
@@ -46,15 +47,18 @@ CPPUNIT_VER=1.13.2
 
 PCRE_VER=8.40
 SWIG_VER=3.0.2
+CYTHON_VER=0.29.16
 
 NUMPY_VER=1.14.3
+PKGCONFIG_VER=1.5.2
 SIX_VER=1.12.0
+CFTIME_VER=1.1.1
 
 PROJ4_VER=5.0.1
 PROJ4_DATUM_VER=1.7
 
-HDF5_VER=1.10.5
-H5PY_VER=2.9.0
+HDF5_VER=1.10.8p1
+H5PY_VER=2.10.0
 
 NETCDF_VER=4.6.3
 NETCDFPY_VER=1.5.0.1
@@ -118,7 +122,10 @@ noinst_tmp = \
 	installed_cppunit \
 	installed_swig \
 	installed_numpy \
+	installed_pkgconfig \
 	installed_six \
+	installed_cython \
+	installed_cftime \
 	installed_proj4 \
 	installed_netcdf \
 	installed_netcdfpy \
@@ -151,19 +158,32 @@ noinst_builddirs = \
 
 
 noinst_srcdirs = \
+	make-$(MAKE_VER) \
+	m4-$(M4_VER) \
+	autoconf-$(AUTOCONF_VER) \
+	automake-$(AUTOMAKE_VER) \
+	libtool-$(LIBTOOL_VER) \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
 	openssl-${OPENSSL_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
+	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
+	setuptools-$(SETUPTOOLS_VER) \
+	Cython-$(CYTHON_VER) \
+	numpy-$(NUMPY_VER) \
+	pkgconfig-$(PKGCONFIG_VER) \
+	six-$(SIX_VER) \
+	cftime-$(CFTIME_VER) \
 	proj-$(PROJ4_VER) \
-	netcdf-$(NETCDF_VER) \
-	netCDF4-$(NETCDFPY_VER) \
 	hdf5-$(HDF5_VER) \
 	h5py-$(H5PY_VER) \
+	netcdf-$(NETCDF_VER) \
+	netCDF4-$(NETCDFPY_VER) \
 	spatialdata-$(SPATIALDATA_VER) \
+	git-$(GIT_VER) \
 	pythia-$(PYTHIA_VER) \
 	nemesis-$(NEMESIS_VER) \
 	cmake-$(CMAKE_VER) \
@@ -205,7 +225,7 @@ cig_deps: installed_nemesis installed_pythia
 
 deps: external_deps cig_deps
 
-rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy six proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
+rebuild-all: finished_mkdest compilers python mpi cppunit swig numpy pkgconfig six proj4 netcdf hdf5 h5py fiat nemesis spatialdata petsc pylith parametersgui
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -231,33 +251,40 @@ finished_mkdest:
 # ----------------------------------------------------------------------
 autotools: finished_mkdest
 if INSTALL_AUTOTOOLS
+	$(FETCH_SCRIPT) "$(downloader)" make-$(MAKE_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" m4-$(M4_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" autoconf-$(AUTOCONF_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" automake-$(AUTOMAKE_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" libtool-$(LIBTOOL_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf m4-$(M4_VER).tar.gz
-	mkdir -p m4-$(M4_VER)-build
-	cd m4-$(M4_VER)-build && \
+	$(TAR) -xf make-$(MAKE_VER).tar.gz
+	mkdir -p make-build
+	cd make-build && \
+		../make-$(MAKE_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
+		make && \
+		make install
+	$(TAR) -xf m4-$(M4_VER).tar.gz
+	mkdir -p m4-build
+	cd m4-build && \
 		../m4-$(M4_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
-		make -j $(MAKE_THREADS) && \
+		make -j$(MAKE_THREADS) && \
 		make install
-	$(TAR) -zxf autoconf-$(AUTOCONF_VER).tar.gz
-	mkdir -p autoconf-$(AUTOCONF_VER)-build
-	cd autoconf-$(AUTOCONF_VER)-build && \
+	$(TAR) -xf autoconf-$(AUTOCONF_VER).tar.gz
+	mkdir -p autoconf-build
+	cd autoconf-build && \
 		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
-		make -j $(MAKE_THREADS) && \
+		make -j$(MAKE_THREADS) && \
 		make install
-	$(TAR) -zxf automake-$(AUTOMAKE_VER).tar.gz
-	mkdir -p automake-$(AUTOMAKE_VER)-build
-	cd automake-$(AUTOMAKE_VER)-build && \
+	$(TAR) -xf automake-$(AUTOMAKE_VER).tar.gz
+	mkdir -p automake-build
+	cd automake-build && \
 		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix_deps) $(env_flags_deps) && \
-		make -j $(MAKE_THREADS) && \
+		make -j$(MAKE_THREADS) && \
 		make install
-	$(TAR) -zxf libtool-$(LIBTOOL_VER).tar.gz
-	mkdir -p libtool-$(LIBTOOL_VER)-build
-	cd libtool-$(LIBTOOL_VER)-build && \
+	$(TAR) -xf libtool-$(LIBTOOL_VER).tar.gz
+	mkdir -p libtool-build
+	cd libtool-build && \
 		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix_deps)  $(env_flags_deps) && \
-		make -j $(MAKE_THREADS) && \
+		make -j$(MAKE_THREADS) && \
 		make install && \
 		touch $(abs_top_builddir)/installed_autotools
 else
@@ -271,17 +298,17 @@ installed_autotools:
 # ----------------------------------------------------------------------
 # compilers
 # ----------------------------------------------------------------------
-compilers: finished_mkdest
+compilers: finished_mkdest installed_autotools
 if INSTALL_GCC
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.bz2 $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.bz2 $(DEPS_URL)
-	$(TAR) -zxf gcc-$(GCC_VER).tar.gz
+	$(TAR) -xf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
 		tar -jxf ../gmp-$(GMP_VER).tar.bz2; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
-		tar -zxf ../mpc-$(MPC_VER).tar.gz; \
+		tar -xf ../mpc-$(MPC_VER).tar.gz; \
 		ln -sf mpc-$(MPC_VER)/ mpc; \
 		tar -jxf ../mpfr-$(MPFR_VER).tar.bz2; \
 		ln -sf mpfr-$(MPFR_VER)/ mpfr
@@ -310,7 +337,7 @@ installed_compilers:
 openssl: installed_compilers
 if INSTALL_OPENSSL
 	$(FETCH_SCRIPT) "$(downloader)" openssl-$(OPENSSL_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf openssl-$(OPENSSL_VER).tar.gz
+	$(TAR) -xf openssl-$(OPENSSL_VER).tar.gz
 	cd openssl-$(OPENSSL_VER) && \
 		$(env_compilers) ./config \
 			--prefix=$(prefix_deps) --openssldir=$(prefix_deps)/share/openssl  shared; \
@@ -333,7 +360,7 @@ installed_openssl:
 python: installed_compilers installed_openssl
 if INSTALL_PYTHON
 	$(FETCH_SCRIPT) "$(downloader)" Python-$(PYTHON_VER).tgz $(DEPS_URL)
-	$(TAR) -zxf Python-$(PYTHON_VER).tgz
+	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --prefix=$(prefix_deps) \
@@ -377,7 +404,7 @@ installed_mpi:
 # ----------------------------------------------------------------------
 openmpi: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" openmpi-$(OPENMPI_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf openmpi-$(OPENMPI_VER).tar.gz
+	$(TAR) -xf openmpi-$(OPENMPI_VER).tar.gz
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
 		../openmpi-$(OPENMPI_VER)/configure \
@@ -398,7 +425,7 @@ mpich_options = --disable-fortran
 endif
 mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf mpich-$(MPICH_VER).tar.gz
+	$(TAR) -xf mpich-$(MPICH_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
 		../mpich-$(MPICH_VER)/configure \
@@ -420,7 +447,7 @@ mpich: installed_compilers
 cppunit: installed_compilers
 if INSTALL_CPPUNIT
 	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf cppunit-$(CPPUNIT_VER).tar.gz
+	$(TAR) -xf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
 		../cppunit-$(CPPUNIT_VER)/configure \
@@ -444,7 +471,7 @@ installed_cppunit:
 pcre: installed_compilers
 if INSTALL_PCRE
 	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf pcre-$(PCRE_VER).tar.gz
+	$(TAR) -xf pcre-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
 		../pcre-$(PCRE_VER)/configure \
@@ -467,7 +494,7 @@ installed_pcre:
 swig: installed_pcre installed_compilers installed_python
 if INSTALL_SWIG
 	$(FETCH_SCRIPT) "$(downloader)" swig-$(SWIG_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf swig-$(SWIG_VER).tar.gz
+	$(TAR) -xf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
 		../swig-$(SWIG_VER)/configure \
@@ -489,12 +516,43 @@ installed_swig:
 
 
 # ----------------------------------------------------------------------
+# setuptools
+# ----------------------------------------------------------------------
+setuptools: installed_python
+if INSTALL_SETUPTOOLS
+	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
+	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
+	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_setuptools
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_top_builddir)/installed_setuptools
+endif
+
+installed_setuptools:
+	$(MAKE) $(AM_MAKEFLAGS) setuptools
+
+
+# ----------------------------------------------------------------------
+# cython
+# ----------------------------------------------------------------------
+cython: installed_python
+	$(FETCH_SCRIPT) "$(downloader)" Cython-$(CYTHON_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf Cython-$(CYTHON_VER).tar.gz
+	cd Cython-$(CYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_cython
+
+
+installed_cython:
+	$(MAKE) $(AM_MAKEFLAGS) cython
+
+
+# ----------------------------------------------------------------------
 # numpy
 # ----------------------------------------------------------------------
 numpy: installed_python installed_setuptools
 if INSTALL_NUMPY
 	$(FETCH_SCRIPT) "$(downloader)" numpy-$(NUMPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf numpy-$(NUMPY_VER).tar.gz
+	$(TAR) -xf numpy-$(NUMPY_VER).tar.gz
 if WITH_NUMPY_BLASLAPACK
 	$(CP) $(top_srcdir)/numpy_blaslapack.cfg numpy-$(NUMPY_VER)/site.cfg
 endif
@@ -512,12 +570,32 @@ installed_numpy:
 
 
 # ----------------------------------------------------------------------
+# pkgconfig
+# ----------------------------------------------------------------------
+pkgconfig: installed_python installed_setuptools
+if INSTALL_PKGCONFIG
+	$(FETCH_SCRIPT) "$(downloader)" pkgconfig-$(PKGCONFIG_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf pkgconfig-$(PKGCONFIG_VER).tar.gz
+	cd pkgconfig-$(PKGCONFIG_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		touch $(abs_top_builddir)/installed_pkgconfig
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_top_builddir)/installed_pkgconfig
+endif
+
+installed_pkgconfig:
+	$(MAKE) $(AM_MAKEFLAGS) pkgconfig
+
+
+# ----------------------------------------------------------------------
 # six
 # ----------------------------------------------------------------------
 six: installed_python installed_setuptools
 if INSTALL_SIX
 	$(FETCH_SCRIPT) "$(downloader)" six-$(SIX_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf six-$(SIX_VER).tar.gz
+	$(TAR) -xf six-$(SIX_VER).tar.gz
 	cd six-$(SIX_VER) && \
 		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_top_builddir)/installed_six
@@ -532,13 +610,27 @@ installed_six:
 
 
 # ----------------------------------------------------------------------
+# cftime
+# ----------------------------------------------------------------------
+cftime: installed_python installed_setuptools installed_numpy
+	$(FETCH_SCRIPT) "$(downloader)" cftime-$(CFTIME_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf cftime-$(CFTIME_VER).tar.gz
+	cd cftime-$(CFTIME_VER) && \
+		$(PYTHON) setup.py install --prefix=$(prefix_deps) && \
+		touch $(abs_top_builddir)/installed_cftime
+
+installed_cftime:
+	$(MAKE) $(AM_MAKEFLAGS) cftime
+
+
+# ----------------------------------------------------------------------
 # proj4
 # ----------------------------------------------------------------------
 proj4: installed_compilers
 if INSTALL_PROJ4
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ4_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" proj-datumgrid-$(PROJ4_DATUM_VER).zip $(DEPS_URL)
-	$(TAR) -zxf proj-$(PROJ4_VER).tar.gz
+	$(TAR) -xf proj-$(PROJ4_VER).tar.gz
 	$(MKDIR_P) proj4-build
 	cd proj4-build && \
 		../proj-$(PROJ4_VER)/configure \
@@ -567,7 +659,7 @@ hdf5_options = --enable-fortran
 endif
 if INSTALL_HDF5
 	$(FETCH_SCRIPT) "$(downloader)" hdf5-$(HDF5_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf hdf5-$(HDF5_VER).tar.gz
+	$(TAR) -xf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
 		../hdf5-$(HDF5_VER)/configure \
@@ -595,10 +687,10 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_numpy installed_six
+h5py: installed_hdf5 installed_numpy installed_six installed_cython installed_pkgconfig
 if INSTALL_H5PY
 	$(FETCH_SCRIPT) "$(downloader)" h5py-$(H5PY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf h5py-$(H5PY_VER).tar.gz
+	$(TAR) -xf h5py-$(H5PY_VER).tar.gz
 	cd h5py-$(H5PY_VER) && \
 		python setup.py configure --hdf5=$(prefix_deps) && \
 		CC=mpicc $(env_flags_deps) python setup.py build && \
@@ -629,7 +721,7 @@ else
 netcdf_4_options = --disable-netcdf-4
 endif
 	$(FETCH_SCRIPT) "$(downloader)" netcdf-c-$(NETCDF_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf netcdf-c-$(NETCDF_VER).tar.gz
+	$(TAR) -xf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
 		../netcdf-c-$(NETCDF_VER)/configure \
@@ -658,10 +750,10 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 # netcdfpy
 # ----------------------------------------------------------------------
-netcdfpy: installed_netcdf installed_numpy
+netcdfpy: installed_netcdf installed_numpy installed_cftime
 if INSTALL_NETCDFPY
 	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf netCDF4-$(NETCDFPY_VER).tar.gz
+	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
 	cd netCDF4-$(NETCDFPY_VER) && \
 		HDF5_DIR=$(prefix_deps) NETCDF4_DIR=$(prefix_deps) $(env_flags_deps) CC=mpicc python setup.py install --prefix=$(prefix_deps) && \
 		touch $(abs_top_builddir)/installed_netcdfpy
@@ -685,10 +777,10 @@ installed_netcdfpy:
 fiat: installed_numpy
 if INSTALL_FIAT
 	$(FETCH_SCRIPT) "$(downloader)" ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
+	$(TAR) -xf ScientificPython-$(SCIENTIFICPYTHON_VER).tar.gz
 	cd ScientificPython-$(SCIENTIFICPYTHON_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps)
 	$(FETCH_SCRIPT) "$(downloader)" FIAT-$(FIAT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf FIAT-$(FIAT_VER).tar.gz
+	$(TAR) -xf FIAT-$(FIAT_VER).tar.gz
 	cd FIAT-$(FIAT_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_fiat
 
 else
@@ -701,31 +793,13 @@ installed_fiat:
 
 
 # ----------------------------------------------------------------------
-# setuptools
-# ----------------------------------------------------------------------
-setuptools: 
-if INSTALL_SETUPTOOLS
-	$(FETCH_SCRIPT) "$(downloader)" setuptools-$(SETUPTOOLS_VER).zip $(DEPS_URL)
-	$(UNZIP) setuptools-$(SETUPTOOLS_VER).zip
-	cd setuptools-$(SETUPTOOLS_VER) && $(PYTHON) setup.py install --prefix=$(prefix_deps) && touch $(abs_top_builddir)/installed_setuptools
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_top_builddir)/installed_setuptools
-endif
-
-installed_setuptools:
-	$(MAKE) $(AM_MAKEFLAGS) setuptools
-
-
-# ----------------------------------------------------------------------
 # pythia
 # ----------------------------------------------------------------------
 pythia: installed_python installed_setuptools
 if INSTALL_PYTHIA
 	$(FETCH_SCRIPT) "$(downloader)" setuptools-0.6c11.tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz https://github.com/geodynamics/pythia/releases/download/v$(PYTHIA_VER)
-	$(TAR) -zxvf pythia-$(PYTHIA_VER).tar.gz
+	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
 	$(CP) -p setuptools-0.6c11.tar.gz pythia-$(PYTHIA_VER)
 	cd pythia-$(PYTHIA_VER) && $(PYTHON) setup.py install --prefix=$(prefix) && touch $(abs_top_builddir)/installed_pythia
 
@@ -744,7 +818,7 @@ installed_pythia:
 nemesis: installed_mpi installed_python installed_pythia
 if INSTALL_NEMESIS
 	$(FETCH_SCRIPT) "$(downloader)" nemesis-$(NEMESIS_VER).tar.gz https://github.com/geodynamics/nemesis/releases/download/v$(NEMESIS_VER)
-	$(TAR) -zxvf nemesis-$(NEMESIS_VER).tar.gz
+	$(TAR) -xf nemesis-$(NEMESIS_VER).tar.gz
 	$(MKDIR_P) nemesis-build
 	cd nemesis-build && \
 		../nemesis-$(NEMESIS_VER)/configure \
@@ -765,7 +839,7 @@ installed_nemesis:
 # ----------------------------------------------------------------------
 # spatialdata
 # ----------------------------------------------------------------------
-spatialdata: installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit installed_autotools 
+spatialdata: installed_compilers installed_numpy installed_pythia installed_proj4 installed_swig installed_cppunit
 if INSTALL_SPATIALDATA
 spatialdata_options = 
 if WITH_TESTING
@@ -779,7 +853,7 @@ spatialdata_options += --enable-swig
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
-	$(TAR) -zxvf spatialdata-$(SPATIALDATA_VER).tgz
+	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tgz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
@@ -807,12 +881,12 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 # cmake
 # ----------------------------------------------------------------------
-cmake:
+cmake: installed_compilers installed_autotools
 if INSTALL_CMAKE
 	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
-	$(TAR) -zxf cmake-$(CMAKE_VER).tar.gz
+	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
-		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make && make install && \
+		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix_deps) && make -j$(MAKE_THREADS) && make install && \
 		touch $(abs_top_builddir)/installed_cmake
 else
 	@echo "Skipping $@ installation."
@@ -834,9 +908,6 @@ endif
 if INSTALL_HDF5
 petsc_options += --with-hdf5-dir=$(prefix) --with-zlib=1 --LIBS=-lz
 endif
-if WITH_CUDA
-petsc_options += --with-cuda=1 --with-cusp=1 --with-thrust=1 --with-nvcc=$(NVCC)
-endif
 if WITH_DEBUGGING
 petsc_options += --with-debugging=1
 else
@@ -849,7 +920,10 @@ petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
-	$(TAR) -zxf petsc-pylith-$(PETSC_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" Chaco-2.2-p2.tar.gz https://ftp.mcs.anl.gov/pub/petsc/externalpackages/
+	$(FETCH_SCRIPT) "$(downloader)" f2cblaslapack-3.4.2.q3.tar.gz https://ftp.mcs.anl.gov/pub/petsc/externalpackages
+	$(FETCH_SCRIPT) "$(downloader)" v6.2-p4.tar.gz https://bitbucket.org/petsc/pkg-ml/get
+	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz
 else
 	git clone --branch knepley/pylith --single-branch https://bitbucket.org/petsc/petsc.git petsc-pylith
 endif
@@ -858,10 +932,11 @@ endif
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
+			--with-packages-download-dir=$(abs_top_builddir) \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
 			$(petsc_options) $(env_flags_cig) \
 			PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
-		make -f gmakefile -j$(make_threads) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
+		make -j$(make_threads) PETSC_DIR=$(abs_top_builddir)/petsc-pylith PETSC_ARCH=$(PETSC_ARCH) && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith install && \
 		make PETSC_DIR=$(abs_top_builddir)/petsc-pylith test && \
 		touch $(abs_top_builddir)/installed_petsc
@@ -889,16 +964,13 @@ endif
 if WITH_TESTING
 pylith_options += --enable-testing
 endif
-if WITH_CUDA
-pylith_options += --enable-cuda
-endif
 if USE_PYLITH_GIT
 pylith_options += --enable-swig
 	$(GIT) clone --branch $(pylith_git) --single-branch --recursive $(pylith_repo) pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
 	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
-	$(TAR) -zxvf pylith-$(PYLITH_VER).tgz
+	$(TAR) -xf pylith-$(PYLITH_VER).tgz
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
@@ -926,7 +998,7 @@ installed_pylith:
 parametersgui: 
 if INSTALL_PARAMETERSGUI
 	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
-	cd $(prefix) && $(TAR) -zxvf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
+	cd $(prefix) && $(TAR) -xf $(abs_top_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
 		cd $(abs_top_builddir) && \
 		touch $(abs_top_builddir)/installed_parametersgui
 

@@ -9,7 +9,7 @@
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2021 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -17,7 +17,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [2.2.2-0], [cig-short@geodynamics.org])
+AC_INIT([PyLith Installer], [2.2.2-2], [https://community.geodynamics.org/c/pylith])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -53,14 +53,6 @@ fi
 AC_SUBST(gcc_languages)
 AM_CONDITIONAL([INSTALL_GCC], [test "$install_gcc" = yes])
 
-# PYTHON
-AC_ARG_ENABLE([python],
-    [AC_HELP_STRING([--enable-python],
-        [install Python @<:@default=no@:>@])],
-	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
-	[install_python=no])
-AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
-
 # MPI
 AC_ARG_ENABLE([mpi],
     [AC_HELP_STRING([--enable-mpi],
@@ -79,14 +71,6 @@ if test "$install_mpi" = mpich ; then
 fi
 AC_SUBST(mpich_sharedarch)  
 
-# OPENSSL
-AC_ARG_ENABLE([openssl],
-    [AC_HELP_STRING([--enable-openssl],
-        [install OpenSSL @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_openssl=yes; else install_openssl=no; fi],
-	[install_openssl=no])
-AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
-
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
     [AC_HELP_STRING([--enable-cppunit],
@@ -94,28 +78,6 @@ AC_ARG_ENABLE([cppunit],
 	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
 	[install_cppunit=yes])
 AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
-
-# NUMPY
-AC_ARG_ENABLE([numpy],
-    [AC_HELP_STRING([--enable-numpy],
-        [install numpy @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
-	[install_numpy=yes])
-AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
-AC_ARG_WITH([numpy-blaslapack],
-    [AC_HELP_STRING([--with-numpy-blaslapack],
-        [force numpy to build its own BLAS/LAPACK @<:@default=no@:>@])],
-	[if test "$withval" = yes; then with_numpy_blaslapack=yes; else with_numpy_blaslapack=no; fi],
-	[with_numpy_blaslapack=no])
-AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
-
-# SIX
-AC_ARG_ENABLE([six],
-    [AC_HELP_STRING([--enable-six],
-        [install six @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_six=yes; else install_six=no; fi],
-	[install_six=no])
-AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
 
 # PROJ4
 AC_ARG_ENABLE([proj4],
@@ -133,14 +95,6 @@ AC_ARG_ENABLE([hdf5],
 	[install_hdf5=yes])
 AM_CONDITIONAL([INSTALL_HDF5], [test "$install_hdf5" = yes])
 
-# H5PY
-AC_ARG_ENABLE([h5py],
-    [AC_HELP_STRING([--enable-h5py],
-        [install HDF5 @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_h5py=yes; else install_h5py=no; fi],
-	[install_h5py=yes])
-AM_CONDITIONAL([INSTALL_H5PY], [test "$install_h5py" = yes])
-
 # NETCDF
 AC_ARG_ENABLE([netcdf],
     [AC_HELP_STRING([--enable-netcdf],
@@ -148,6 +102,76 @@ AC_ARG_ENABLE([netcdf],
 	[if test "$enableval" = yes ; then install_netcdf=yes; else install_netcdf=no; fi],
 	[install_netcdf=yes])
 AM_CONDITIONAL([INSTALL_NETCDF], [test "$install_netcdf" = yes])
+
+# OPENSSL
+AC_ARG_ENABLE([openssl],
+    [AC_HELP_STRING([--enable-openssl],
+        [install OpenSSL @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_openssl=yes; else install_openssl=no; fi],
+	[install_openssl=no])
+AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
+
+# PYTHON
+AC_ARG_ENABLE([python],
+    [AC_HELP_STRING([--enable-python],
+        [install Python @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_python=yes; else install_python=no; fi],
+	[install_python=yes])
+AM_CONDITIONAL([INSTALL_PYTHON], [test "$install_python" = yes])
+
+# SETUPTOOLS
+AC_ARG_ENABLE([setuptools],
+    [AC_HELP_STRING([--enable-setuptools],
+        [install setuptools @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
+	[install_setuptools=yes])
+AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
+
+# CYTHON
+AC_ARG_ENABLE([cython],
+    [AC_HELP_STRING([--enable-cython],
+        [install cython @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_cython=yes; else install_cython=no; fi],
+	[install_cython=yes])
+AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
+
+# PKGCONFIG
+AC_ARG_ENABLE([pkgconfig],
+    [AC_HELP_STRING([--enable-pkgconfig],
+        [install pkgconfig @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_pkgconfig=yes; else install_pkgconfig=no; fi],
+	[install_pkgconfig=yes])
+AM_CONDITIONAL([INSTALL_PKGCONFIG], [test "$install_pkgconfig" = yes])
+
+# SIX
+AC_ARG_ENABLE([six],
+    [AC_HELP_STRING([--enable-six],
+        [install six @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_six=yes; else install_six=no; fi],
+	[install_six=yes])
+AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
+
+# NUMPY
+AC_ARG_ENABLE([numpy],
+    [AC_HELP_STRING([--enable-numpy],
+        [install numpy @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_numpy=yes; else install_numpy=no; fi],
+	[install_numpy=yes])
+AM_CONDITIONAL([INSTALL_NUMPY], [test "$install_numpy" = yes])
+AC_ARG_WITH([numpy-blaslapack],
+    [AC_HELP_STRING([--with-numpy-blaslapack],
+        [force numpy to build its own BLAS/LAPACK @<:@default=no@:>@])],
+	[if test "$withval" = yes; then with_numpy_blaslapack=yes; else with_numpy_blaslapack=no; fi],
+	[with_numpy_blaslapack=no])
+AM_CONDITIONAL([WITH_NUMPY_BLASLAPACK], [test "$with_numpy_blaslapack" = yes])
+
+# H5PY
+AC_ARG_ENABLE([h5py],
+    [AC_HELP_STRING([--enable-h5py],
+        [install HDF5 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_h5py=yes; else install_h5py=no; fi],
+	[install_h5py=yes])
+AM_CONDITIONAL([INSTALL_H5PY], [test "$install_h5py" = yes])
 
 # NETCDFPY
 AC_ARG_ENABLE([netcdfpy],
@@ -196,14 +220,6 @@ AC_ARG_ENABLE([fiat],
 	[if test "$enableval" = yes ; then install_fiat=yes; else install_fiat=no; fi],
 	[install_fiat=yes])
 AM_CONDITIONAL([INSTALL_FIAT], [test "$install_fiat" = yes])
-
-# SETUPTOOLS
-AC_ARG_ENABLE([setuptools],
-    [AC_HELP_STRING([--enable-setuptools],
-        [install setuptools @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_setuptools=yes; else install_setuptools=no; fi],
-	[install_setuptools=yes])
-AM_CONDITIONAL([INSTALL_SETUPTOOLS], [test "$install_setuptools" = yes])
 
 # PCRE
 AC_ARG_ENABLE([pcre],
@@ -321,14 +337,6 @@ AC_ARG_WITH([netcdfpy],
 	[if test "$withval" = yes; then with_netcdfpy=yes; else with_netcdfpy=no; fi],
 	[with_netcdfpy=yes])
 AM_CONDITIONAL([WITH_NETCDFPY], [test "$with_netcdfpy" = yes])
-
-# CUDA
-AC_ARG_WITH([cuda],
-    [AC_HELP_STRING([--with-cuda],
-        [enable CUDA support in PETSc and PyLith @<:@default=no@:>@])],
-	[if test "$withval" = yes; then with_cuda=yes; else with_cuda=no; fi],
-	[with_cuda=no])
-AM_CONDITIONAL([WITH_CUDA], [test "$with_cuda" = yes])
 
 # PETSC options
 AC_ARG_WITH([petsc-options],
@@ -483,7 +491,11 @@ if test "$install_python" = yes ; then
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
                 ])
-
+  if test "$install_openssl" != yes ; then
+    AC_CHECK_HEADER([openssl/ssl.h], [], [
+                  AC_MSG_ERROR([Building Python requires openssl. Header file 'openssl/ssl.h' not found; maybe you don't have the openssl development package, e.g. 'openssl-dev', installed?])
+                ])
+  fi
   if test "$install_numpy" != yes ; then
     AC_MSG_WARN([Incompatible configure options. Building Python requires building numpy as well. Adding installation of numpy.])
   fi
@@ -629,8 +641,25 @@ if test "$install_h5py" = yes ; then
        AC_MSG_ERROR([h5py requires HDF5.])
      fi
    fi
+  if test "$install_python" = yes ; then
+    if test "$install_six" != yes ; then
+      AC_MSG_WARN([Building Python requires building six (for h5py) as well. Adding installation of six.])
+    fi
+    install_six=yes
+    AM_CONDITIONAL([INSTALL_SIX], [test "$install_six" = yes])
+    if test "$install_pkgconfig" != yes ; then
+      AC_MSG_WARN([Building Python requires building pkgconfig (for h5py) as well. Adding installation of pkgconfig.])
+    fi
+    install_pkgconfig=yes
+    AM_CONDITIONAL([INSTALL_PKGCONFIG], [test "$install_pkgconfig" = yes])
+    if test "$install_cython" != yes ; then
+      AC_MSG_WARN([Building Python requires building cython (for h5py) as well. Adding installation of cython.])
+    fi
+    install_cython=yes
+    AM_CONDITIONAL([INSTALL_CYTHON], [test "$install_cython" = yes])
+  fi
   if test "$install_python" = no ; then
-    AM_PATH_PYTHON([2.6])
+    AM_PATH_PYTHON([2.7])
   fi
 else
   if test "$with_h5py" = yes ; then
@@ -665,18 +694,15 @@ if test "$install_netcdfpy" = yes ; then
        AC_MSG_ERROR([netCDF4 requires NetCDF and HDF5.])
      fi
    fi
+  if test "$install_python" = yes ; then
+    if test "$install_cftime" != yes ; then
+      AC_MSG_WARN([Building Python requires building cftime (for NetCDF4) as well. Adding installation of cftime.])
+    fi
+    install_cftime=yes
+  fi
 else
   if test "$with_netcdfpy" = yes ; then
     CIT_PYTHON_MODULE([netCDF4],[1.0])
-  fi
-fi
-
-# CUDA
-if test "$with_cuda" = yes ; then
-  AC_PATH_PROG(NVCC, nvcc)
-  if test -z "$NVCC" ; then
-    AC_MSG_FAILURE([cannot find 'nvcc'.])
-    NVCC=`echo "Error: CUDA is not installed." ; false`
   fi
 fi
 
@@ -878,26 +904,29 @@ echo "  Debugging: $with_debugging"
 echo ""
 echo "PyLith dependencies to be installed:"
 echo ""
+echo "  autotools: $install_autotools"
 echo "  gcc: $install_gcc, languages: $gcc_languages"
 echo "  openssl: $install_openssl (binary package)"
-echo "  Python: $install_python"
 echo "  mpi: $install_mpi"
-echo "  autotools: $install_autotools"
-echo "  setuptools: $install_setuptools"
 echo "  cppunit: $install_cppunit"
 echo "  proj4: $install_proj4"
 echo "  hdf5: $install_hdf5"
-echo "  h5py: $install_h5py"
 echo "  netcdf: $install_netcdf"
-echo "  netCDF4 (python): $install_netcdfpy (optional; post-processing)"
+echo "  cmake: $install_cmake"
+echo "  Python: $install_python"
+echo "    setuptools: $install_setuptools"
+echo "    cython: $install_cython"
+echo "    pkgconfig: $install_pkgconfig"
+echo "    six: $install_six"
+echo "    numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
+echo "    h5py: $install_h5py"
+echo "    cftime: $install_cftime"
+echo "    netCDF4 (python): $install_netcdfpy (optional; post-processing)"
 echo "  pcre: $install_pcre"
 echo "  swig: $install_swig"
 echo "  nemesis: $install_nemesis"
-echo "  numpy: $install_numpy  w/own blas/lapack: $with_numpy_blaslapack"
-echo "  six: $install_six"
 echo "  fiat: $install_fiat"
 echo "  spatialdata: $install_spatialdata"
-echo "  cmake: $install_cmake"
 echo "  petsc: $install_petsc, options: $petsc_options"
 echo "  pyre/pythia: $install_pythia"
 echo "  pylith-parameters GUI: $install_parametersgui"
