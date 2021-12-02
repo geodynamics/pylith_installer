@@ -26,7 +26,6 @@ apt-get install -y --no-install-recommends \
       mpich \
       libhdf5-mpich-103 \
       libhdf5-mpich-dev \
-      libproj-dev \
       cmake
 ```
 
@@ -42,7 +41,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/pylith/src/pylith-installer-2.2.2-2/configure \
+$HOME/src/pylith/pylith-installer-2.2.2-2/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \

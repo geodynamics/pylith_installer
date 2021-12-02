@@ -18,9 +18,9 @@ In the examples below, we set the number of threads to 2.
 The default configure options assume you have:
 
 * C and C++ compilers
-* Python 2.7
 * MPI
 * OpenSSL
+* wget
 
 If you have these dependencies, you can simply specify the number of threads and the destination directory:
 ```bash
@@ -34,7 +34,7 @@ The examples in the [common configurations section](../configs/index.md) illustr
 
 :::{warning}
 NetCDF depends on HDF5 (we use the parallel version built with MPI) which, in turn, depends on MPI.
-Most Linux distributions do not provide NetCDF that is built upon a parallel version of HDF5.
+Most Linux distributions do not provide NetCDF that is built using a parallel version of HDF5.
 As a result, we build NetCDF using the installer rather than using a version supplied by the operating system.
 :::
 

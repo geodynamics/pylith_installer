@@ -1,13 +1,27 @@
 # Building for PyLith development
 
+:::{important}
+PyLith v2.2.2 requires the versions of Pythia, nemesis, spatialdata, and PETSc at the time of the PyLith v2.2.2 release.
+You cannot use the current versions of those packages with PyLith v2.2.2.
+:::
+
+:::{danger}
+There are many significant changes from PyLith v2.2.2 to v3.x.
+In general, any work done extending v2.2.2 will require major rewriting to be compatible with v3.x.
+:::
+
 There are a few modifications to the usual process when using the installer to build for PyLith development.
 There are several configure arguments relevant to using the installer for development:
 
 `--with-pylith-repo=URL`
-: Clone the PyLith source code from this URL. The URL corresponds to your fork of the PyLith repository. If you are accessing GitHub via SSH, the URL usually has the form `git@github.com:YOUR_GITHUB_USERNAME/pylith.git`. If you are accessing GitHub via HTTPS, the URL usually has the form `https://github.com/YOUR_GITHUB_USERNAME/pylith.git`. The default URL is the `geodynamics/pylith` repository, <https://github.com/geodynamics/pylith.git>.
+: Clone the PyLith source code from this URL. The URL corresponds to your fork of the PyLith repository.
+If you are accessing GitHub via SSH, the URL usually has the form `git@github.com:YOUR_GITHUB_USERNAME/pylith.git`.
+If you are accessing GitHub via HTTPS, the URL usually has the form `https://github.com/YOUR_GITHUB_USERNAME/pylith.git`.
+The default URL is the `geodynamics/pylith` repository, <https://github.com/geodynamics/pylith.git>.
 
 `--with-pylith-git=BRANCH`
-:  Build branch `BRANCH` of PyLith. If you are just starting development and have not created any feature branches, then use the `main` branch.
+:  Build branch `BRANCH` of PyLith.
+If you are just starting development and have not created any feature branches, then use the `main` branch.
 
 Other arguments commonly used when configuring for PyLith development include:
 
@@ -41,10 +55,9 @@ We use the following directory structure:
 pylith-developer/
 ├── pylith_installer-2.2.2-2 # source code for the installer
 ├── build
-│   └── debug # top-level directory for building with debugging
+│   └── debug # top-level directory for building with debugging
 └── dest
-   ├── dependencies # directory where dependencies are installed by installer
-   └── debug # directory where PyLith and other CIG code is installed by installer
+    └── debug # directory where PyLith and other CIG code is installed by installer
 ```
 
 
@@ -72,33 +85,47 @@ $ tar -xf pylith_installer-2.2.2-2.tar.gz
 This configuration is for the Ubuntu 20.04 Linux distribution.
 The setup is similar for other Linux distributions.
 
-We install several packages in addition to those installed for a [user installation for Ubuntu 20.04](../configs/ubuntu.md).
+Install the operating system packages as listed in the [user installation for Ubuntu 20.04](../configs/ubuntu.md).
+We also recommend installing the following packages.
 
 ```bash
 apt-get install -y --no-install-recommends \
-      uncrustify \
       gnupg2 \
       lcov \
       gdb \
       valgrind
 ```
 
-We use `autopep8` and `uncrustify` to format the source code, `gdb` and `valgrind` for debugging, and `lcov` to measure code coverage of tests.
+We use `gdb` and `valgrind` for debugging and `lcov` to measure code coverage of tests.
+
+Set some environment variables to aid the PyLith configuration.
+
+```bash
+export PYTHON_VERSION=2.7
+export HDF5_INCDIR=/usr/include/hdf5/mpich
+export HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+```
 
 Configure the installer.
 
 ```bash
-mkdir $PYLITH_DIR/build/debug
+mkdir -p $PYLITH_DIR/build/debug
 cd $PYLITH_DIR/build/debug
-$PYLITH_DIR/pylith_installer-2.2.2-2/configure \
+$PYLITH_DIR/pylith-installer-2.2.2-2/configure \
     --with-pylith-git=$PYLITH_BRANCH \
     --with-pylith-repo=$PYLITH_REPO \
     --enable-debugging \
     --with-fetch=curl \
     --with-make-threads=$(nproc) \
     --prefix=$PYLITH_DIR/dest/debug \
-    --enable-swig \
-    --enable-pcre \
+    --with-hdf5-incdir=${HDF5_INCDIR} \
+    --with-hdf5-libdir=${HDF5_LIBDIR} \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-cmake \
+    --disable-hdf5 \
+	--enable-swig \
+    --enable-pcre
 ```
 
 Check the configure output to make sure it ran without errors and the configuration matches what you want.
@@ -139,10 +166,16 @@ This configuration is for Big Sur (11.6.x).
 We use the Apple clang/clang++ compiler.
 We use the installer to build autotools and Python 2.7.
 
+Set some environment variables to aid the PyLith configuration.
+
+```
+export PYTHON_VERSION=2.7
+```
+
 Configure the installer.
 
 ```bash
-${HOME}/src/pylith/pylith_installer-3.0.0-0/configure  \
+${HOME}/src/pylith/pylith_installer-2.2.2-2/configure  \
     --with-pylith-git=$PYLITH_BRANCH \
     --with-pylith-repo=$PYLITH_REPO \
     --enable-debugging \
@@ -157,9 +190,8 @@ ${HOME}/src/pylith/pylith_installer-3.0.0-0/configure  \
     --with-numpy-blaslapack=no \
     --enable-swig \
     --enable-pcre \
-    --enable-cmake \
-    CC=clang CXX=clang++
-```
+    CC=clang CXX=clang++ \
+	CFLAGS="-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk -Wno-implicit-function-declaration"```
 
 Check the configure output to make sure it ran without errors and the configuration matches what you want.
 Setup your environment by running `source setup.sh` (bash shell).
@@ -188,3 +220,11 @@ Finally, configure and build PyLith.
 cd $PYLITH_DIR/build/debug
 make installed_pylith
 ```
+
+## Modifying and Rebuilding PyLith
+
+The PyLith source will be in the directory `$PYLITH_DIR/build/debug/pylith/$PYLITH_BRANCH`.
+You can manage the source using Git to create branches, make commits, and push changes to your fork.
+
+You can rebuild PyLith by running `make install` in the `$PYLITH_DIR/build/debug/pylith-build` directory.
+Similarly, use `make check` to run the test suite.

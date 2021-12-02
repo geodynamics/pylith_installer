@@ -46,7 +46,7 @@ $HOME/src/pylith/pylith-installer-2.2.2-2/configure \
     --with-fortran=no \
     --with-make-threads=$(nproc) \
     --disable-cmake \
-    --enable-mpi=openmpi \
+    --enable-mpi=openmpi
 ```
 
 

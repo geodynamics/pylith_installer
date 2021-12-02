@@ -2,7 +2,7 @@
 
 The `pylith-devenv` Docker image provides all of the dependencies and defines the environment for PyLith development.
 It is built using the Ubuntu 20.04 Linux distribution.
-It is intended to be read only with a separate Docker volume for persistent storage of the PyLith development workspace.
+It is intended to be read-only with a separate Docker volume for persistent storage of the PyLith development workspace.
 We separate the development "environment" from the "workspace" so that we can update the development environment without affecting the workspace and easily maintain a persistent workspace while starting and stopping the Docker container that holds the development environment.
 
 In addition to the PyLith dependencies, the Docker image includes the following development tools:
@@ -11,9 +11,6 @@ In addition to the PyLith dependencies, the Docker image includes the following 
 * valgrind (memory debugging tool)
 * lcov (code coverage)
 * uncrustify (C++ code formatter)
-* autopep8 (Python code formatter)
-* matplotlib (Python plotting) [TODO]
-* Sphinx with MyST (documentation tools) [TODO]
 
 The Docker image also defines the environment:
 
@@ -27,11 +24,11 @@ The Docker image also defines the environment:
 | `TOPSRC_DIR`         |           `${BASE_DIR}/src`           | Top-level directory for source code                     |
 | `TOPBUILD_DIR`       |       `${BASE_DIR}/build/debug`       | Top-level directory for building                        |
 | `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith`        | Top-level directory where we build PyLith [^vscode]     |
-| `PYLITH_DIR`        |           `${INSTALL_DIR}`            | Directory containing CIG-related dependencies [^vscode] |
+| `PYLITH_DIR`        |           `${INSTALL_DIR}`            | Directory containing installed PyLith [^vscode] |
 | `PYLITHDEPS_DIR`        |           `/opt/dependencies`            | Directory containing external dependencies [^vscode] |
-| `PYTHON_INCDIR`      |       `/usr/include/python3.8`        | Directory containing Python header files [^vscode]      |
+| `PYTHON_INCDIR`      |       `/opt/dependencies/include/python2.7`        | Directory containing Python header files [^vscode]      |
 | `MPI_INCDIR`         | `/usr/include/x86_64-linux-gnu/mpich` | Directory containing MPI header files [^vscode]         |
-| `PROJ_INCDIR`        |            `/usr/include`             | Directory containing Proj header files [^vscode]        |
+| `PROJ_INCDIR`        |            `/opt/dependencies/include`             | Directory containing Proj header files [^vscode]        |
 | `CPPUNIT_INCDIR`     |            `/usr/include`             | Directory containing CppUnit header files [^vscode]     |
 
 [^vscode]: Environment variables used in Visual Studio Code workspace settings.
@@ -53,14 +50,14 @@ You only need to run these setup steps once.
 
 2. Fork the PyLith repository <https://github.com/geodynamics/pylith>.
 
-This creates copies of the repositories in your GitHub account.
+This creates copies of the repository in your GitHub account.
 
 ### Create Docker volume for persistent storage
 
 On your local machine, create a Docker volume for persistent storage.
 
 ```{code-block} bash
-docker volume create pylith-dev
+docker volume create pylith-dev-2.2.2
 ```
 
 ### Start PyLith development Docker container
@@ -72,12 +69,13 @@ Running the command below will:
 3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
 
 ```{code-block} bash
-docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
+docker run --name pylith-dev-workspace --rm -it -v pylith-dev-2.2.2:/opt/pylith \
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv:2.2.2
 ```
 
 :::{warning}
-Closing the `pylith-dev-workspace` Docker container interactive shell (terminal) will stop the container. Simply run the command again to restart the container.
+Closing the `pylith-dev-workspace` Docker container interactive shell (terminal) will stop the container.
+Simply run the command again to restart the container.
 :::
 
 ### Setup directory structure
@@ -103,7 +101,8 @@ We will use the following directory structure for the persistent storage.
             └── share
 ```
 
-We place the PyLith source code in `/opt/pylith/src`. You should not crate this directory as it will be created when you clone (download) the repository.
+We place the PyLith source code in `/opt/pylith/src`.
+You should not create this directory as it will be created when you clone (download) the repository.
 
 This directory structure is set up for both a debugging version for development (debug directory) and an optimized version for performance testing (opt directory).
 For now, we will only setup the debugging version.
@@ -121,7 +120,7 @@ These are your working copies of the repositories.
 
 ```{code-block} bash
 cd /opt/pylith
-git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git
+git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git src
 ```
 
 #### Set the upstream repository
@@ -171,10 +170,9 @@ The consequence of using a relative link is that your local clone will look for 
 
 ```{code-block} bash
 cd ${TOPBUILD_DIR}/pylith
-pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
-${TOPSRC_DIR}/pylith/configure --prefix=${PYLITH_DIR} \
+pushd ${TOPSRC_DIR} && autoreconf -if && popd
+${TOPSRC_DIR}/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
-    --enable-test-coverage --with-python-coverage=coverage3 \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
     LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
     CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
@@ -247,7 +245,7 @@ Whenever you need to restart the `pylith-dev-workspace` Docker container, simply
 
 ```{code-block} bash
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv:2.2.2-2
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv:2.2.2
 ```
 
 :::{tip}

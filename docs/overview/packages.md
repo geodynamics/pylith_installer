@@ -33,7 +33,7 @@ The dependencies will be downloaded from <http://geoweb.cse.ucdavis.edu/~buildbo
   * six 1.12.0
   * cftime 1.1.1
   * netCDF (Python) 1.5.0.1
-  * h5py 2.10.0
+  * h5py 2.10.1
 
 * General tools
   * OpenSSL 1.1.1l
