@@ -73,16 +73,12 @@ NEMESIS_VER=1.1.0
 
 CMAKE_VER=3.14.2
 
-if USE_PYLITH_GIT
-SPATIALDATA_VER=master
-PYLITH_VER=$(pylith_git)
-if PETSC_TARBALL
-PETSC_VER=2.2.2
-endif
-else
 SPATIALDATA_VER=1.10.0
-PYLITH_VER=2.2.2
 PETSC_VER=2.2.2
+if USE_PYLITH_GIT
+PYLITH_VER=$(pylith_git)
+else
+PYLITH_VER=2.2.2
 endif
 
 PARAMETERSGUI_VER=1.1.0
@@ -821,14 +817,8 @@ spatialdata_options += --enable-testing
 endif
 if WITH_DEBUGGING
 endif
-if USE_PYLITH_GIT
-spatialdata_options += --enable-swig
-	$(GIT) clone --branch master --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
-	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
-else
 	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz https://github.com/geodynamics/spatialdata/releases/download/v$(SPATIALDATA_VER)
 	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tgz
-endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
@@ -890,15 +880,11 @@ petsc_options +=
 else
 petsc_options += --with-fc=0
 endif
-if PETSC_TARBALL
 	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PETSC_VER)
 	$(FETCH_SCRIPT) "$(downloader)" Chaco-2.2-p2.tar.gz https://ftp.mcs.anl.gov/pub/petsc/externalpackages/
 	$(FETCH_SCRIPT) "$(downloader)" f2cblaslapack-3.4.2.q3.tar.gz https://ftp.mcs.anl.gov/pub/petsc/externalpackages
 	$(FETCH_SCRIPT) "$(downloader)" v6.2-p4.tar.gz https://bitbucket.org/petsc/pkg-ml/get
 	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz
-else
-	git clone --branch knepley/pylith --single-branch https://bitbucket.org/petsc/petsc.git petsc-pylith
-endif
 	cd petsc-pylith && \
 		./configure \
 			--prefix=$(prefix) \
