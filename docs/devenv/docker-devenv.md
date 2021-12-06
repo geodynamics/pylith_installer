@@ -204,7 +204,7 @@ The fix is to run the container in privileged mode as root and restart the `proc
 
 ```{code-block} bash
 # Run docker image in privileged mode as root.
-docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv:2.2.2 /bin/bash
 
 # Verify ptrace setting needs updating
 cat /proc/sys/kernel/yama/ptrace_scope
