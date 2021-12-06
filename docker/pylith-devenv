@@ -1,0 +1,127 @@
+ARG BUILD_ENV=nocerts
+FROM ubuntu:20.04 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libssl-dev \
+      libcppunit-dev \
+      libmpich-dev \
+      mpich \
+      libhdf5-mpich-103 \
+      libhdf5-mpich-dev \
+      hdf5-tools \
+      cmake \
+      lcov \
+      gdb \
+      valgrind \
+      tree \
+      less \
+      uncrustify \
+      gnupg2 \
+      ssh \
+      linux-tools-common \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
+RUN echo "kernel.yama.ptrace_scope = 0" > /etc/sysctl.d/10-ptrace.conf
+
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
+
+ONBUILD COPY docker/certs/ /usr/local/share/ca-certificates
+ONBUILD RUN update-ca-certificates
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=DOIRootCA2.pem
+
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+
+# ------------------------------------------------------------------------------
+from build-${BUILD_ENV} as build-deps
+
+ENV  PYLITH_USER=pylith-dev \
+     PYLITHDEPS_DIR=/opt/dependencies \
+     DEV_DIR=/opt/pylith \
+     PYTHON_VERSION=2.7 \
+     HDF5_INCDIR=/usr/include/hdf5/mpich \
+     HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich \
+     PATH_ORIG=${PATH}
+    
+ENV  HOME=/home/$PYLITH_USER \
+     INSTALL_DIR=$DEV_DIR/dest/debug \
+     TOPSRC_DIR=$DEV_DIR/src \
+     TOPBUILD_DIR=$DEV_DIR/build/debug
+
+# Create 'pylith-user'
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
+  && mkdir -p ${PYLITHDEPS_DIR} \
+  && mkdir -p ${DEV_DIR} \
+  && chown ${PYLITH_USER} ${DEV_DIR} \
+  && chgrp ${PYLITH_USER} ${DEV_DIR}
+ENV PATH=${PYLITHDEPS_DIR}/bin:$PATH \
+     LD_LIBRARY_PATH=${PYLITHDEPS_DIR}/lib \
+     PYTHONPATH=${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
+
+# PyLith installer
+ENV  src_dir=/opt/pylith-installer/src  build_dir=/opt/pylith-installer/build
+RUN mkdir -p /opt/pylith-installer && mkdir -p ${build_dir}
+
+COPY . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-cmake \
+    --disable-hdf5 \
+    --enable-pcre \
+    --enable-swig \
+    && make external_deps \
+    && make installed_pythia \
+    && make installed_nemesis \
+    && make installed_spatialdata \
+    && make installed_petsc \
+    && rm -r /opt/pylith-installer
+
+
+WORKDIR ${HOME}
+USER ${PYLITH_USER}
+
+# Environment variables used in VSCode settings
+ENV  PYLITH_DIR=${INSTALL_DIR} \
+     PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
+     PYTHON_INCDIR=/usr/include/python3.8 \
+     MPI_INCDIR=/usr/include/x86_64-linux-gnu/mpich \
+     PROJ_INCDIR=/usr/include \
+     CPPUNIT_INCDIR=/usr/include
+
+ENV PATH=${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
+    LD_LIBRARY_PATH=${PYLITH_DIR}/lib:${PYLITHDEPS_DIR}/lib \
+    PYTHONPATH=${PYLITH_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
+
+CMD /bin/bash
+
+# docker run -ti --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+# service procps restart
+# cat /proc/sys/kernel/yama/ptrace_scope
