@@ -18,11 +18,11 @@ The Docker image also defines the environment:
 | :------------------- | :-----------------------------------: | :------------------------------------------------------ |
 | `PYTHON_VERSION`     |                 `2.7`                 | Python version                                          |
 | `PYLITH_USER`        |             `pylith-dev`              | Username within container                               |
-| `BASE_DIR`           |             `/opt/pylith`             | Top-level directory for development workspace           |
+| `DEV_DIR`           |             `/opt/pylith`             | Top-level directory for development workspace           |
 | `HOME`               |        `/home/${PYLITH_USER}`         | Home directory for user                                 |
-| `INSTALL_DIR`        |       `${BASE_DIR}/dest/debug`        | Directory where code is installed                       |
-| `TOPSRC_DIR`         |           `${BASE_DIR}/src`           | Top-level directory for source code                     |
-| `TOPBUILD_DIR`       |       `${BASE_DIR}/build/debug`       | Top-level directory for building                        |
+| `INSTALL_DIR`        |       `${DEV_DIR}/dest/debug`        | Directory where code is installed                       |
+| `TOPSRC_DIR`         |           `${DEV_DIR}/src`           | Top-level directory for source code                     |
+| `TOPBUILD_DIR`       |       `${DEV_DIR}/build/debug`       | Top-level directory for building                        |
 | `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith`        | Top-level directory where we build PyLith [^vscode]     |
 | `PYLITH_DIR`        |           `${INSTALL_DIR}`            | Directory containing installed PyLith [^vscode] |
 | `PYLITHDEPS_DIR`        |           `/opt/dependencies`            | Directory containing external dependencies [^vscode] |
@@ -44,7 +44,7 @@ You only need to run these setup steps once.
 2. You need to have a [GitHub](https://github.com) account.
 :::
 
-### Fork repositories on GitHub
+### Fork repository on GitHub
 
 1. Log in to your [GitHub](https://github.com) account.
 
@@ -167,6 +167,16 @@ The consequence of using a relative link is that your local clone will look for 
 :::
 
 ### Configure and build PyLith for development
+
+:::{important}
+Make sure your PyLith clone is on a v2.2 compatible branch.
+This is either `releases/v2.2` from the `geodynamics/pylith` repository or one of your own branches from that branch.
+
+```{code-block} bash
+cd /opt/pylith/src
+git checkout releases/v2.2
+```
+:::
 
 ```{code-block} bash
 cd ${TOPBUILD_DIR}/pylith

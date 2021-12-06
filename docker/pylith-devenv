@@ -110,10 +110,11 @@ USER ${PYLITH_USER}
 
 # Environment variables used in VSCode settings
 ENV  PYLITH_DIR=${INSTALL_DIR} \
-     PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
-     PYTHON_INCDIR=/usr/include/python3.8 \
+     PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith \
+     PETSC_DIR=${PYLITHDEPS_DIR} \
+     PYTHON_INCDIR=${PYLITHDEPS_DIR}/include/python2.7 \
      MPI_INCDIR=/usr/include/x86_64-linux-gnu/mpich \
-     PROJ_INCDIR=/usr/include \
+     PROJ_INCDIR=${PYLITHDEPS_DIR}/include \
      CPPUNIT_INCDIR=/usr/include
 
 ENV PATH=${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
