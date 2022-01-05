@@ -101,7 +101,8 @@ EXTRA_DIST = \
 	docker/debian-baseenv \
 	docker/debian-data \
 	docker/debian-binary \
-	docker/build.py \
+	docker/builder.py \
+	docker/pylith-devenv \
 	packager/build.py \
 	packager/setup_darwin.sh \
 	packager/setup_linux32.sh \
