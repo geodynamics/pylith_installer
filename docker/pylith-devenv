@@ -35,7 +35,6 @@ RUN apt-get update \
       proj-bin \
       proj-data \
       libproj-dev \
-      cmake \
       swig \
       lcov \
       gdb \
@@ -106,7 +105,7 @@ RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
-    --disable-cmake \
+    --enable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
