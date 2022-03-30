@@ -33,6 +33,9 @@ RUN apt-get update \
       proj-bin \
       proj-data \
       libproj-dev \
+      openssl \
+      libssl1.1 \
+      libssl-dev \
       swig \
       lcov \
       gdb \
