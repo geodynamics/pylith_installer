@@ -39,7 +39,6 @@ RUN apt-get update \
       libsqlite3-dev \
       libtiff5 \
       libtiff5-dev \
-      cmake \
       lcov \
       gdb \
       valgrind \
@@ -97,7 +96,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
-    --disable-cmake \
+    --enable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
     --enable-python \
