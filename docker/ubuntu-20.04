@@ -33,7 +33,9 @@ RUN apt-get update \
       proj-bin \
       proj-data \
       libproj-dev \
-      cmake \
+      openssl \
+      libssl1.1 \
+      libssl-dev \
       swig \
       lcov \
       gdb \
@@ -92,7 +94,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
-    --disable-cmake \
+    --enable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \

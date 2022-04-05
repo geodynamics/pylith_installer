@@ -1,47 +1,62 @@
+# libz does not appear to be compatible.
 ARG BUILD_ENV=nocerts
-FROM centos:7 as os-update
+FROM fedora:36 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
 
-RUN yum install -y \
-        gcc \
-	gcc-c++ \
-	make \
-        file \
-	which \
-	diffutils \
-	gettext \
-        automake \
-        autoconf \
-        libtool \
-        curl \
-	libcurl-devel \
-	openssh \
-	openssl \
-	openssl-devel \
-	libtiff \
-	libtiff-devel \
-        zlib-devel \
-	libffi-devel \
-	unzip \
-	bzip2 \
-        git \
-	ca-certificates \
-	lcov \
-	gdb \
-	valgrind \
-	vim-common \
-	vim-runtime
-    
+RUN dnf install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    file \
+    diffutils \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    openssh \
+    python3 \
+    python3-devel \
+    python3-pip \
+    zlib \
+    zlib-devel \
+    blas \
+    blas-devel \
+    lapack \
+    lapack-devel \
+    atlas \
+    atlas-devel \
+    openssl \
+    openssl-libs \
+    unzip \
+    git \
+    ca-certificates \
+    cppunit \
+    cppunit-devel \
+    mpich-devel \
+    hdf5-mpich \
+    hdf5-mpich-devel \
+    sqlite \
+    sqlite-libs \
+    sqlite-devel \
+    proj \
+    proj-devel \
+    cmake \
+    swig \
+    lcov \
+    gdb \
+    valgrind \
+    vim \
+    vim-common
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
 
 ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 ONBUILD RUN update-ca-trust enable
-ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt 
 
 from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
@@ -51,18 +66,18 @@ from build-${BUILD_ENV} as build-deps
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.9
+    PYTHON_VERSION=3.10 \
+    HDF5_INCDIR=/usr/include/mpich-x86_64 \
+    HDF5_LIBDIR=/usr/lib64/mpich/lib
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
      TOPBUILD_DIR=${HOME}/build \
-     PATH=${INSTALL_DIR}/bin:$PATH \
+     PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
      LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
-     HDF5_LIBDIR=${INSTALL_DIR}/lib \
-     HDF5_INCDIR=${INSTALL_DIR}/include    
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
@@ -82,18 +97,14 @@ RUN autoreconf --install --verbose --force
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
-    --enable-cmake \
+    --disable-mpi \
+    --disable-cppunit \
+    --disable-cmake \
     --disable-sqlite \
-    --enable-gcc \
-    --enable-mpi=openmpi \
-    --enable-cppunit \
-    --enable-python \
-    --enable-pcre \
-    --enable-swig \
-    --enable-sqlite \
-    --enable-proj \
-    --enable-hdf5 \
+    --disable-hdf5 \
+    --disable-proj \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \
