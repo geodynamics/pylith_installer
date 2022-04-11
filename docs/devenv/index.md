@@ -2,6 +2,6 @@
 
 ```{toctree}
 configs.md
-docker-devenv.md
+docker/index.md
 dev-helper.md
 ```
