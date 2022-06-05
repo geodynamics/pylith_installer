@@ -23,6 +23,7 @@ noinst_tmp = \
 	installed_autotools \
 	installed_compilers \
 	installed_openssl \
+	installed_curl \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
@@ -46,6 +47,7 @@ noinst_builddirs = \
 	automake-build \
 	libtool-build \
 	openssl-build \
+	curl-build \
 	git-build \
 	python-build \
 	openmpi-build \
@@ -67,6 +69,7 @@ noinst_srcdirs = \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
 	openssl-${OPENSSL_VER) \
+	curl-$(CURL_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
@@ -84,7 +87,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -251,9 +254,34 @@ installed_openssl:
 
 
 # ----------------------------------------------------------------------
+# curl
+# ----------------------------------------------------------------------
+curl: installed_compilers installed_openssl
+if INSTALL_CURL
+	$(FETCH_SCRIPT) "$(downloader)" curl-$(CURL_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf curl-$(CURL_VER).tar.gz
+	$(MKDIR_P) curl-build
+	cd curl-build && \
+		../curl-$(CURL_VER)/configure --prefix=$(prefix) \
+		--enable-shared --with-openssl --disable-ldap CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		$(env_flags_deps) $(env_compilers) && \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_curl
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_curl
+endif
+
+installed_curl:
+	$(MAKE) $(AM_MAKEFLAGS) curl
+
+
+# ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers installed_openssl installed_sqlite
+python: installed_compilers installed_openssl installed_sqlite installed_curl
 if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)
@@ -343,7 +371,7 @@ mpich: installed_compilers
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
 		../mpich-$(MPICH_VER)/configure \
-			--with-pm=gforker \
+			--with-device=ch3 \
 			--enable-shared \
 			--enable-sharedlibs=$(mpich_sharedarch) \
 			--disable-static --disable-mpe \
@@ -481,7 +509,7 @@ installed_tiff:
 # ----------------------------------------------------------------------
 # proj
 # ----------------------------------------------------------------------
-proj: installed_compilers installed_sqlite installed_tiff
+proj: installed_compilers installed_sqlite installed_tiff installed_curl
 if INSTALL_PROJ
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz

@@ -134,6 +134,14 @@ AC_ARG_ENABLE([openssl],
 	[install_openssl=no])
 AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
 
+# CURL
+AC_ARG_ENABLE([curl],
+    [AC_HELP_STRING([--enable-curl],
+        [install curl @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_curl=yes; else install_curl=no; fi],
+	[install_curl=no])
+AM_CONDITIONAL([INSTALL_CURL], [test "$install_curl" = yes])
+
 # PYTHON
 AC_ARG_ENABLE([python],
     [AC_HELP_STRING([--enable-python],
@@ -965,6 +973,7 @@ printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
 printf "  openssl: $install_openssl\n"
+printf "  curl: $install_curl\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
 printf "    h5py: $install_h5py\n"

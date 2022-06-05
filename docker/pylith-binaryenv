@@ -1,0 +1,60 @@
+ARG BUILD_ENV=nocerts
+FROM centos:7 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
+RUN yum install -y \
+        gcc \
+        gcc-c++ \
+        make \
+        file \
+        which \
+        diffutils \
+        gettext \
+        automake \
+        autoconf \
+        libtool \
+        curl \
+        openssh \
+        zlib-devel \
+        libffi-devel \
+        unzip \
+        bzip2 \
+        git \
+        ca-certificates \
+        python3 \
+        gdb \
+        vim-common \
+        vim-runtime
+
+
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
+
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
+
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+
+# ------------------------------------------------------------------------------
+from build-${BUILD_ENV} as build-deps
+
+ENV PYLITH_USER=pylith-user \
+        BASE_DIR=/opt/pylith
+
+# Create 'pylith-user' user
+RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
+        && mkdir -p ${BASE_DIR} \
+        && chown ${PYLITH_USER} ${BASE_DIR} \
+        && chgrp ${PYLITH_USER} ${BASE_DIR}
+ENV  HOME=/home/$PYLITH_USER
+
+# ------------------------------------------------------------------------------
+USER ${PYLITH_USER}
+WORKDIR ${BASE_DIR}
+
+
+CMD /bin/bash

@@ -52,8 +52,6 @@ class Darwin:
         for line in output.split("\t")[1:]:
             deplibs.append(line.split()[0])
         for libPathAbs in deplibs:
-            if ".dylibs" in libPathAbs:
-                import pdb; pdb.set_trace()
             if libPathAbs.startswith("/usr") or libPathAbs.startswith("/System"):
                 continue
             if libPathAbs.startswith("@loader_path"):
@@ -75,10 +73,10 @@ class Packager:
 
     def make_src_tarball(self):
         os.chdir(self.build_dir)
-        #self._run_cmd(("make", "dist"))
+        self._run_cmd(("make", "dist"))
         filename_dist = f"{self.make['package']}-{self.make['version']}.tar.gz"
         filename_tagged = f"{self.git_version}-{filename_dist}"
-        #self._run_cmd(("mv", filename_dist, filename_tagged))
+        self._run_cmd(("mv", filename_dist, filename_tagged))
         self.src_tarball = self.build_dir / filename_tagged
 
     def make_dist_tarball(self):
@@ -86,11 +84,11 @@ class Packager:
         arch = self._get_arch()
 
         dist_name = f"{self.make['package']}-{self.make['version']}-{arch}"
-        #self._install_src(self.dest_dir)
+        self._install_src(self.dest_dir)
         tfilename = f"{self.git_version}-{dist_name}.tar.gz"
-        #with tarfile.open(tfilename, mode="w:gz") as tfile:
-        #    tfile.add(self.dest_dir, arcname=dist_name, filter=self._exclude)
-        #shutil.rmtree(self.dest_dir / "src")
+        with tarfile.open(tfilename, mode="w:gz") as tfile:
+            tfile.add(self.dest_dir, arcname=dist_name, filter=self._exclude)
+        shutil.rmtree(self.dest_dir / "src")
 
         self._update_linking(dist_name, tfilename)
 
@@ -125,7 +123,6 @@ class Packager:
         if platform.system().lower() != "darwin":
             return
 
-        import pdb; pdb.set_trace()
         tarball_dir = self.build_dir / dist_name
         shutil.rmtree(tarball_dir, ignore_errors=True)
         with tarfile.open(tfilename, "r:*") as tfile:
@@ -184,7 +181,7 @@ class MakeBinaryApp:
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
-        self.pythonVersion = "3.9" # :KLUDGE:
+        self.python_version = "3.9" # :KLUDGE:
 
     def main(self):
         args = self._parse_command_line()
@@ -219,9 +216,10 @@ class MakeBinaryApp:
 
     def configure(self):
         if self.os == "Linux":
-            configArgs = ("--enable-gcc",
+            config_args = ("--enable-gcc",
                           "--enable-mpi=mpich",
                           "--enable-openssl", 
+                          "--enable-curl",
                           "--enable-sqlite",
                           "--enable-cppunit",
                           "--enable-python", 
@@ -236,8 +234,9 @@ class MakeBinaryApp:
                           "--with-fetch=curl",
                       )
         elif self.os == "Darwin":
-            configArgs = ("--enable-mpi=mpich",
-                          "--enable-openssl", 
+            config_args = ("--enable-mpi=mpich",
+                          "--enable-openssl",
+                          "--enable-curl", 
                           "--enable-sqlite",
                           "--enable-cppunit",
                           "--enable-python",
@@ -254,6 +253,8 @@ class MakeBinaryApp:
 
         else:
             raise ValueError(f"Unknown os '{self.os}'.")
+        if "CERT_PATH" in os.environ:
+            config_args += ("--with-cert-path=${CERT_PATH}", "--with-cert-file=${CERT_FILE}")
 
         petscOptions = ("--download-chaco=1",
                         "--download-f2cblaslapack=1",
@@ -268,30 +269,30 @@ class MakeBinaryApp:
         # autoreconf
         os.chdir(self.src_dir)
         cmd = ("autoreconf", "--install", "--force", "--verbose")
-        self._runCmd(cmd)
+        self._run_cmd(cmd)
         self._setEnviron()
 
         # configure
         os.chdir(self.build_dir)
-        cmd = (self.src_dir / "configure",
+        cmd = (str(self.src_dir / "configure"),
                f"--with-make-threads={self.make_threads}",
                f"--prefix={self.dest_dir}",
         )
         if not self.pylith_branch is None:
             cmd += (f"--with-pylith-git={self.pylith_branch}",)
-        if self.forceConfig:
+        if self.force_config:
             cmd += ("--enable-force-install",)
 
-        cmd += configArgs
+        cmd += config_args
         cmd += ("--with-petsc-options=" + " ".join(petscOptions),)
-        self._runCmd(cmd)
+        self._run_cmd(cmd)
 
     def build(self):
         os.chdir(self.build_dir)
         self._setEnviron()
 
         cmd = ("make",)
-        self._runCmd(cmd)
+        self._run_cmd(cmd)
 
     def package(self):
         if self.os == "Darwin":
@@ -339,9 +340,9 @@ class MakeBinaryApp:
         )
         os.environ["PATH"] = ":".join(path)
 
-        pythonpath = (os.path.join(self.dest_dir, "lib", "python%s" % self.pythonVersion, "site-packages"),)
+        pythonpath = (os.path.join(self.dest_dir, "lib", "python%s" % self.python_version, "site-packages"),)
         if self.arch == "x86_64":
-            pythonpath += (os.path.join(self.dest_dir, "lib64", "python%s" % self.pythonVersion, "site-packages"),)
+            pythonpath += (os.path.join(self.dest_dir, "lib64", "python%s" % self.python_version, "site-packages"),)
         os.environ["PYTHONPATH"] = ":".join(pythonpath)
         
         if self.os == "Linux":
@@ -351,7 +352,7 @@ class MakeBinaryApp:
             os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
         return
 
-    def _runCmd(self, cmd):
+    def _run_cmd(self, cmd):
         print("Running '%s'..." % " ".join(cmd))
         subprocess.check_call(cmd)
 
