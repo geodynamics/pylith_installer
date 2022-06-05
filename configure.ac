@@ -2,14 +2,14 @@
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Matthew G. Knepley, University at Buffalo
 #
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
-# See COPYING for license information.
+# See LICENSE.md for license information.
 #
 # ----------------------------------------------------------------------
 # Process this file with autoconf to produce a configure script.
@@ -149,6 +149,14 @@ AC_ARG_ENABLE([developer],
 	[if test "$enableval" != no ; then install_developer=yes; else install_developer=no; fi],
 	[install_developer=no])
 AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
+
+# ADDONS
+AC_ARG_ENABLE([addons],
+    [AC_HELP_STRING([--enable-addons],
+        [install Gmsh and matplotlib Python packages @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_addons=yes; else install_addons=no; fi],
+	[install_addons=no])
+AM_CONDITIONAL([INSTALL_ADDONS], [test "$install_addons" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -339,9 +347,9 @@ AC_ARG_ENABLE([petsc],
 AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-f2cblaslapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1"])
+	[petsc_options="--download-chaco=1 --download-f2cblaslapack=1"])
 AC_SUBST(petsc_options)
 AC_ARG_WITH([petsc-tarball],
     [AC_HELP_STRING([--with-petsc-tarball],
