@@ -1,17 +1,17 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # ----------------------------------------------------------------------
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Matthew G. Knepley, University at Buffalo
 #
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
-# See COPYING for license information.
+# See LICENSE.md for license information.
 #
 # ----------------------------------------------------------------------
 #
@@ -24,155 +24,313 @@
 import os
 import shutil
 import subprocess
+import argparse
+import pathlib
+import tarfile
+import platform
+from distutils.sysconfig import parse_makefile
 
-class BinaryApp(object):
+class Darwin:
 
-    def __init__(self, base_dir, pylith_branch, nthreads, force_config):
-        self.baseDir = base_dir
-        self.pylithBranch = pylith_branch
-        self.nthreads = nthreads
-        self.forceConfig = force_config
+    @staticmethod
+    def update_linking(install_dir):
+        for filepath in install_dir.glob("bin/*"):
+            Darwin.update_deplibs(filepath)
+        for filepath in install_dir.glob("*/*.dylib"):
+            Darwin.update_deplibs(filepath)
+        for filepath in install_dir.glob("**/*.so"):
+            Darwin.update_deplibs(filepath)
 
-        self.srcDir = os.path.join(base_dir, "src", "pylith_installer")
-        self.destDir = os.path.join(base_dir, "dist")
-        self.buildDir = os.path.join(base_dir, "build")
+    @staticmethod
+    def update_deplibs(filename):
+        if filename.is_symlink() or filename.is_dir():
+            return
 
+        proc = subprocess.run(["otool", "-L", filename], stdout=subprocess.PIPE, check=True)
+        output = proc.stdout.decode("utf-8")
+        deplibs = []
+        for line in output.split("\t")[1:]:
+            deplibs.append(line.split()[0])
+        for libPathAbs in deplibs:
+            if ".dylibs" in libPathAbs:
+                import pdb; pdb.set_trace()
+            if libPathAbs.startswith("/usr") or libPathAbs.startswith("/System"):
+                continue
+            if libPathAbs.startswith("@loader_path"):
+                continue
+            libName = os.path.split(libPathAbs)[1]
+            libPathNew = f"@executable_path/../lib/{libName}"
+            cmd = ["install_name_tool", "-change", libPathAbs, libPathNew, str(filename)]
+            subprocess.run(cmd, check=True)
+
+
+class Packager:
+
+    def __init__(self, dest_dir, build_dir):
+        self.dest_dir = dest_dir
+        self.build_dir = build_dir
+
+        self._get_makeinfo()
+        self._get_git_version()
+
+    def make_src_tarball(self):
+        os.chdir(self.build_dir)
+        #self._run_cmd(("make", "dist"))
+        filename_dist = f"{self.make['package']}-{self.make['version']}.tar.gz"
+        filename_tagged = f"{self.git_version}-{filename_dist}"
+        #self._run_cmd(("mv", filename_dist, filename_tagged))
+        self.src_tarball = self.build_dir / filename_tagged
+
+    def make_dist_tarball(self):
+        os.chdir(self.build_dir)
+        arch = self._get_arch()
+
+        dist_name = f"{self.make['package']}-{self.make['version']}-{arch}"
+        #self._install_src(self.dest_dir)
+        tfilename = f"{self.git_version}-{dist_name}.tar.gz"
+        #with tarfile.open(tfilename, mode="w:gz") as tfile:
+        #    tfile.add(self.dest_dir, arcname=dist_name, filter=self._exclude)
+        #shutil.rmtree(self.dest_dir / "src")
+
+        self._update_linking(dist_name, tfilename)
+
+    def _run_cmd(self, cmd):
+        print("Running '%s'..." % " ".join(cmd))
+        subprocess.check_call(cmd)
+
+    def _get_makeinfo(self):
+        os.chdir(self.build_dir)
+        makefile = parse_makefile("Makefile")
+        self.make = {
+            "package_name": makefile["PACKAGE_NAME"],
+            "package": makefile["PACKAGE"],
+            "version": makefile["VERSION"],
+            "src_dir": makefile["abs_top_srcdir"],
+        }
+
+    def _get_git_version(self):
+        os.chdir(self.make["src_dir"])
+        cmd = ("git", "describe", "--tags")
+        status = subprocess.run(cmd, capture_output=True)
+        self.git_version = status.stdout.strip().decode()
+
+    def _install_src(self, target_dir):
+        dist_src = target_dir / "src"
+        shutil.rmtree(dist_src, ignore_errors=True)
+        dist_src.mkdir(exist_ok=True)
+        tfile = tarfile.open(self.src_tarball, mode="r:*")
+        tfile.extractall(path=dist_src)
+
+    def _update_linking(self, dist_name, tfilename):
+        if platform.system().lower() != "darwin":
+            return
+
+        import pdb; pdb.set_trace()
+        tarball_dir = self.build_dir / dist_name
+        shutil.rmtree(tarball_dir, ignore_errors=True)
+        with tarfile.open(tfilename, "r:*") as tfile:
+            tfile.extractall(path=self.build_dir)
+        Darwin.update_linking(tarball_dir)
+        with tarfile.open(tfilename, mode="w:gz") as tfile:
+            tfile.add(tarball_dir, arcname=dist_name)
+        shutil.rmtree(tarball_dir)
+
+    @staticmethod
+    def _get_arch():
+        op_sys = platform.system().lower()
+        if op_sys=="darwin":
+            mac_ver = platform.mac_ver()
+            arch = f"macOS-{mac_ver[0]}_{mac_ver[2]}"
+        else:
+            machine = (platform.processor() or platform.machine())
+            arch = f"{op_sys}-{machine}"
+        return arch
+
+    @staticmethod
+    def _exclude(tarinfo):
+        EXCLUDE = (
+            "gcc",
+            "g++",
+            "gcov",
+            "gcov-dump",
+            "gcov-tool",
+            "cpp",
+            "cc",
+            "c++",
+            "lto-dump",
+            )
+        filepath = tarinfo.name
+        if os.path.splitext(filepath)[1] == ".a":
+            return None
+        filename = os.path.split(filepath)[1]
+        if filename in EXCLUDE:
+            return None
+        if filename.startswith("x86_64-pc-linux-gnu"):
+            return None
+        if filename.startswith("libasan") or \
+            filename.startswith("libtsan") or \
+            filename.startswith("libubsan") or \
+            filename.startswith("liblsan"):
+            return None
+        if os.path.split(filepath)[0].endswith("libexec"):
+            return None
+        if os.path.split(filepath)[0].startswith("include"):
+            return None
+        return tarinfo
+
+class MakeBinaryApp:
+
+    def __init__(self):
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
-        self.pythonVersion = "2.7" # :KLUDGE:
-        return
+        self.pythonVersion = "3.9" # :KLUDGE:
 
+    def main(self):
+        args = self._parse_command_line()
+        self.base_dir = pathlib.Path(args.base_dir)
+        self.pylith_branch = args.pylith_branch
+        self.make_threads = args.make_threads
+        self.force_config = args.force_config
+
+        self.src_dir = self.base_dir / "src" / "pylith_installer"
+        self.dest_dir = self.base_dir / "dist"
+        self.build_dir = self.base_dir / "build"
+
+        if args.setup or args.all:
+            self.setup()
+        if args.configure or args.all:
+            self.configure()
+        if args.build or args.all:
+            self.build()
+        if args.package or args.all:
+            self.package()
 
     def setup(self):
-        print("Cleaning destination directory '%s'..." % self.destDir)
-        if os.path.isdir(self.destDir):
-            shutil.rmtree(self.destDir)
-        print("Cleaning build directory '%s'..." % self.buildDir)
-        if os.path.isdir(self.buildDir):
-            shutil.rmtree(self.buildDir)
+        print(f"Cleaning destination directory '{self.dest_dir}'...")
+        if self.dest_dir.is_dir():
+            shutil.rmtree(self.dest_dir)
+        print(f"Cleaning build directory '{self.build_dir}'...")
+        if self.build_dir.is_dir():
+            shutil.rmtree(self.build_dir)
 
-        os.mkdir(self.destDir)
-        os.mkdir(self.buildDir)
-        return
-
+        self.dest_dir.mkdir(parents=True, exist_ok=True)
+        self.build_dir.mkdir(parents=True, exist_ok=True)
 
     def configure(self):
         if self.os == "Linux":
             configArgs = ("--enable-gcc",
+                          "--enable-mpi=mpich",
                           "--enable-openssl", 
-                          "--enable-python", 
-                          "--enable-mpi=mpich",
+                          "--enable-sqlite",
                           "--enable-cppunit",
-                          "--enable-numpy",
-                          "--with-numpy-blaslapack",
-                          "--enable-six",
-                          "--enable-proj4",
+                          "--enable-python", 
+                          "--enable-swig",
+                          "--enable-pcre",
+                          "--enable-proj",
                           "--enable-hdf5",
-                          "--enable-netcdfpy",
                           "--enable-cmake",
-                          "--enable-nemesis",
-                          "--enable-fiat",
-                          "--enable-pcre",
-                          "--enable-swig",
-                          "--enable-setuptools",
+                          "--enable-addons",
+                          "--enable-tiff",
+                          "--with-fortran=no",
+                          "--with-fetch=curl",
                       )
-            petscOptions = ("--download-chaco=1",
-                            "--download-ml=1",
-                            "--download-f2cblaslapack=1",
-                            "--with-hwloc=0",
-                            "--with-ssl=0",
-                            "--with-x=0",
-                            "--with-c2html=0",
-                            "--with-lgrind=0",
-                            )
         elif self.os == "Darwin":
-            configArgs = ("--enable-autotools",
-                          "--enable-mpi=mpich",
+            configArgs = ("--enable-mpi=mpich",
+                          "--enable-openssl", 
+                          "--enable-sqlite",
+                          "--enable-cppunit",
+                          "--enable-python",
                           "--enable-swig",
                           "--enable-pcre",
-                          "--enable-numpy",
+                          "--enable-proj",
+                          "--enable-hdf5",
                           "--enable-cmake",
+                          "--enable-addons",
+                          "--enable-tiff",
                           "--with-fortran=no",
                           "--with-fetch=curl",
                           )
-            petscOptions = ("--download-chaco=1",
-                            "--download-ml",
-                            "--with-fc=0",
-                            "--with-hwloc=0",
-                            "--with-ssl=0",
-                            "--with-x=0",
-                            "--with-c2html=0",
-                            "--with-lgrind=0",
-                            "--with-blas-lib=/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libBLAS.dylib",
-                            "--with-lapack-lib=/System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/Versions/Current/libLAPACK.dylib",
-                            )
+
         else:
-            raise ValueError("Unknown os '%s'." % self.os)
+            raise ValueError(f"Unknown os '{self.os}'.")
+
+        petscOptions = ("--download-chaco=1",
+                        "--download-f2cblaslapack=1",
+                        "--with-fc=0",
+                        "--with-hwloc=0",
+                        "--with-ssl=0",
+                        "--with-x=0",
+                        "--with-c2html=0",
+                        "--with-lgrind=0",
+                        )
 
         # autoreconf
-        os.chdir(self.srcDir)
+        os.chdir(self.src_dir)
         cmd = ("autoreconf", "--install", "--force", "--verbose")
         self._runCmd(cmd)
-
         self._setEnviron()
 
         # configure
-        os.chdir(self.buildDir)
-        cmd = ("%s" % os.path.join(self.srcDir, "configure"),
-               "--with-make-threads=%d" % self.nthreads,
-               "--prefix=%s" % self.destDir,
+        os.chdir(self.build_dir)
+        cmd = (self.src_dir / "configure",
+               f"--with-make-threads={self.make_threads}",
+               f"--prefix={self.dest_dir}",
         )
-        if not self.pylithBranch is None:
-            cmd += ("--with-pylith-git=%s" % self.pylithBranch,)
+        if not self.pylith_branch is None:
+            cmd += (f"--with-pylith-git={self.pylith_branch}",)
         if self.forceConfig:
             cmd += ("--enable-force-install",)
 
         cmd += configArgs
-        cmd += ("--with-petsc-options=%s" % " ".join(petscOptions),)
+        cmd += ("--with-petsc-options=" + " ".join(petscOptions),)
         self._runCmd(cmd)
-        return
-
 
     def build(self):
-        os.chdir(self.buildDir)
+        os.chdir(self.build_dir)
         self._setEnviron()
 
         cmd = ("make",)
         self._runCmd(cmd)
-        return
-
 
     def package(self):
         if self.os == "Darwin":
-            filename = "setup_darwin.sh"
+            filename = "setup_macos.sh"
         elif self.os == "Linux":
             if self.arch == "x86_64":
-                filename = "setup_linux64.sh"
-            elif self.arch == "i686":
-                filename = "setup_linux32.sh"
+                filename = "setup_linux.sh"
             else:
-                raise ValueError("Unknown architecture '%s'." % self.arch)
+                raise ValueError(f"Unknown architecture '{self.arch}'.")
         else:
-            raise ValueError("Unknown os '%s'." % self.os)
+            raise ValueError(f"Unknown os '{self.os}'.")
+        shutil.copyfile(self.src_dir / "packager" / filename, self.dest_dir / "setup.sh")
 
-        shutil.copyfile(os.path.join(self.srcDir, "packager", filename), os.path.join(self.destDir, "setup.sh"))
-        os.chdir(os.path.join(self.buildDir, "pylith-build"))
-        cmd = (os.path.join(self.srcDir, "packager", "make_package.py"),)
-        self._runCmd(cmd)
+        build_dir = self.build_dir / "cig" / "pylith-build"
+        packager = Packager(build_dir=build_dir, dest_dir=self.dest_dir)
+        packager.make_src_tarball()
+        packager.make_dist_tarball()
 
-        # Darwin
-        if self.os == "Darwin":
-            print("Unpack tarball")
-            print("Run packager/update_darwinlinking.py in top-level directory of unpacked tarball.")
-            print("Repack tarball")
-        return
+    def _parse_command_line(self):
+        baseDirDefault = "/opt"
 
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--setup", action="store_true", dest="setup")
+        parser.add_argument("--configure", action="store_true", dest="configure")
+        parser.add_argument("--build", action="store_true", dest="build")
+        parser.add_argument("--package", action="store_true", dest="package")
+        parser.add_argument("--all", action="store_true", dest="all")
+        parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
+        parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
+        parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=8)
+        parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
+        args = parser.parse_args()
+        return args
 
+    
     def _setEnviron(self):
         print("Setting environment...")
 
-        path = (os.path.join(self.destDir, "bin"),
+        path = (os.path.join(self.dest_dir, "bin"),
                 os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
                 "/bin",
                 "/usr/bin",
@@ -181,58 +339,23 @@ class BinaryApp(object):
         )
         os.environ["PATH"] = ":".join(path)
 
-        pythonpath = (os.path.join(self.destDir, "lib", "python%s" % self.pythonVersion, "site-packages"),)
+        pythonpath = (os.path.join(self.dest_dir, "lib", "python%s" % self.pythonVersion, "site-packages"),)
         if self.arch == "x86_64":
-            pythonpath += (os.path.join(self.destDir, "lib64", "python%s" % self.pythonVersion, "site-packages"),)
+            pythonpath += (os.path.join(self.dest_dir, "lib64", "python%s" % self.pythonVersion, "site-packages"),)
         os.environ["PYTHONPATH"] = ":".join(pythonpath)
         
         if self.os == "Linux":
-            ldpath = (os.path.join(self.destDir, "lib"),)
+            ldpath = (os.path.join(self.dest_dir, "lib"),)
             if self.arch == "x86_64":
-                ldpath += (os.path.join(self.destDir, "lib64"),)
+                ldpath += (os.path.join(self.dest_dir, "lib64"),)
             os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
         return
-
 
     def _runCmd(self, cmd):
         print("Running '%s'..." % " ".join(cmd))
         subprocess.check_call(cmd)
-        return
 
-    
+
 # ======================================================================
 if __name__ == "__main__":
-    import argparse
-
-    baseDirDefault = os.path.join(os.environ["HOME"], "pylith-binary")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--setup", action="store_true", dest="setup")
-    parser.add_argument("--configure", action="store_true", dest="configure")
-    parser.add_argument("--build", action="store_true", dest="build")
-    parser.add_argument("--package", action="store_true", dest="package")
-    parser.add_argument("--all", action="store_true", dest="all")
-    parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
-    parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
-    parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=4)
-    parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
-    args = parser.parse_args()
-
-    app = BinaryApp(args.base_dir, args.pylith_branch, args.make_threads, args.force_config)
-
-    if args.setup or args.all:
-        app.setup()
-
-    if args.configure or args.all:
-        app.configure()
-
-    if args.build or args.all:
-        app.build()
-        
-    if args.package or args.all:
-        app.package()
-        
-    
-# End of file
-
-
+    MakeBinaryApp().main()

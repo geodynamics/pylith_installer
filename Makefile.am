@@ -2,14 +2,14 @@
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Matthew G. Knepley, University at Buffalo
 #
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
-# See COPYING for license information.
+# See LICENSE.md for license information.
 #
 # ----------------------------------------------------------------------
 
@@ -44,8 +44,8 @@ EXTRA_DIST = \
 	developer/developer-helper.py \
 	developer/developer-helper.cfg \
 	packager/build.py \
-	packager/setup_darwin.sh \
-	packager/setup_linux64.sh \
+	packager/setup_macos.sh \
+	packager/setup_linux.sh \
 	packager/make_package.py \
 	packager/make_petscdist.sh \
 	packager/update_darwinlinking.py
