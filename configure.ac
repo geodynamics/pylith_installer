@@ -522,7 +522,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix/bin/python3
-  PYTHON_VERSION=3.9.1
+  PYTHON_VERSION=3.9
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Building Python requires zlib. Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
