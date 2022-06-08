@@ -75,7 +75,8 @@ class Packager:
         os.chdir(self.build_dir)
         self._run_cmd(("make", "dist"))
         filename_dist = f"{self.make['package']}-{self.make['version']}.tar.gz"
-        filename_tagged = f"{self.git_version}-{filename_dist}"
+        prefix = self.git_version or "release"
+        filename_tagged = f"{prefix}-{filename_dist}"
         self._run_cmd(("mv", filename_dist, filename_tagged))
         self.src_tarball = self.build_dir / filename_tagged
 
@@ -85,7 +86,9 @@ class Packager:
 
         dist_name = f"{self.make['package']}-{self.make['version']}-{arch}"
         self._install_src(self.dest_dir)
-        tfilename = f"{self.git_version}-{dist_name}.tar.gz"
+        prefix = self.git_version or "release"
+        tfilename = f"{prefix}-{dist_name}.tar.gz"
+        print(f"Making binary package tarball '{tfilename}'...")
         with tarfile.open(tfilename, mode="w:gz") as tfile:
             tfile.add(self.dest_dir, arcname=dist_name, filter=self._exclude)
         shutil.rmtree(self.dest_dir / "src")
@@ -123,6 +126,7 @@ class Packager:
         if platform.system().lower() != "darwin":
             return
 
+        print(f"Updating linking...")
         tarball_dir = self.build_dir / dist_name
         shutil.rmtree(tarball_dir, ignore_errors=True)
         with tarfile.open(tfilename, "r:*") as tfile:
@@ -137,7 +141,7 @@ class Packager:
         op_sys = platform.system().lower()
         if op_sys=="darwin":
             mac_ver = platform.mac_ver()
-            arch = f"macOS-{mac_ver[0]}_{mac_ver[2]}"
+            arch = f"macOS-{mac_ver[0]}-{mac_ver[2]}"
         else:
             machine = (platform.processor() or platform.machine())
             arch = f"{op_sys}-{machine}"
