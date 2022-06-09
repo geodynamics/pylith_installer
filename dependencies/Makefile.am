@@ -24,6 +24,7 @@ noinst_tmp = \
 	installed_compilers \
 	installed_openssl \
 	installed_curl \
+	installed_libffi \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
@@ -48,6 +49,7 @@ noinst_builddirs = \
 	libtool-build \
 	openssl-build \
 	curl-build \
+	libffi-build \
 	git-build \
 	python-build \
 	openmpi-build \
@@ -70,6 +72,7 @@ noinst_srcdirs = \
 	Python-$(PYTHON_VER) \
 	openssl-${OPENSSL_VER) \
 	curl-$(CURL_VER) \
+	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
@@ -279,9 +282,34 @@ installed_curl:
 
 
 # ----------------------------------------------------------------------
+# libffi
+# ----------------------------------------------------------------------
+libffi: installed_compilers installed_openssl
+if INSTALL_LIBFFI
+	$(FETCH_SCRIPT) "$(downloader)" libffi-$(LIBFFI_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf libffi-$(LIBFFI_VER).tar.gz
+	$(MKDIR_P) libffi-build
+	cd libffi-build && \
+		../libffi-$(LIBFFI_VER)/configure --prefix=$(prefix) \
+		--enable-shared CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		$(env_flags_deps) $(env_compilers) && \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_libffi
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_libffi
+endif
+
+installed_libffi:
+	$(MAKE) $(AM_MAKEFLAGS) libffi
+
+
+# ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers installed_openssl installed_sqlite installed_curl
+python: installed_compilers installed_openssl installed_sqlite installed_curl installed_libffi
 if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)

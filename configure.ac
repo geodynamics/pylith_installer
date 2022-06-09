@@ -142,6 +142,14 @@ AC_ARG_ENABLE([curl],
 	[install_curl=no])
 AM_CONDITIONAL([INSTALL_CURL], [test "$install_curl" = yes])
 
+# libFFI
+AC_ARG_ENABLE([libffi],
+    [AC_HELP_STRING([--enable-libffi],
+        [install libffi @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_libffi=yes; else install_libffi=no; fi],
+	[install_libffi=no])
+AM_CONDITIONAL([INSTALL_LIBFFI], [test "$install_libffi" = yes])
+
 # PYTHON
 AC_ARG_ENABLE([python],
     [AC_HELP_STRING([--enable-python],
@@ -974,6 +982,7 @@ printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
 printf "  openssl: $install_openssl\n"
 printf "  curl: $install_curl\n"
+printf "  libffi: $install_libffi\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
 printf "    h5py: $install_h5py\n"
