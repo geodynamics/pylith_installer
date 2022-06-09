@@ -22,6 +22,7 @@
 #   Source setup.sh after running --configure.
 
 import os
+import stat
 import shutil
 import subprocess
 import argparse
@@ -33,12 +34,12 @@ from distutils.sysconfig import parse_makefile
 class Darwin:
 
     @staticmethod
-    def update_linking(install_dir):
-        for filepath in install_dir.glob("bin/*"):
+    def update_linking(dist_dir):
+        for filepath in dist_dir.glob("bin/*"):
             Darwin.update_deplibs(filepath)
-        for filepath in install_dir.glob("*/*.dylib"):
+        for filepath in dist_dir.glob("*/*.dylib"):
             Darwin.update_deplibs(filepath)
-        for filepath in install_dir.glob("**/*.so"):
+        for filepath in dist_dir.glob("**/*.so"):
             Darwin.update_deplibs(filepath)
 
     @staticmethod
@@ -64,8 +65,8 @@ class Darwin:
 
 class Packager:
 
-    def __init__(self, dest_dir, build_dir):
-        self.dest_dir = dest_dir
+    def __init__(self, dist_dir, build_dir):
+        self.dist_dir = dist_dir
         self.build_dir = build_dir
 
         self._get_makeinfo()
@@ -84,14 +85,16 @@ class Packager:
         os.chdir(self.build_dir)
         arch = self._get_arch()
 
+        self._fix_python_path()
+
         dist_name = f"{self.make['package']}-{self.make['version']}-{arch}"
-        self._install_src(self.dest_dir)
+        self._install_src(self.dist_dir)
         prefix = self.git_version or "release"
         tfilename = f"{prefix}-{dist_name}.tar.gz"
         print(f"Making binary package tarball '{tfilename}'...")
         with tarfile.open(tfilename, mode="w:gz") as tfile:
-            tfile.add(self.dest_dir, arcname=dist_name, filter=self._exclude)
-        shutil.rmtree(self.dest_dir / "src")
+            tfile.add(self.dist_dir, arcname=dist_name, filter=self._exclude)
+        shutil.rmtree(self.dist_dir / "src")
 
         self._update_linking(dist_name, tfilename)
 
@@ -121,6 +124,32 @@ class Packager:
         dist_src.mkdir(exist_ok=True)
         tfile = tarfile.open(self.src_tarball, mode="r:*")
         tfile.extractall(path=dist_src)
+
+    def _fix_python_path(self):
+        def _rewrite(filename):
+            mode = os.stat(filename).st_mode
+            filename_tmp = str(filename) + "-tmp"
+            with open(filename, "r") as fin, open(filename_tmp, "w") as fout:
+                line0 = fin.readline()
+                line0 = line0.replace(old_path, new_path)
+                fout.write(line0)
+                fout.writelines(fin.readlines())
+            os.replace(filename_tmp, filename)
+            os.chmod(filename, mode | stat.S_IEXEC)
+
+        dist_bin = self.dist_dir / "bin"
+        old_path = f"{dist_bin}/"
+        new_path = "/usr/bin/env "
+        for filename in dist_bin.glob("*"):
+            if filename.is_dir() or filename.is_symlink():
+                continue
+            with open(filename, "r") as fin:
+                try:
+                    line = fin.readline()
+                except UnicodeDecodeError:
+                    continue
+                if line.startswith(f"#!{old_path}"):
+                    _rewrite(filename)
 
     def _update_linking(self, dist_name, tfilename):
         if platform.system().lower() != "darwin":
@@ -158,6 +187,7 @@ class Packager:
             "cpp",
             "cc",
             "c++",
+            "python", # use python3
             "lto-dump",
             )
         filepath = tarinfo.name
@@ -195,7 +225,7 @@ class MakeBinaryApp:
         self.force_config = args.force_config
 
         self.src_dir = self.base_dir / "src" / "pylith_installer"
-        self.dest_dir = self.base_dir / "dist"
+        self.dist_dir = self.base_dir / "dist"
         self.build_dir = self.base_dir / "build"
 
         if args.setup or args.all:
@@ -208,21 +238,22 @@ class MakeBinaryApp:
             self.package()
 
     def setup(self):
-        print(f"Cleaning destination directory '{self.dest_dir}'...")
-        if self.dest_dir.is_dir():
-            shutil.rmtree(self.dest_dir)
+        print(f"Cleaning destination directory '{self.dist_dir}'...")
+        if self.dist_dir.is_dir():
+            shutil.rmtree(self.dist_dir)
         print(f"Cleaning build directory '{self.build_dir}'...")
         if self.build_dir.is_dir():
             shutil.rmtree(self.build_dir)
 
-        self.dest_dir.mkdir(parents=True, exist_ok=True)
+        self.dist_dir.mkdir(parents=True, exist_ok=True)
         self.build_dir.mkdir(parents=True, exist_ok=True)
 
     def configure(self):
         if self.os == "Linux":
             config_args = ("--enable-gcc",
                           "--enable-mpi=mpich",
-                          "--enable-openssl", 
+                          "--enable-openssl",
+                          "--enable-libffi", 
                           "--enable-curl",
                           "--enable-sqlite",
                           "--enable-cppunit",
@@ -240,6 +271,7 @@ class MakeBinaryApp:
         elif self.os == "Darwin":
             config_args = ("--enable-mpi=mpich",
                           "--enable-openssl",
+                          "--enable-libffi", 
                           "--enable-curl", 
                           "--enable-sqlite",
                           "--enable-cppunit",
@@ -280,7 +312,7 @@ class MakeBinaryApp:
         os.chdir(self.build_dir)
         cmd = (str(self.src_dir / "configure"),
                f"--with-make-threads={self.make_threads}",
-               f"--prefix={self.dest_dir}",
+               f"--prefix={self.dist_dir}",
         )
         if not self.pylith_branch is None:
             cmd += (f"--with-pylith-git={self.pylith_branch}",)
@@ -308,10 +340,10 @@ class MakeBinaryApp:
                 raise ValueError(f"Unknown architecture '{self.arch}'.")
         else:
             raise ValueError(f"Unknown os '{self.os}'.")
-        shutil.copyfile(self.src_dir / "packager" / filename, self.dest_dir / "setup.sh")
+        shutil.copyfile(self.src_dir / "packager" / filename, self.dist_dir / "setup.sh")
 
         build_dir = self.build_dir / "cig" / "pylith-build"
-        packager = Packager(build_dir=build_dir, dest_dir=self.dest_dir)
+        packager = Packager(build_dir=build_dir, dist_dir=self.dist_dir)
         packager.make_src_tarball()
         packager.make_dist_tarball()
 
@@ -335,7 +367,7 @@ class MakeBinaryApp:
     def _setEnviron(self):
         print("Setting environment...")
 
-        path = (os.path.join(self.dest_dir, "bin"),
+        path = (os.path.join(self.dist_dir, "bin"),
                 os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
                 "/bin",
                 "/usr/bin",
@@ -344,15 +376,15 @@ class MakeBinaryApp:
         )
         os.environ["PATH"] = ":".join(path)
 
-        pythonpath = (os.path.join(self.dest_dir, "lib", "python%s" % self.python_version, "site-packages"),)
+        pythonpath = (os.path.join(self.dist_dir, "lib", "python%s" % self.python_version, "site-packages"),)
         if self.arch == "x86_64":
-            pythonpath += (os.path.join(self.dest_dir, "lib64", "python%s" % self.python_version, "site-packages"),)
+            pythonpath += (os.path.join(self.dist_dir, "lib64", "python%s" % self.python_version, "site-packages"),)
         os.environ["PYTHONPATH"] = ":".join(pythonpath)
         
         if self.os == "Linux":
-            ldpath = (os.path.join(self.dest_dir, "lib"),)
+            ldpath = (os.path.join(self.dist_dir, "lib"),)
             if self.arch == "x86_64":
-                ldpath += (os.path.join(self.dest_dir, "lib64"),)
+                ldpath += (os.path.join(self.dist_dir, "lib64"),)
             os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
         return
 
