@@ -170,7 +170,11 @@ class Packager:
         op_sys = platform.system().lower()
         if op_sys=="darwin":
             mac_ver = platform.mac_ver()
-            arch = f"macOS-{mac_ver[0]}-{mac_ver[2]}"
+            if "OSX_DEPLOYMENT_TARGET" in os.environ:
+                target = os.environ["OSX_DEPLOYMENT_TARGET"]
+            else:
+                target = mac_ver[0]
+            arch = f"macOS-{target}-{mac_ver[2]}"
         else:
             machine = (platform.processor() or platform.machine())
             arch = f"{op_sys}-{machine}"
@@ -179,6 +183,11 @@ class Packager:
     @staticmethod
     def _exclude(tarinfo):
         EXCLUDE = (
+            "include",
+            "ccmake",
+            "cmake",
+            "cpack",
+            "ctest",
             "gcc",
             "g++",
             "gcov",
@@ -189,11 +198,12 @@ class Packager:
             "c++",
             "python", # use python3
             "lto-dump",
+            "swig",
             )
         filepath = tarinfo.name
         if os.path.splitext(filepath)[1] == ".a":
             return None
-        filename = os.path.split(filepath)[1]
+        rootpath, filename = os.path.split(filepath)
         if filename in EXCLUDE:
             return None
         if filename.startswith("x86_64-pc-linux-gnu"):
@@ -203,14 +213,21 @@ class Packager:
             filename.startswith("libubsan") or \
             filename.startswith("liblsan"):
             return None
-        if os.path.split(filepath)[0].endswith("libexec"):
+        if rootpath.endswith("libexec"):
             return None
-        if os.path.split(filepath)[0].startswith("include"):
+        if rootpath.endswith("doc") and filename.startswith("cmake"):
             return None
+        if rootpath.endswith("share"):
+            if filename.startswith("cmake") or \
+              filename.startswith("petsc"):
+                return None
         return tarinfo
+
 
 class MakeBinaryApp:
 
+    MACOS_DEPLOYMENT_TARGET = "10.15"
+    
     def __init__(self):
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
@@ -386,6 +403,9 @@ class MakeBinaryApp:
             if self.arch == "x86_64":
                 ldpath += (os.path.join(self.dist_dir, "lib64"),)
             os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
+        elif self.os == "Darwin":
+            os.environ["OSX_DEPLOYMENT_TARGET"] = self.MACOS_DEPLOYMENT_TARGET
+            
         return
 
     def _run_cmd(self, cmd):
