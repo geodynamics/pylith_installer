@@ -339,11 +339,11 @@ if INSTALL_NETCDFPY
 	$(env_flags_python) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_flags_python) $(PYTHON) -m pip install coverage autopep8 gmsh matplotlib
+	$(env_flags_python) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt5 matplotlib
 	$(env_flags_python) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif
 if INSTALL_ADDONS
-	$(env_flags_python) $(PYTHON) -m pip install gmsh matplotlib
+	$(env_flags_python) $(PYTHON) -m pip install gmsh PyQt5 matplotlib
 endif
 
 
