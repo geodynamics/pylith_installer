@@ -335,6 +335,7 @@ installed_python:
 	python3 -m venv $(prefix)
 	$(env_flags_python) $(PYTHON) -m pip install --upgrade pip setuptools certifi
 	$(env_flags_python) $(PYTHON) -m pip install numpy
+	rm -f $(prefix)/share/openssl/cert.pem && $(LN_S) $(prefix)/lib/python3.9/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
 	$(env_flags_python) $(PYTHON) -m pip install cftime
 endif

@@ -384,8 +384,11 @@ class MakeBinaryApp:
     def _setEnviron(self):
         print("Setting environment...")
 
-        path = (os.path.join(self.dist_dir, "bin"),
-                os.path.join(os.environ["HOME"], "bin"), # utilities for building PyLith (e.g., updated version of git)
+        if "PYLITH_INSTALLER_PATH" in os.environ: # Local tools needed for building
+            path = os.environ["PYLITH_INSTALLER_PATH"].split(":")
+        else:
+            path = []
+        path += (os.path.join(self.dist_dir, "bin"),
                 "/bin",
                 "/usr/bin",
                 "/sbin",
