@@ -269,6 +269,7 @@ class MakeBinaryApp:
         if self.os == "Linux":
             config_args = ("--enable-gcc",
                           "--enable-mpi=mpich",
+                          "--with-mpich-options=--with-device=ch4:ofi --with-pm=gforker",
                           "--enable-openssl",
                           "--enable-libffi", 
                           "--enable-curl",
@@ -287,6 +288,7 @@ class MakeBinaryApp:
                       )
         elif self.os == "Darwin":
             config_args = ("--enable-mpi=mpich",
+                          "--with-mpich-options=--with-pm=gforker",
                           "--enable-openssl",
                           "--enable-libffi", 
                           "--enable-curl", 
@@ -311,6 +313,7 @@ class MakeBinaryApp:
 
         petscOptions = ("--download-chaco=1",
                         "--download-f2cblaslapack=1",
+                        "--download-ml",
                         "--with-fc=0",
                         "--with-hwloc=0",
                         "--with-ssl=0",

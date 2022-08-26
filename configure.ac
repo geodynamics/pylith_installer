@@ -80,7 +80,14 @@ if test "$install_mpi" = mpich ; then
       mpich_sharedarch=osx-gcc ;;
   esac
 fi
-AC_SUBST(mpich_sharedarch)  
+AC_SUBST(mpich_sharedarch)
+AC_ARG_WITH([mpich-options],
+    [AC_HELP_STRING([--with-mpich-options],
+        [MPICH configure options @<:@default=@:>@])],
+	[mpich_options=$withval],
+	[mpich_options=""])
+AC_SUBST(mpich_options)
+
 
 # GIT
 AC_ARG_ENABLE([git],
@@ -974,7 +981,12 @@ else
   printf "\n"
 fi
 printf "  cmake: $install_cmake\n"
-printf "  mpi: $install_mpi\n"
+printf "  mpi: $install_mpi"
+if test "$install_mpi" != "mpich" ; then
+  printf "\n"
+else
+  printf ", options: $mpich_options\n"
+fi
 printf "  git: $install_git\n"
 printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"

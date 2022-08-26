@@ -330,8 +330,7 @@ else
 	touch $(abs_builddir)/installed_python
 endif
 
-installed_python:
-	$(MAKE) $(AM_MAKEFLAGS) python
+python_postinstall:
 	python3 -m venv $(prefix)
 	$(env_flags_python) $(PYTHON) -m pip install --upgrade pip setuptools certifi
 	$(env_flags_python) $(PYTHON) -m pip install numpy
@@ -347,6 +346,9 @@ if INSTALL_ADDONS
 	$(env_flags_python) $(PYTHON) -m pip install gmsh PyQt5 matplotlib
 endif
 
+installed_python:
+	$(MAKE) $(AM_MAKEFLAGS) python
+	$(MAKE) $(AM_MAKEFLAGS) python_postinstall
 
 # ----------------------------------------------------------------------
 # mpi
@@ -390,9 +392,9 @@ openmpi: installed_compilers
 # mpich
 # ----------------------------------------------------------------------
 if WITH_FORTRAN
-mpich_options = --enable-fc
+mpich_options += --enable-fc
 else
-mpich_options = --disable-fortran
+mpich_options += --disable-fortran
 endif
 mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
@@ -400,12 +402,12 @@ mpich: installed_compilers
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
 		../mpich-$(MPICH_VER)/configure \
-			--with-device=ch3 \
 			--enable-shared \
 			--enable-sharedlibs=$(mpich_sharedarch) \
 			--disable-static --disable-mpe \
 			--prefix=$(prefix) \
-			$(env_flags_deps) $(env_compilers) $(mpich_options) ; \
+			 $(mpich_options) \
+			$(env_flags_deps) $(env_compilers) ; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_mpi
