@@ -1,5 +1,42 @@
 See <https://github.com/geodynamics/pylith_installer/commits/main> for the complete log of changes made to PyLith Installer.
 
+## Version 3.0.2-0
+
+* Install PyLith to Python virtual environment and use pip to install Python modules (setuptools, certifi, numpy, cftime).
+* Migrate documentation to Sphinx+MyST
+* Separate build directory for external dependencies and CIG-related code (pythia, spatialdata, PETSc, PyLith)
+* Update versions of dependencies.
+  * gcc 10.3.0
+  * mpc 1.2.1
+  * gmp 6.2.1
+  * mpfr 4.1.0
+  * mpich 3.4.2
+  * openmpi 4.1.1
+  * openssl 1.1.1l
+  * libffi 3.4.2
+  * curl 7.83.1
+  * cmake 3.21.3
+  * python 3.9.7
+  * pcre 8.40
+  * swig 4.0.2
+  * cppunit 1.15.1
+  * sqlite 3.31
+  * tiff 4.3.0
+  * proj 8.1.1
+  * hdf5 1.12.1
+  * h5py 3.6.0
+  * netcdf 4.8.1
+  * netCDF4 1.5.7
+  * pythia 1.0.0
+  * spatialdata 3.0.0
+* Remove installing dependencies that are now obsolete.
+  * ScientificPython
+  * FIAT
+  * Cython
+* Use projsync to install PROJ datum files.
+* Allow specification of MPICH options in configure.
+* Provide `--enable-developer` configure argument to install pacakges for development. 
+
 ## Version 2.2.2-1
 
 * Install `cython` when building `h5py` and `netCDF4`.
