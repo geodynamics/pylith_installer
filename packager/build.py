@@ -65,9 +65,10 @@ class Darwin:
 
 class Packager:
 
-    def __init__(self, dist_dir, build_dir):
+    def __init__(self, dist_dir, build_dir, macos_target):
         self.dist_dir = dist_dir
         self.build_dir = build_dir
+        self.macos_target = macos_target
 
         self._get_makeinfo()
         self._get_git_version()
@@ -165,15 +166,11 @@ class Packager:
             tfile.add(tarball_dir, arcname=dist_name)
         shutil.rmtree(tarball_dir)
 
-    @staticmethod
-    def _get_arch():
+    def _get_arch(self):
         op_sys = platform.system().lower()
         if op_sys=="darwin":
             mac_ver = platform.mac_ver()
-            if "OSX_DEPLOYMENT_TARGET" in os.environ:
-                target = os.environ["OSX_DEPLOYMENT_TARGET"]
-            else:
-                target = mac_ver[0]
+            target = self.macos_target or mac_ver[0]
             arch = f"macOS-{target}-{mac_ver[2]}"
         else:
             machine = (platform.processor() or platform.machine())
@@ -226,13 +223,12 @@ class Packager:
 
 class MakeBinaryApp:
 
-    MACOS_DEPLOYMENT_TARGET = "10.15"
-    
     def __init__(self):
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
         self.python_version = "3.9" # :KLUDGE:
+        self.env = None
 
     def main(self):
         args = self._parse_command_line()
@@ -240,6 +236,7 @@ class MakeBinaryApp:
         self.pylith_branch = args.pylith_branch
         self.make_threads = args.make_threads
         self.force_config = args.force_config
+        self.macos_target = args.macos_target if self.os == "Darwin" else None            
 
         self.src_dir = self.base_dir / "src" / "pylith_installer"
         self.dist_dir = self.base_dir / "dist"
@@ -309,7 +306,9 @@ class MakeBinaryApp:
         else:
             raise ValueError(f"Unknown os '{self.os}'.")
         if "CERT_PATH" in os.environ:
-            config_args += ("--with-cert-path=${CERT_PATH}", "--with-cert-file=${CERT_FILE}")
+            cert_path = os.environ["CERT_PATH"]
+            cert_file = os.environ["CERT_FILE"]
+            config_args += (f"--with-cert-path={cert_path}", f"--with-cert-file={cert_file}")
 
         petscOptions = ("--download-chaco=1",
                         "--download-f2cblaslapack=1",
@@ -326,7 +325,6 @@ class MakeBinaryApp:
         os.chdir(self.src_dir)
         cmd = ("autoreconf", "--install", "--force", "--verbose")
         self._run_cmd(cmd)
-        self._setEnviron()
 
         # configure
         os.chdir(self.build_dir)
@@ -341,14 +339,13 @@ class MakeBinaryApp:
 
         cmd += config_args
         cmd += ("--with-petsc-options=" + " ".join(petscOptions),)
+        self._set_environ()
         self._run_cmd(cmd)
 
     def build(self):
         os.chdir(self.build_dir)
-        self._setEnviron()
-
-        cmd = ("make",)
-        self._run_cmd(cmd)
+        self._set_environ()
+        self._run_cmd( ("make",) )       
 
     def package(self):
         if self.os == "Darwin":
@@ -363,7 +360,7 @@ class MakeBinaryApp:
         shutil.copyfile(self.src_dir / "packager" / filename, self.dist_dir / "setup.sh")
 
         build_dir = self.build_dir / "cig" / "pylith-build"
-        packager = Packager(build_dir=build_dir, dist_dir=self.dist_dir)
+        packager = Packager(build_dir=build_dir, dist_dir=self.dist_dir, macos_target=self.macos_target)
         packager.make_src_tarball()
         packager.make_dist_tarball()
 
@@ -380,11 +377,12 @@ class MakeBinaryApp:
         parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
         parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=8)
         parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
+        parser.add_argument("--macos-target", action="store", dest="macos_target", default="10.15")
         args = parser.parse_args()
         return args
 
     
-    def _setEnviron(self):
+    def _set_environ(self):
         print("Setting environment...")
 
         if "PYLITH_INSTALLER_PATH" in os.environ: # Local tools needed for building
@@ -397,26 +395,25 @@ class MakeBinaryApp:
                 "/sbin",
                 "/usr/sbin",
         )
-        os.environ["PATH"] = ":".join(path)
+        env = {"PATH": ":".join(path) }
 
         pythonpath = (os.path.join(self.dist_dir, "lib", "python%s" % self.python_version, "site-packages"),)
         if self.arch == "x86_64":
             pythonpath += (os.path.join(self.dist_dir, "lib64", "python%s" % self.python_version, "site-packages"),)
-        os.environ["PYTHONPATH"] = ":".join(pythonpath)
+        env["PYTHONPATH"] = ":".join(pythonpath)
         
         if self.os == "Linux":
             ldpath = (os.path.join(self.dist_dir, "lib"),)
             if self.arch == "x86_64":
                 ldpath += (os.path.join(self.dist_dir, "lib64"),)
-            os.environ["LD_LIBRARY_PATH"] = ":".join(ldpath)
+            env["LD_LIBRARY_PATH"] = ":".join(ldpath)
         elif self.os == "Darwin":
-            os.environ["OSX_DEPLOYMENT_TARGET"] = self.MACOS_DEPLOYMENT_TARGET
-            
-        return
+            env["OSX_DEPLOYMENT_TARGET"] = self.macos_target
+        self.env = env
 
     def _run_cmd(self, cmd):
         print("Running '%s'..." % " ".join(cmd))
-        subprocess.check_call(cmd)
+        subprocess.run(cmd, check=True, env=self.env)
 
 
 # ======================================================================

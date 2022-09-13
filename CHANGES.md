@@ -1,6 +1,6 @@
 See <https://github.com/geodynamics/pylith_installer/commits/main> for the complete log of changes made to PyLith Installer.
 
-## Version 3.0.2-0
+## Version 3.0.3-0
 
 * Install PyLith to Python virtual environment and use pip to install Python modules (setuptools, certifi, numpy, cftime).
 * Migrate documentation to Sphinx+MyST
@@ -16,7 +16,7 @@ See <https://github.com/geodynamics/pylith_installer/commits/main> for the compl
   * libffi 3.4.2
   * curl 7.83.1
   * cmake 3.21.3
-  * python 3.9.7
+  * python 3.10.6
   * pcre 8.40
   * swig 4.0.2
   * cppunit 1.15.1

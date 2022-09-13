@@ -13,8 +13,8 @@ the build.py script.
 
 ## macOS
 
-export OSX_DEPLOYMENT_TARGET=10.15
+export PYLITH_INSTALLER_PATH=/Users/baagaard/software/unix/autotools/clang-13.0/bin
 
 1. `cd ~/scratch/build/pylith-binary`
 2. `mkdir src && pushd src && ln -s $HOME/src/pylith_installer && popd`
-3. `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=8 --setup`
+3. `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=8 --setup --macos-target=10.15`

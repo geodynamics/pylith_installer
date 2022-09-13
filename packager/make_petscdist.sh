@@ -202,7 +202,7 @@ find $tmpdir/petsc$version -type f -name "*.html" -exec rm {} \;
 # recreate EMACS-TAGS [after deletion]
 #cd $tmpdir/petsc$version; ${PETSC_DIR}/lib/petsc/bin/maint/generateetags.py
 # generate PKG-INFO for updating petsc version at pypy
-cd $tmpdir/petsc$version && python setup.py egg_info && /bin/cp petsc.egg-info/PKG-INFO . && /bin/rm -rf petsc.egg-info config/pypi
+cd $tmpdir/petsc$version && python3 setup.py egg_info && /bin/cp petsc.egg-info/PKG-INFO . && /bin/rm -rf petsc.egg-info config/pypi
 
 cd $tmpdir
 tar -czf ~/petsc$version.tar.gz petsc$version

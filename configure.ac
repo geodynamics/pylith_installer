@@ -394,7 +394,7 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------
-# Debugging
+# debugging
 AC_ARG_WITH([debugging],
     [AC_HELP_STRING([--with-debugging],
         [Generate debugging symbols and use low-level optimization for spatialdata, PETSc, and PyLith builds. @<:@default=no@:>@])],
@@ -537,7 +537,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix/bin/python3
-  PYTHON_VERSION=3.9
+  PYTHON_VERSION=3.10
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Building Python requires zlib. Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
@@ -972,8 +972,14 @@ if test "$with_fortran" = yes ; then
 else
   printf "C,C++\n"
 fi
-printf "  Debugging: $with_debugging\n\n"
-printf "PyLith dependencies to be installed:\n\n"
+printf "  Debugging: $with_debugging\n"
+printf "  Building for architecture: "
+if test "$target_arch" = no ; then
+  printf "native\n"
+else
+  printf "$target_arch\n"
+fi
+printf "\nPyLith dependencies to be installed:\n\n"
 printf "  gcc: $install_gcc"
 if test "$install_gcc" = yes ; then
   printf ", languages: $gcc_languages, flags: $gcc_flags\n"
