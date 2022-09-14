@@ -196,6 +196,7 @@ class Packager:
             "python", # use python3
             "lto-dump",
             "swig",
+            "TrilinosRepoVersion.txt",
             )
         filepath = tarinfo.name
         if os.path.splitext(filepath)[1] == ".a":
@@ -236,7 +237,9 @@ class MakeBinaryApp:
         self.pylith_branch = args.pylith_branch
         self.make_threads = args.make_threads
         self.force_config = args.force_config
-        self.macos_target = args.macos_target if self.os == "Darwin" else None            
+        self.macos_target = None
+        if self.os == "Darwin" and args.macos_target != "None":
+            self.macos_target = args.macos_target
 
         self.src_dir = self.base_dir / "src" / "pylith_installer"
         self.dist_dir = self.base_dir / "dist"
@@ -364,24 +367,6 @@ class MakeBinaryApp:
         packager.make_src_tarball()
         packager.make_dist_tarball()
 
-    def _parse_command_line(self):
-        baseDirDefault = "/opt"
-
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--setup", action="store_true", dest="setup")
-        parser.add_argument("--configure", action="store_true", dest="configure")
-        parser.add_argument("--build", action="store_true", dest="build")
-        parser.add_argument("--package", action="store_true", dest="package")
-        parser.add_argument("--all", action="store_true", dest="all")
-        parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
-        parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
-        parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=8)
-        parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
-        parser.add_argument("--macos-target", action="store", dest="macos_target", default="10.15")
-        args = parser.parse_args()
-        return args
-
-    
     def _set_environ(self):
         print("Setting environment...")
 
@@ -407,7 +392,7 @@ class MakeBinaryApp:
             if self.arch == "x86_64":
                 ldpath += (os.path.join(self.dist_dir, "lib64"),)
             env["LD_LIBRARY_PATH"] = ":".join(ldpath)
-        elif self.os == "Darwin":
+        elif self.os == "Darwin" and self.macos_target:
             env["OSX_DEPLOYMENT_TARGET"] = self.macos_target
         self.env = env
 
@@ -415,7 +400,24 @@ class MakeBinaryApp:
         print("Running '%s'..." % " ".join(cmd))
         subprocess.run(cmd, check=True, env=self.env)
 
+    def _parse_command_line(self):
+        baseDirDefault = "/opt"
 
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--setup", action="store_true", dest="setup")
+        parser.add_argument("--configure", action="store_true", dest="configure")
+        parser.add_argument("--build", action="store_true", dest="build")
+        parser.add_argument("--package", action="store_true", dest="package")
+        parser.add_argument("--all", action="store_true", dest="all")
+        parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
+        parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
+        parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=8)
+        parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
+        parser.add_argument("--macos-target", action="store", dest="macos_target", default="10.15")
+        args = parser.parse_args()
+        return args
+
+    
 # ======================================================================
 if __name__ == "__main__":
     MakeBinaryApp().main()

@@ -15,7 +15,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [3.0.1-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [3.0.3-0], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -972,14 +972,8 @@ if test "$with_fortran" = yes ; then
 else
   printf "C,C++\n"
 fi
-printf "  Debugging: $with_debugging\n"
-printf "  Building for architecture: "
-if test "$target_arch" = no ; then
-  printf "native\n"
-else
-  printf "$target_arch\n"
-fi
-printf "\nPyLith dependencies to be installed:\n\n"
+printf "  Debugging: $with_debugging\n\n"
+printf "PyLith dependencies to be installed:\n\n"
 printf "  gcc: $install_gcc"
 if test "$install_gcc" = yes ; then
   printf ", languages: $gcc_languages, flags: $gcc_flags\n"
