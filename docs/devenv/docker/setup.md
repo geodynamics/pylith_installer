@@ -57,26 +57,24 @@ We will use the following directory structure for the persistent storage.
     │    ├── spatialdata
     │    ├── petsc
     │    └── pylith
-    ├── build
-    │   ├── debug
-    │   │   ├── pythia
-    │   │   ├── spatialdata
-    │   │   └── pylith
-    │   └── opt
-    │       ├── pythia
-    │       ├── spatialdata
-    │       └── pylith
-    └── dest
-        ├── debug
-        │   ├── bin
-        │   ├── include
-        │   ├── lib
-        │   └── share
-        └── opt
-            ├── bin
-            ├── include
-            ├── lib
-            └── share
+    ├── build-debug
+    │   ├── pythia
+    │   ├── spatialdata
+    │   └── pylith
+    ├── build-opt
+    │   ├── pythia
+    │   ├── spatialdata
+    │   └── pylith
+    ├── dest-debug
+    │   ├── bin
+    │   ├── include
+    │   ├── lib
+    │   └── share
+    └── build-opt
+        ├── bin
+        ├── include
+        ├── lib
+        └── share
 ```
 
 All of the source code will be placed under `/opt/pylith/src`. You only need to create the top-level source directory as the subdirectories will be created when you clone (download) the repositories.
@@ -95,11 +93,6 @@ mkdir -p ${INSTALL_DIR}
 
 This creates a local copy of the repositories in the persistent storage volume of the PyLith development container.
 These are your working copies of the repositories.
-
-:::{tip}
-Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
-This script and the default configuration file are in the `/opt/pylith-devenv` directory.
-:::
 
 ```{code-block} bash
 cd /opt/pylith/src
