@@ -152,7 +152,7 @@ else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) petsc-pylith
 endif
 	cd petsc-pylith && \
-		$(env_flags_python) $(PYTHON) ./configure \
+		$(env_cert) $(PYTHON) ./configure \
 			--prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \

@@ -35,7 +35,7 @@ endif
 PYTHON_SITEPKGS=lib/python$(PYTHON_VERSION)/site-packages
 PYTHON64_SITEPKGS=lib64/python$(PYTHON_VERSION)/site-packages
 if WITH_CERT
-env_flags_python = SSL_CERT_FILE="$(cert_path)/$(cert_file)"  REQUESTS_CA_BUNDLE="$(cert_path)/$(cert_file)"
+env_cert = SSL_CERT_FILE="$(cert_path)/$(cert_file)"  REQUESTS_CA_BUNDLE="$(cert_path)/$(cert_file)"
 endif
 
 # End of file

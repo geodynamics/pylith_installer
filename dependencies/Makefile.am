@@ -340,18 +340,18 @@ endif
 
 python_postinstall:
 	python3 -m venv $(prefix)
-	$(env_flags_python) $(PYTHON) -m pip install --upgrade pip setuptools certifi
-	$(env_flags_python) $(PYTHON) -m pip install numpy
+	$(env_cert) $(PYTHON) -m pip install --upgrade pip setuptools certifi
+	$(env_cert) $(PYTHON) -m pip install numpy
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
-	$(env_flags_python) $(PYTHON) -m pip install cftime
+	$(env_cert) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_flags_python) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt6 matplotlib
-	$(env_flags_python) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
+	$(env_cert) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt6 matplotlib
+	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif
 if INSTALL_ADDONS
-	$(env_flags_python) $(PYTHON) -m pip install gmsh PyQt5 matplotlib
+	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
 endif
 
 installed_python:
@@ -566,7 +566,7 @@ if INSTALL_PROJ
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
-		projsync --system-directory --all && \
+		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
 
 else
@@ -612,7 +612,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -655,7 +655,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."
