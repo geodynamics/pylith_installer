@@ -351,7 +351,8 @@ if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif
 if INSTALL_ADDONS
-	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
+	$(env_cert) $(PYTHON) -m pip install PyQt6 matplotlib
+	$(env_cert) $(PYTHON) -m pip install -i https://gmsh.info/python-packages-dev --force-reinstall --no-cache-dir gmsh
 endif
 
 installed_python:
