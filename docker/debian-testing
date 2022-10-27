@@ -2,7 +2,7 @@ ARG BUILD_ENV=nocerts
 FROM debian:testing as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
-ENV BUILD_ENV=${BUILD_ENV}a
+ENV BUILD_ENV=${BUILD_ENV}
 
 
 RUN apt-get update \
@@ -61,7 +61,8 @@ ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
     PYTHON_VERSION=3.10 \
     HDF5_INCDIR=/usr/include/hdf5/openmpi \
-    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+    OMPI_MCA_btl_vader_single_copy_mechanism=none
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
