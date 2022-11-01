@@ -19,8 +19,6 @@ RUN yum install -y \
         curl \
 	libcurl-devel \
 	openssh \
-	openssl \
-	openssl-devel \
 	libtiff \
 	libtiff-devel \
         zlib-devel \
@@ -88,6 +86,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --enable-cmake \
     --disable-sqlite \
     --enable-gcc \
+    --enable-openssl \
     --enable-mpi=openmpi \
     --enable-cppunit \
     --enable-python \
