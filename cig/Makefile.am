@@ -128,8 +128,7 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: 
-if INSTALL_PETSC
+build_petsc: 
 petsc_options += --with-hdf5=1
 PETSC_DIR_BUILD = $(abs_top_builddir)/cig/petsc-pylith
 if INSTALL_HDF5
@@ -161,15 +160,24 @@ endif
 			$(petsc_options) $(env_flags_cig) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR_BUILD)  PETSC_ARCH=$(PETSC_ARCH) && \
-		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH) && \
+		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH)
+
+petsc:
+if INSTALL_PETSC
+if INSTALL_DEVELOPER
+	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
+		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
+		touch $(abs_builddir)/installed_petsc
+else
+	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
 		make PETSC_DIR=$(PETSC_DIR_BUILD) install && \
 		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
+endif
 else
 	@echo "$@ already installed. Skipping installation."
 	touch $(abs_builddir)/installed_petsc
 endif
-
 
 installed_petsc:
 	$(MAKE) $(AM_MAKEFLAGS) petsc
@@ -196,7 +204,7 @@ endif
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLDUES) $(NETCDF_INCLUDES)" \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \

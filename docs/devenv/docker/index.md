@@ -12,8 +12,8 @@ In addition to the PyLith dependencies, the Docker image includes the following 
 * lcov (code coverage)
 * uncrustify (C++ code formatter)
 * autopep8 (Python code formatter)
-* matplotlib (Python plotting) [TODO]
-* Sphinx with MyST (documentation tools) [TODO]
+* matplotlib (Python plotting)
+* Sphinx with MyST (documentation tools)
 
 The Docker image also defines the environment:
 
@@ -25,12 +25,12 @@ The Docker image also defines the environment:
 | `HOME`               |        `/home/${PYLITH_USER}`         | Home directory for user                                 |
 | `INSTALL_DIR`        |       `${BASE_DIR}/dest-debug`        | Directory where code is installed                       |
 | `TOPSRC_DIR`         |           `${BASE_DIR}/src`           | Top-level directory for source code                     |
-| `TOPBUILD_DIR`       |       `${BASE_DIR}/build-debug`       | Top-level directory for building                        |
+| `TOPBUILD_DIR`       |       `${BASE_DIR}/build`             | Top-level directory for building                        |
 | `PETSC_DIR`          |         `${TOPSRC_DIR}/petsc`         | Directory for PETSc                                     |
 | `PETSC_ARCH`         |          `arch-pylith-debug`          | Build label for PETSc debugging configuration           |
-| `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith`        | Top-level directory where we build PyLith [^vscode]     |
-| `PYLITH_DIR`        |           `${INSTALL_DIR}`            | Directory containing CIG-related dependencies [^vscode] |
-| `PYLITHDEPS_DIR`        |           `/opt/dependencies`            | Directory containing external dependencies [^vscode] |
+| `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith-debug`  | Top-level directory where we build PyLith [^vscode]     |
+| `PYLITH_DIR`        |           `${INSTALL_DIR}`             | Directory containing CIG-related dependencies [^vscode] |
+| `PYLITHDEPS_DIR`        |           `/opt/dependencies`      | Directory containing external dependencies [^vscode] |
 | `PYTHON_INCDIR`      |       `/usr/include/python3.8`        | Directory containing Python header files [^vscode]      |
 | `MPI_INCDIR`         | `/usr/include/x86_64-linux-gnu/mpich` | Directory containing MPI header files [^vscode]         |
 | `PROJ_INCDIR`        |            `/usr/include`             | Directory containing Proj header files [^vscode]        |

@@ -57,20 +57,19 @@ We will use the following directory structure for the persistent storage.
     │    ├── spatialdata
     │    ├── petsc
     │    └── pylith
-    ├── build-debug
-    │   ├── pythia
-    │   ├── spatialdata
-    │   └── pylith
-    ├── build-opt
-    │   ├── pythia
-    │   ├── spatialdata
-    │   └── pylith
+    ├── build
+    │   ├── pythia-debug
+    │   ├── pythia-opt
+    │   ├── spatialdata-debug
+    │   ├── spatialdata-opt
+    │   ├── pylith-debug
+    │   └── pylith-opt
     ├── dest-debug
     │   ├── bin
     │   ├── include
     │   ├── lib
     │   └── share
-    └── build-opt
+    └── dest-opt
         ├── bin
         ├── include
         ├── lib
@@ -79,13 +78,13 @@ We will use the following directory structure for the persistent storage.
 
 All of the source code will be placed under `/opt/pylith/src`. You only need to create the top-level source directory as the subdirectories will be created when you clone (download) the repositories.
 
-This directory structure is set up for both a debugging version for development (debug directory) and an optimized version for performance testing (opt directory).
+This directory structure is set up for both a debugging version for development (`*-debug` directories) and an optimized version for performance testing (`*-opt` directories).
 For now, we will only setup the debugging version.
 
 ```{code-block} bash
 cd /opt/pylith
 mkdir src
-mkdir -p ${TOPBUILD_DIR} && pushd ${TOPBUILD_DIR} && mkdir pythia spatialdata pylith && popd
+mkdir -p ${TOPBUILD_DIR} && pushd ${TOPBUILD_DIR} && mkdir pythia-debug spatialdata-debug pylith-debug && popd
 mkdir -p ${INSTALL_DIR}
 ```
 
@@ -174,7 +173,7 @@ You can often find speedup with up to twice as many threads as the number of cor
 ### Pythia
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/pythia
+cd ${TOPBUILD_DIR}/pythia-debug
 pushd ${TOPSRC_DIR}/pythia && autoreconf -if && popd
 ${TOPSRC_DIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
     CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
@@ -185,11 +184,10 @@ make check
 ### Spatialdata
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/spatialdata
+cd ${TOPBUILD_DIR}/spatialdata-debug
 pushd ${TOPSRC_DIR}/spatialdata && autoreconf -if && popd
 ${TOPSRC_DIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
-    --enable-swig --enable-testing --enable-test-coverage \
-    --with-python-coverage=coverage3 \
+    --enable-swig --enable-testing \
 	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
 	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
 	CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
@@ -215,7 +213,7 @@ make check
 ### PyLith
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/pylith
+cd ${TOPBUILD_DIR}/pylith-debug
 pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
 ${TOPSRC_DIR}/pylith/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \

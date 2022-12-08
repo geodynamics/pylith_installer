@@ -372,7 +372,7 @@ AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
         [set optional PETSc configure options @<:@default=--download-chaco=1 --download-f2cblaslapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-f2cblaslapack=1"])
+	[petsc_options="--download-chaco=1 --download-f2cblaslapack=1 --download-ml=1"])
 AC_SUBST(petsc_options)
 AC_ARG_WITH([petsc-tarball],
     [AC_HELP_STRING([--with-petsc-tarball],
@@ -639,7 +639,7 @@ if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$pylith_git" != no ; then
-    AC_PROG_SWIG([2.0.4], [3.0.2])
+    AC_PROG_SWIG([4.0.0])
   fi
 fi
 
@@ -733,7 +733,7 @@ if test "$install_h5py" = yes ; then
   x=1
 else
   if test "$with_h5py" = yes ; then
-    CIT_PYTHON_MODULE([h5py],[2.0.0])
+    CIT_PYTHON_MODULE([h5py],[3.0.0])
   fi
 fi
 
@@ -782,13 +782,17 @@ if test "$install_petsc" = yes ; then
 
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
-  PETSC_DIR=$prefix
+  if test "$install_developer" = yes ; then
+    PETSC_DIR="$(pwd)/cig/petsc-pylith"
+  else
+    PETSC_DIR=$prefix
+  fi
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
   AC_LANG(C)
-  CIT_PATH_PETSC([3.5.3])
+  CIT_PATH_PETSC([3.18.2])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
 fi
@@ -928,32 +932,39 @@ AC_SUBST(LDFLAGS)
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
-TEMPVAR="$prefix/bin"
+TEMP_BINDIR="$prefix/bin"
+echo "if [[ -d $TEMP_BINDIR ]]; then" >> setup.sh
+echo "  source ${TEMP_BINDIR}/activate" >> setup.sh
+echo "else" >> setup.sh
 if test "X${PATH}" = X ; then
-  echo "export PATH=$TEMPVAR" >> setup.sh
+  echo "export PATH=${TEMP_BINDIR}" >> setup.sh
 else
-  echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
+  echo "export PATH=${TEMP_BINDIR}:\${PATH}" >> setup.sh
 fi
+TEMP_PATH="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+if test "X$PYTHONPATH" = X ; then
+  echo "export PYTHONPATH=${TEMP_PATH}" >> setup.sh
+else
+  echo "export PYTHONPATH=${TEMP_PATH}:\${PYTHONPATH}" >> setup.sh
+fi
+echo "fi" >> setup.sh
 
 case $host_os in
   darwin*)
     ;;
   *)
-    TEMPVAR="$prefix/lib:$prefix/lib64"
+    TEMP_PATH="$prefix/lib:$prefix/lib64"
+    if test "$install_developer" = "yes"; then
+     TEMP_PATH="${TEMP_PATH}:${PETSC_DIR}/${PETSC_ARCH}/lib"
+    fi
     if test "X${LD_LIBRARY_PATH}" = X ; then
-      echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
+      echo "export LD_LIBRARY_PATH=${TEMP_PATH}" >> setup.sh
     else
-      echo "export LD_LIBRARY_PATH=$TEMPVAR:\${LD_LIBRARY_PATH}" >> setup.sh
+      echo "export LD_LIBRARY_PATH=${TEMP_PATH}:\${LD_LIBRARY_PATH}" >> setup.sh
     fi
     ;;
 esac
 
-TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
-if test "X$PYTHONPATH" = X ; then
-  echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
-else
-  echo "export PYTHONPATH=$TEMPVAR:\${PYTHONPATH}" >> setup.sh
-fi
 
 # ----------------------------------------------------------------------
 AC_CONFIG_FILES([Makefile dependencies/Makefile cig/Makefile])
