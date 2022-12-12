@@ -47,7 +47,7 @@ We use the following directory structure:
 
 ```{code-block} console
 pylith-developer/
-├── pylith_installer-3.0.0-0 # source code for the installer
+├── pylith_installer-3.0.3-0 # source code for the installer
 ├── build-debug # top-level directory for building with debugging
 └── pylith-debug # directory where PyLith and other CIG code is installed by installer
 ```
@@ -91,7 +91,7 @@ mkdir -p $PYLITH_DIR
 cd $PYLITH_DIR
 
 # Place the installer source code tarball in $PYLITH_DIR and then unpack the tarball.
-tar -xf pylith_installer-3.0.0-0.tar.gz
+tar -xf pylith_installer-3.0.3-0.tar.gz
 ```
 
 ## Linux
@@ -121,7 +121,7 @@ Configure the installer.
 ```{code-block} bash
 mkdir $PYLITH_DIR/build-debug
 cd $PYLITH_DIR/build-debug
-$PYLITH_DIR/pylith_installer-3.0.0-0/configure \
+$PYLITH_DIR/pylith_installer-3.0.3-0/configure \
     --enable-developer \
     --with-debugging \
     --with-pylith-git=$PYLITH_BRANCH \
@@ -172,7 +172,7 @@ Configure the installer.
 ```{code-block} bash
 mkdir $PYLITH_DIR/build-debug
 cd $PYLITH_DIR/build-debug
-${HOME}/src/pylith/pylith_installer-3.0.0-0/configure  \
+${HOME}/src/pylith/pylith_installer-3.0.3-0/configure  \
     --enable-developer \
     --with-debugging \
     --with-pylith-git=$PYLITH_BRANCH \

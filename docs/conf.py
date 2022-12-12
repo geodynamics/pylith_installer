@@ -20,7 +20,7 @@ project = 'PyLith Installer'
 author = 'Brad T. Aagaard'
 
 # The full version, including alpha/beta/rc tags
-release = 'v3.0.0-0dev'
+release = 'v3.0.3-0'
 
 
 # -- General configuration ---------------------------------------------------
