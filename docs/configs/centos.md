@@ -1,6 +1,6 @@
 # CentOS
 
-## CentOS 7
+## CentOS 7 (similar to Red Hat 7)
 
 CentOS 7 does not (by default) provide a C++11 compiler. As a result,
 we use the installer to build a more recent gcc version and only use a
@@ -25,6 +25,8 @@ yum install -y \
     openssh \
     openssl \
     openssl-devel \
+    libtiff \
+    libtiff-devel \
     sqlite \
     sqlite-devel \
     zlib-devel \
@@ -32,21 +34,22 @@ yum install -y \
     unzip \
     bzip2 \
     git \
-    ca-certificates \
-    cmake
+    ca-certificates
 ```
 
 ### Environment variables
 
 ```
-export PYTHON_VERSION 3.9
+export PYTHON_VERSION 3.10
 PREFIX_DIR=$HOME/pylith
+export HDF5_LIBDIR=${PREFIX_DIR}/dependencies/lib
+export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ```
 
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.0-0/configure \
+$HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -55,28 +58,21 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --disable-cmake \
     --disable-sqlite \
     --enable-gcc \
+    --enable-openssl \
     --enable-mpi=openmpi \
     --enable-cppunit \
     --enable-python \
-    --enable-setuptools \
-    --enable-cython \
-    --enable-pcre \
-    --enable-swig \
+    --enable-sqlite \
     --enable-proj \
-    --enable-numpy \
-    --enable-six \
-    --enable-cftime \
     --enable-hdf5 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy
 ```
 
-
-## CentOS 8
+## Rocky Linux 8 (similar to RedHat 8)
 
 ### Operating system packages
-
 
 ```bash
 dnf install -y \
@@ -91,6 +87,7 @@ dnf install -y \
     autoconf \
     libtool \
     curl \
+    libcurl-devel \
     openssl \
     openssl-devel \
     zlib-devel \
@@ -100,16 +97,13 @@ dnf install -y \
     python38 \
     python38-devel \
     python38-pip \
-    python38-setuptools \
-    python38-six \
-    python38-numpy \
-    python38-Cython \
-    python3-coverage \
     mpich \
     mpich-devel \
     cmake \
     sqlite \
     sqlite-devel \
+    libtiff \
+    libtiff-devel \
     dnf-plugins-core
 #
 # Use python3.8 for python3	
@@ -132,7 +126,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.0-0/configure \
+$HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -140,14 +134,8 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-cmake \
     --disable-sqlite \
-    --disable-setuptools \
-    --disable-numpy \
-    --disable-six \
     --disable-cppunit \
-    --enable-pcre \
-    --enable-swig \
     --enable-proj \
-    --enable-cftime \
     --enable-hdf5 \
     --enable-h5py \
     --enable-netcdf \

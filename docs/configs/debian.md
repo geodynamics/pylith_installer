@@ -1,6 +1,6 @@
 # Debian
 
-## Debian stable (buster)
+## Debian stable (bullseye)
 
 ### Operating system packages
 
@@ -13,14 +13,15 @@ apt-get install -y --no-install-recommends \
       autoconf \
       libtool \
       curl \
+      libcurl4 \
+      libcurl4-openssl-dev \
+      openssl \
+      libssl1.1 \
+      libssl-dev \
       python3-dev \
-      libpython3.7 \
+      libpython3.9 \
+      python3-venv \
       python3-pip \
-      python3-setuptools \
-      python3-numpy \
-      python3-cftime \
-      python3-coverage \
-      python3-h5py \
       zlib1g-dev \
       unzip \
       git \
@@ -33,13 +34,17 @@ apt-get install -y --no-install-recommends \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \
-      cmake
+      libtiff5 \
+      libtiff5-dev \
+      libproj-dev \
+      proj-bin \
+      proj-data
 ```
 
 ### Environment variables
 
 ```
-PYTHON_VERSION=3.7
+PYTHON_VERSION=3.9
 HDF5_INCDIR=/usr/include/hdf5/mpich
 HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 ```
@@ -47,7 +52,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.0-0/configure \
+$HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -57,22 +62,16 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --with-deps-prefix=$PREFIX_DIR/dependencies \
     --disable-mpi \
     --disable-hdf5 \
-    --disable-h5py \
     --disable-cppunit \
-    --disable-cmake \
     --disable-sqlite \
-    --disable-numpy \
-    --disable-setuptools \
-    --disable-cftime \
-    --enable-pcre \
-    --enable-swig \
-    --enable-proj \
+    --disable-proj \
+    --enable-h5py \
+    --enable-cmake \
     --enable-netcdf \
     --enable-netcdfpy
 ```
 
-
-## Debian testing
+## Debian testing (bookworm)
 
 ### Operating system packages
 
@@ -87,14 +86,9 @@ apt-get install -y --no-install-recommends \
       curl \
       ssh \
       python3-dev \
-      libpython3.9 \
+      libpython3.10 \
       python3-pip \
-      python3-setuptools \
-      python3-numpy \
-      python3-cftime \
-      python3-six \
-      python3-coverage \
-      cython3 \
+      python3-venv \
       zlib1g-dev \
       unzip \
       git \
@@ -112,14 +106,13 @@ apt-get install -y --no-install-recommends \
       libproj-dev \
       proj-bin \
       proj-data \
-      cmake \
-      swig
+      cmake
 ```
 
 ### Environment variables
 
 ```
-PYTHON_VERSION=3.9
+PYTHON_VERSION=3.10
 HDF5_INCDIR=/usr/include/hdf5/openmpi
 HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 ```
@@ -127,7 +120,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.0-0/configure \
+$HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -139,9 +132,6 @@ $HOME/src/pylith/pylith-installer-3.0.0-0/configure \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
-    --disable-numpy \
-    --disable-setuptools \
-    --disable-cftime \
     --disable-hdf5 \
     --disable-proj \
     --enable-h5py \

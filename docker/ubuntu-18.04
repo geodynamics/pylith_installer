@@ -97,10 +97,10 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
-    --enable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
     --enable-python \
+    --enable-cmake \
     --enable-h5py \
     --enable-pcre \
     --enable-swig \

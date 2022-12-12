@@ -33,22 +33,21 @@ EXTRA_DIST = \
 	docker/README-developer \
 	docker/builder.py \
 	docker/centos-7 \
-	docker/centos-8 \
+	docker/rockylinux-8 \
 	docker/debian-stable \
 	docker/debian-testing \
-	docker/fedora-33 \
-	docker/fedora-34 \
+	docker/fedora-35 \
+	docker/fedora-36 \
+	docker/fedora-37 \
 	docker/ubuntu-18.04 \
 	docker/ubuntu-20.04 \
-	docker/ubuntu-21.04 \
-	developer/developer-helper.py \
-	developer/developer-helper.cfg \
+	docker/ubuntu-22.04 \
+	docker/ubuntu-22.10 \
 	packager/build.py \
 	packager/setup_macos.sh \
 	packager/setup_linux.sh \
-	packager/make_package.py \
-	packager/make_petscdist.sh \
-	packager/update_darwinlinking.py
+	packager/build.py \
+	packager/make_petscdist.sh
 
 
 dist_noinst_SCRIPTS = \

@@ -17,8 +17,10 @@ EXTRA_DIST = \
 	developer/creating-binaries.md \
 	devenv/index.md \
 	devenv/configs.md \
-	devenv/dev-helper.md \
-	devenv/docker-devenv.md \
+	devenv/docker/index.md \
+	devenv/docker/setup.md \
+	devenv/docker/run.md \
+	devenv/docker/update.md \
 	devenv/images/docker-attach-vscode.png \
 	install/index.md \
 	install/configure.md \
