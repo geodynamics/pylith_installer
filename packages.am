@@ -2,14 +2,14 @@
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Matthew G. Knepley, University at Buffalo
 #
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
-# See COPYING for license information.
+# See LICENSE.md for license information.
 #
 # ----------------------------------------------------------------------
 
@@ -33,14 +33,16 @@ GMP_VER=6.2.1
 MPFR_VER=4.1.0
 
 
-MPICH_VER=3.4.2
+MPICH_VER=4.0.2
 OPENMPI_VER=4.1.1
 
 OPENSSL_VER=1.1.1l
+LIBFFI_VER=3.4.2
+CURL_VER=7.83.1
 GIT_VER=2.33.0
 CMAKE_VER=3.21.3
 
-PYTHON_VER=3.9.7
+PYTHON_VER=3.10.6
 
 PCRE_VER=8.40
 SWIG_VER=4.0.2
@@ -67,16 +69,16 @@ PYTHIA_VER=main
 SPATIALDATA_VER=main
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=3.0.0
+PETSC_VER=3.0.3
 endif
 else
 PYTHIA_VER=1.0.0
 SPATIALDATA_VER=3.0.0
-PYLITH_VER=3.0.0
-PETSC_VER=3.0.0
+PYLITH_VER=3.0.3
+PETSC_VER=3.0.3
 endif
 
-PARAMETERSGUI_VER=1.1.0
+PARAMETERSGUI_VER=2.0.1
 
 
 # End of file

@@ -3,6 +3,10 @@
 There are a few modifications to the usual process when using the installer to build for PyLith development.
 There are several configure arguments relevant to using the installer for development:
 
+`--enable-developer`
+: Enable installation of development tools (for example, generating documentation).
+PETSc is kept in its build directory to prevent conflicts when rebuilding.
+
 `--with-pylith-repo=URL`
 : Clone the PyLith source code from this URL. The URL corresponds to your fork of the PyLith repository. If you are accessing GitHub via SSH, the URL usually has the form `git@github.com:YOUR_GITHUB_USERNAME/pylith.git`. If you are accessing GitHub via HTTPS, the URL usually has the form `https://github.com/YOUR_GITHUB_USERNAME/pylith.git`. The default URL is the `geodynamics/pylith` repository, <https://github.com/geodynamics/pylith.git>.
 
@@ -14,14 +18,14 @@ There are several configure arguments relevant to using the installer for develo
 
 Other arguments commonly used when configuring for PyLith development include:
 
+`--with-debugging`
+: Use debugging (generate debugging symbols and use low-level optimization) when building spatialdata, PETSc, and PyLith.
+
 `--enable-swig`
 : Build the SWIG library for generating the Python/C++ interface.
 
  `--enable-pcre`
  : Build the PCRE library for use by SWIG.
-
-`--enable-debugging`
-: Use debugging (generate debugging symbols and use low-level optimization) when building spatialdata, PETSc, and PyLith.
 
 :::{tip}
 We always have debugging turned on when we are developing.
@@ -41,34 +45,53 @@ Prerequisites:
 
 We use the following directory structure:
 
-```bash
+```{code-block} console
 pylith-developer/
-├── pylith_installer-3.0.0-0 # source code for the installer
-├── build
-│   └── debug # top-level directory for building with debugging
-└── dest
-   ├── dependencies # directory where dependencies are installed by installer
-   └── debug # directory where PyLith and other CIG code is installed by installer
+├── pylith_installer-3.0.3-0 # source code for the installer
+├── build-debug # top-level directory for building with debugging
+└── pylith-debug # directory where PyLith and other CIG code is installed by installer
 ```
 
+:::{important}
+The installer will create a virtual Python environment for PyLith in `pylith-debug`.
 
-```{code-block} console
+***You will need to activate the virtual Python environment for PyLith in every shell where you rebuild or use PyLith.***
+
+Running configure will generate a bash script `setup.sh` in the `build-debug` directory.
+You should activate the virtual environment using this bash script, because we include any additional environment variables that need to be set in the setup.sh script.
+
+```{code-block} bash
+---
+caption: Activate the environment using setup.sh
+---
+source $PYLITH_DIR/build-debug/setup.sh
+```
+
+:::
+
+:::{note}
+We do not install PETSc to `$PYLITH_DIR/pylith-debug`.
+Instead we run leave its build in place.
+This prevents conflicts between the installed location and the local source files when rebuilding.
+:::
+
+```{code-block} bash
 ---
 caption: Setting up the installer for PyLith development.
 ---
 # Set some variables to hold information about our installer setup.
 # The PYLITH_REPO should be https://github.com/YOUR_GITHUB_USERNAME/pylith.git if using a personal
 # access token or git@github.com:YOUR_GITHUB_USERNAME/pylith.git if using SSH.
-$ PYLITH_DIR=$HOME/pylith-developer
-$ PYLITH_REPO=git@github.com:YOUR_GITHUB_USERNAME/pylith.git
-$ PYLITH_BRANCH=main
+PYLITH_DIR=$HOME/pylith-developer
+PYLITH_REPO=git@github.com:YOUR_GITHUB_USERNAME/pylith.git
+PYLITH_BRANCH=main
 
 # Create a top-level directory for PyLith.
-$ mkdir -p $PYLITH_DIR
-$ cd $PYLITH_DIR
+mkdir -p $PYLITH_DIR
+cd $PYLITH_DIR
 
 # Place the installer source code tarball in $PYLITH_DIR and then unpack the tarball.
-$ tar -xf pylith_installer-3.0.0-0.tar.gz
+tar -xf pylith_installer-3.0.3-0.tar.gz
 ```
 
 ## Linux
@@ -77,9 +100,11 @@ This configuration is for the Ubuntu 20.04 Linux distribution.
 The setup is similar for other Linux distributions.
 Some older distributions may not provide Python 3 packages for the PyLith dependencies.
 
-We install several packages in addition to those installed for a [user installation for Ubuntu 20.04](../configs/ubuntu.md).
+Install all of the system packages listed in the [user installation for Ubuntu 20.04](../configs/ubuntu.md).
+You will also need to set the `PYTHON_VERSION`, `HDF5_INCDIR`, and `HDF5_LIBDIR` environment variables as in the user installation.
+Then, install the additional packages recommended for development:
 
-```bash
+```{code-block} console
 apt-get install -y --no-install-recommends \
       python3-autopep8 \
       uncrustify \
@@ -93,89 +118,36 @@ We use `autopep8` and `uncrustify` to format the source code, `gdb` and `valgrin
 
 Configure the installer.
 
-```bash
-mkdir $PYLITH_DIR/build/debug
-cd $PYLITH_DIR/build/debug
-$PYLITH_DIR/pylith_installer-3.0.0-0/configure \
+```{code-block} bash
+mkdir $PYLITH_DIR/build-debug
+cd $PYLITH_DIR/build-debug
+$PYLITH_DIR/pylith_installer-3.0.3-0/configure \
+    --enable-developer \
+    --with-debugging \
     --with-pylith-git=$PYLITH_BRANCH \
     --with-pylith-repo=$PYLITH_REPO \
-    --enable-debugging \
     --with-fetch=curl \
     --with-make-threads=$(nproc) \
-    --prefix=$PYLITH_DIR/dest/debug \
+    --prefix=$PYLITH_DIR/pylith-debug \
     --with-hdf5-incdir=${HDF5_INCDIR} \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
-    --with-deps-prefix=${PYLITH_DIR}/dest/debug/dependencies \
     --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-numpy \
     --disable-hdf5 \
-    --disable-h5py \
+    --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy
 ```
 
 Check the configure output to make sure it ran without errors and the configuration matches what you want.
-Setup your environment by running `source setup.sh` (bash shell).
-Just like in a user installation, you need to rerun `source setup.sh` in every terminal shell used for PyLith development, or transfer the environment settings to your `.bashrc`. 
+Setup your environment, and then build the remaining dependencies and then Pythia, SpatialData, PETSc, and PyLith.
 
-First, we build the remaining dependencies.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make -j$(nproc) -C dependencies
-```
-
-:::{tip}
-Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
-This script and the default configuration file are in the `developer` directory of the PyLith installer source.
-:::
-
-Next, we configure and build pythia and spatialdata.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make installed_pythia
-make installed_spatialdata
-```
-
-We do not run `make installed_petsc` because we do not want to install PETSc to `$PYLITH_DIR/dest/debug`.
-Instead we will leave its build in place.
-This prevents conflicts between the installed location and the local source files when rebuilding.
-PyLith users a different build setup and does not have this problem.
-
-:::{important}
-Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `PETSC_ARCH` environment variable to a tag associated with a debugging build. 
-You should add these to your `.bashrc` or `setup.sh` file.
-
-```bash
-export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley/pylith
-export PETSC_ARCH=arch-pylith-debug
-```
-
-:::
-
-Manually configure and build PETSc.
-
-```bash
-cd $PETSC_DIR
-python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
-    --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
-    --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
-    --with-hdf5=1 --download-chaco=1 --download-ml=1 \
-    --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
-    CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITH_DIR}/dest/debug/dependencies/include -I${PYLITH_DIR}/dest/debug/include" \
-    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITH_DIR}/dest/debug/dependencies/lib -L${PYLITH_DIR}/dest/debug/lib" 
-make 
-make check
-```
-
-Finally, configure and build PyLith.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make installed_pylith
+```{code-block} bash
+cd $PYLITH_DIR/build-debug
+source setup.sh
+make
 ```
 
 ## macOS
@@ -184,94 +156,54 @@ make installed_pylith
 You will need to install XCode or XCode command line tools before configuring the installer.
 :::
 
-This configuration is for Mojave (10.14.x), which does not include Python 3.
-Newer versions of macOS include Python 3, so you may be able to use some Python 3 packages provided by the operating system.
+This configuration is for Monterey (12.6.X).
 We use the Apple clang/clang++ compiler.
-We use the installer to build autotools and Python 3.8.
+macOS does not provide a standard installation of Python 3, so we use the installer to build Python 3.
+XCode does not contain the autotools suite (automake, autoconf, libtool), so we also use the installer to build autotools.
+
+:::{important}
+When the installer builds Python, it will create a virtual environment for PyLith.
+You will need to activate this virtual environment for PyLith in every shell (terminal) where you want to build or use PyLith.
+You may want to add `source $PYLITH_DIR/pylith-debug/bin/activate` to your `.bashrc` or local `setup.sh` file.
+:::
 
 Configure the installer.
 
-```bash
-${HOME}/src/pylith/pylith_installer-3.0.0-0/configure  \
+```{code-block} bash
+mkdir $PYLITH_DIR/build-debug
+cd $PYLITH_DIR/build-debug
+${HOME}/src/pylith/pylith_installer-3.0.3-0/configure  \
+    --enable-developer \
+    --with-debugging \
     --with-pylith-git=$PYLITH_BRANCH \
     --with-pylith-repo=$PYLITH_REPO \
-    --enable-debugging \
     --with-fetch=curl \
-    --prefix=$PYLITH_DIR/dest/debug \
+    --prefix=$PYLITH_DIR/pylith-debug \
     --enable-force-install \
-    --with-make-threads=4 \
+    --with-make-threads=8 \
     --with-fortran=no \
     --enable-autotools \
     --enable-mpi=mpich \
     --enable-openssl \
-    --with-numpy-blaslapack=no \
+    --enable-libffi \
+    --enable-curl \
     --enable-sqlite \
     --enable-python \
     --enable-swig \
     --enable-pcre \
+    --enable-tiff \
+    --enable-proj \
+    --enable-hdf5 \
     --enable-cmake \
     CC=clang CXX=clang++
 ```
 
 Check the configure output to make sure it ran without errors and the configuration matches what you want.
-Setup your environment by running `source setup.sh` (bash shell).
-Just like in a user installation, you need to rerun `source setup.sh` in every terminal shell used for PyLith development, or transfer the environment settings to your `.bashrc`. 
+Setup your environment, and then build the remaining dependencies and then Pythia, SpatialData, PETSc, and PyLith.
 
-First, we build the dependencies.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make -j$(nproc) -C dependencies
+```{code-block} bash
+cd $PYLITH_DIR/build-debug
+source setup.sh
+make
 ```
 
-:::{tip}
-Starting at this step, you can use the `developer-helper.py` Python script (see {ref}`sec-developer-helper`) to show the exact commands to run.
-This script and the default configuration file are in the `developer` directory of the PyLith installer source.
-:::
-
-Next, we configure and build pythia and spatialdata.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make installed_pythia
-make installed_spatialdata
-```
-
-We do not run `make installed_petsc` because we do not want to install PETSc to `$PYLITH_DIR/dest/debug`.
-Instead we will leave its build in place.
-This prevents conflicts between the installed location and the local source files when rebuilding.
-PyLith users a different build setup and does not have this problem.
-
-:::{important}
-Set the `PETSC_DIR` environment variable to the location of PETSc, and set the `PETSC_ARCH` environment variable to a tag associated with a debugging build. 
-You should add these to your `.bashrc` or `setup.sh` file.
-
-```bash
-export PETSC_DIR=$PYLITH_DIR/build/debug/petsc/knepley/pylith
-export PETSC_ARCH=arch-pylith-debug
-```
-
-:::
-
-Manually configure and build PETSc.
-
-```bash
-cd $PETSC_DIR
-
-python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 --with-hwloc=0 \
-    --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
-    --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
-    --with-hdf5=1 --download-chaco=1 --download-ml=1 \
-    --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
-    CPPFLAGS="-I${PYLITH_DIR}/dest/debug/dependencies/include -I${PYLITH_DIR}/dest/debug/include" \
-    LDFLAGS="-L${PYLITH_DIR}/dest/debug/dependencies/lib -L${PYLITH_DIR}/dest/debug/lib"
-make 
-make check
-```
-
-Finally, configure and build PyLith.
-
-```bash
-cd $PYLITH_DIR/build/debug
-make installed_pylith
-```

@@ -23,6 +23,8 @@ noinst_tmp = \
 	installed_autotools \
 	installed_compilers \
 	installed_openssl \
+	installed_curl \
+	installed_libffi \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
@@ -46,6 +48,8 @@ noinst_builddirs = \
 	automake-build \
 	libtool-build \
 	openssl-build \
+	curl-build \
+	libffi-build \
 	git-build \
 	python-build \
 	openmpi-build \
@@ -67,6 +71,8 @@ noinst_srcdirs = \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
 	openssl-${OPENSSL_VER) \
+	curl-$(CURL_VER) \
+	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
@@ -84,7 +90,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -231,14 +237,19 @@ installed_compilers:
 # openssl
 # ----------------------------------------------------------------------
 openssl: installed_compilers
+
 if INSTALL_OPENSSL
 	$(FETCH_SCRIPT) "$(downloader)" openssl-$(OPENSSL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf openssl-$(OPENSSL_VER).tar.gz
-	cd openssl-$(OPENSSL_VER) && \
-		$(env_compilers) ./config \
-			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl  shared; \
+	$(MKDIR_P) openssl-build
+	cd openssl-build && \
+		../openssl-$(OPENSSL_VER)/config \
+			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl \
+			$(env_flags_deps) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
+			shared ; \
 		make -j $(make_threads) && \
-		make install && \
+		make install_sw && \
 		touch $(abs_builddir)/installed_openssl
 
 else
@@ -251,9 +262,61 @@ installed_openssl:
 
 
 # ----------------------------------------------------------------------
+# curl
+# ----------------------------------------------------------------------
+curl: installed_compilers installed_openssl
+if INSTALL_CURL
+	$(FETCH_SCRIPT) "$(downloader)" curl-$(CURL_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf curl-$(CURL_VER).tar.gz
+	$(MKDIR_P) curl-build
+	cd curl-build && \
+		../curl-$(CURL_VER)/configure --prefix=$(prefix) \
+			--enable-shared --with-openssl --disable-ldap \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_curl
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_curl
+endif
+
+installed_curl:
+	$(MAKE) $(AM_MAKEFLAGS) curl
+
+
+# ----------------------------------------------------------------------
+# libffi
+# ----------------------------------------------------------------------
+libffi: installed_compilers installed_openssl
+if INSTALL_LIBFFI
+	$(FETCH_SCRIPT) "$(downloader)" libffi-$(LIBFFI_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf libffi-$(LIBFFI_VER).tar.gz
+	$(MKDIR_P) libffi-build
+	cd libffi-build && \
+		../libffi-$(LIBFFI_VER)/configure --prefix=$(prefix) \
+			--enable-shared \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_libffi
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_libffi
+endif
+
+installed_libffi:
+	$(MAKE) $(AM_MAKEFLAGS) libffi
+
+
+# ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers installed_openssl installed_sqlite
+python: installed_compilers installed_openssl installed_sqlite installed_curl installed_libffi
 if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)
@@ -262,9 +325,10 @@ endif
 	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
-		../Python-$(PYTHON_VER)/configure --prefix=$(prefix) \
-		--enable-shared --enable-optimizations $(OPENSSL) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
-		$(env_flags_deps) $(env_compilers) && \
+		../Python-$(PYTHON_VER)/configure --build=x86_64 --prefix=$(prefix) \
+			--enable-shared --enable-optimizations $(OPENSSL) \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		$(LN_S) $(prefix)/bin/python3 $(prefix)/bin/python && \
@@ -274,19 +338,25 @@ else
 	touch $(abs_builddir)/installed_python
 endif
 
-installed_python:
-	$(MAKE) $(AM_MAKEFLAGS) python
+python_postinstall:
 	python3 -m venv $(prefix)
-	$(env_flags_python) $(PYTHON) -m pip install --upgrade pip setuptools certifi
-	$(env_flags_python) $(PYTHON) -m pip install numpy
+	$(env_cert) $(PYTHON) -m pip install --upgrade pip setuptools certifi
+	$(env_cert) $(PYTHON) -m pip install numpy
+	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
-	$(env_flags_python) $(PYTHON) -m pip install cftime
+	$(env_cert) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_flags_python) $(PYTHON) -m pip install coverage autopep8 matplotlib
-	$(env_flags_python) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
+	$(env_cert) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt6 matplotlib
+	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
+endif
+if INSTALL_ADDONS
+	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
 endif
 
+installed_python:
+	$(MAKE) $(AM_MAKEFLAGS) python
+	$(MAKE) $(AM_MAKEFLAGS) python_postinstall
 
 # ----------------------------------------------------------------------
 # mpi
@@ -318,8 +388,9 @@ openmpi: installed_compilers
 	$(TAR) -xf openmpi-$(OPENMPI_VER).tar.gz
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
-		../openmpi-$(OPENMPI_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_compilers); \
+		../openmpi-$(OPENMPI_VER)/configure --prefix=$(prefix) \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_mpi
@@ -330,22 +401,22 @@ openmpi: installed_compilers
 # mpich
 # ----------------------------------------------------------------------
 if WITH_FORTRAN
-mpich_options = --enable-fc
+mpich_options += --enable-fc
 else
-mpich_options = --disable-fortran
+mpich_options += --disable-fortran
 endif
 mpich: installed_compilers
 	$(FETCH_SCRIPT) "$(downloader)" mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf mpich-$(MPICH_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
-		../mpich-$(MPICH_VER)/configure \
-			--with-pm=gforker \
+		../mpich-$(MPICH_VER)/configure --prefix=$(prefix) \
 			--enable-shared \
 			--enable-sharedlibs=$(mpich_sharedarch) \
 			--disable-static --disable-mpe \
-			--prefix=$(prefix) \
-			$(env_flags_deps) $(env_compilers) $(mpich_options) ; \
+			 $(mpich_options) \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_mpi
@@ -361,8 +432,9 @@ if INSTALL_CPPUNIT
 	$(TAR) -xf cppunit-$(CPPUNIT_VER).tar.gz
 	$(MKDIR_P) cppunit-build
 	cd cppunit-build && \
-		../cppunit-$(CPPUNIT_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_compilers); \
+		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_cppunit
@@ -385,8 +457,9 @@ if INSTALL_PCRE
 	$(TAR) -xf pcre-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
-		../pcre-$(PCRE_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_compilers) ; \
+		../pcre-$(PCRE_VER)/configure --prefix=$(prefix) \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_pcre
@@ -408,8 +481,8 @@ if INSTALL_SWIG
 	$(TAR) -xf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
-		../swig-$(SWIG_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_compilers) \
+		../swig-$(SWIG_VER)/configure --prefix=$(prefix) \
+			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS) $(PCRE_INCLUDES)" LDFLAGS="$(LDFLAGS) $(PCRE_LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
@@ -436,8 +509,9 @@ if INSTALL_SQLITE
 	$(TAR) -xf sqlite-autoconf-$(SQLITE_VER).tar.gz
 	$(MKDIR_P) sqlite-build
 	cd sqlite-build && \
-		../sqlite-autoconf-$(SQLITE_VER)/configure \
-			--prefix=$(prefix) --enable-shared $(env_flags_deps) $(env_compilers) ; \
+		../sqlite-autoconf-$(SQLITE_VER)/configure --prefix=$(prefix) \
+			--enable-shared $(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_sqlite
@@ -460,8 +534,9 @@ if INSTALL_TIFF
 	$(TAR) -xf tiff-$(TIFF_VER).tar.gz
 	$(MKDIR_P) tiff-build
 	cd tiff-build && \
-		../tiff-$(TIFF_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_compilers) ; \
+		../tiff-$(TIFF_VER)/configure --prefix=$(prefix) \
+			--enable-shared $(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_tiff
@@ -478,20 +553,20 @@ installed_tiff:
 # ----------------------------------------------------------------------
 # proj
 # ----------------------------------------------------------------------
-proj: installed_compilers installed_sqlite installed_tiff
+proj: installed_compilers installed_sqlite installed_tiff installed_curl
 if INSTALL_PROJ
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz
 	$(MKDIR_P) proj-build
 	cd proj-build && \
-		../proj-$(PROJ_VER)/configure \
-			--prefix=$(prefix) \
+		../proj-$(PROJ_VER)/configure --prefix=$(prefix) \
 			SQLITE3_CFLAGS=$(SQLITE3_INCLUDES) SQLITE3_LIBS="$(SQLITE3_LDFLAGS) -lsqlite3" \
 			TIFF_CFLAGS=$(TIFF_INCLUDES) TIFF_LIBS="$(TIFF_LDFLAGS) -ltiff" \
-			$(env_flags_deps) $(env_compilers); \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
-		projsync --system-directory --all && \
+		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
 
 else
@@ -515,10 +590,11 @@ if INSTALL_HDF5
 	$(TAR) -xf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
-		../hdf5-$(HDF5_VER)/configure \
+		../hdf5-$(HDF5_VER)/configure  --prefix=$(prefix) \
 			--enable-parallel --enable-shared --enable-unsupported \
-			--disable-static --prefix=$(prefix) $(hdf5_options) \
-			$(env_flags_deps) $(env_mpicompilers); \
+			--disable-static$(hdf5_options) \
+			$(env_flags_deps) $(env_mpicompilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_hdf5
@@ -536,7 +612,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -556,8 +632,8 @@ if INSTALL_NETCDF
 	$(TAR) -xf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
-		../netcdf-c-$(NETCDF_VER)/configure \
-			--prefix=$(prefix) $(env_flags_deps) $(env_mpicompilers) \
+		../netcdf-c-$(NETCDF_VER)/configure --prefix=$(prefix) \
+			$(env_flags_deps) $(env_mpicompilers) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
@@ -579,7 +655,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_flags_python) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."

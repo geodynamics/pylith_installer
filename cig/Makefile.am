@@ -97,8 +97,8 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tgz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
-	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tar.gz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
+	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tar.gz
 endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
@@ -128,8 +128,7 @@ installed_spatialdata:
 # ----------------------------------------------------------------------
 # petsc
 # ----------------------------------------------------------------------
-petsc: 
-if INSTALL_PETSC
+build_petsc: 
 petsc_options += --with-hdf5=1
 PETSC_DIR_BUILD = $(abs_top_builddir)/cig/petsc-pylith
 if INSTALL_HDF5
@@ -146,13 +145,13 @@ else
 petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tgz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
-	$(TAR) -xf petsc-pylith-$(PETSC_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tar.gz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
+	$(TAR) -xf petsc-pylith-$(PETSC_VER).tar.gz
 else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) petsc-pylith
 endif
 	cd petsc-pylith && \
-		$(PYTHON) ./configure \
+		$(env_cert) $(PYTHON) ./configure \
 			--prefix=$(prefix) \
 			--with-c2html=0 --with-x=0 \
 			--with-clanguage=C \
@@ -161,15 +160,24 @@ endif
 			$(petsc_options) $(env_flags_cig) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR_BUILD)  PETSC_ARCH=$(PETSC_ARCH) && \
-		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH) && \
+		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH)
+
+petsc:
+if INSTALL_PETSC
+if INSTALL_DEVELOPER
+	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
+		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
+		touch $(abs_builddir)/installed_petsc
+else
+	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
 		make PETSC_DIR=$(PETSC_DIR_BUILD) install && \
 		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
+endif
 else
 	@echo "$@ already installed. Skipping installation."
 	touch $(abs_builddir)/installed_petsc
 endif
-
 
 installed_petsc:
 	$(MAKE) $(AM_MAKEFLAGS) petsc
@@ -188,15 +196,15 @@ pylith_options += --enable-swig
 	$(GIT) clone --branch $(pylith_git) --single-branch --recursive $(pylith_repo) pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tgz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
-	$(TAR) -xf pylith-$(PYLITH_VER).tgz
+	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tar.gz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
+	$(TAR) -xf pylith-$(PYLITH_VER).tar.gz
 endif
 	$(MKDIR_P) pylith-build
 	cd pylith-build && \
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLDUES) $(NETCDF_INCLUDES)" \
+			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
@@ -218,8 +226,8 @@ installed_pylith:
 # ----------------------------------------------------------------------
 parametersgui: 
 if INSTALL_PARAMETERSGUI
-	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tgz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
-	cd $(prefix) && $(TAR) -xf $(abs_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tgz && \
+	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tar.gz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
+	cd $(prefix) && $(TAR) -xf $(abs_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tar.gz && \
 		cd $(abs_builddir) && \
 		touch $(abs_builddir)/installed_parametersgui
 

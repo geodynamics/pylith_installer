@@ -1,70 +1,20 @@
 Binary version is distributed via tarballs that are generated using
 the build.py script.
 
-Instructions for setting up Linux Virtual Machines via VirtualBox
+## Linux
 
-1. Download ISO image of the Linux distribution. The preferred version
-is the oldest LTS Ubuntu Linux distribution that has not reached its
-end of life. Note the GLIBC version (ldd --version).
+1. `docker volume create pylith-binary`
+2. `docker build -t registry.gitlab.com/cig-pylith/pylith_installer/pylith-binaryenv -f docker/pylith-binaryenv  --build-arg BUILD_ENV=certs-doi .`
+3. `docker run --name pylith-binary-workspace --rm -t -v pylith-binary:/opt/pylith registry.gitlab.com/cig-pylith/pylith_installer/pylith-binaryenv &`
+4. `docker exec -it  pylith-binary-workspace /bin/bash`
+   1. `mkdir src dist build && cd src`
+   2. `git clone --recursive https://github.com/geodynamics/pylith_installer.git`
+   3. `src/pylith_installer/packager/build.py --base-dir=/opt/pylith --make-threads=40 --setup`
 
-2. Create the virtual machine.
+## macOS
 
-3. Install the Guest Additions (larger screen size, etc).
-  Devices -> Insert Guest Additions CD image ...
+export PYLITH_INSTALLER_PATH=/Users/baagaard/software/unix/autotools/clang-13.0/bin
 
-4. Add a shared folder (used to export the tarballs).
-  Settings -> Shared Folders (automount: Yes; access: Full)
-
-3. Install packages (see pkgs-ubuntu-12.04-amd64 for complete list).
-  autoconf
-  libtool
-  git
-  zlib1g-dev
-  openssh-server
-
-  Shouldn't need this since we build the compiler and Python.
-  g++
-  gfortran
-  python-dev
-
-4. Copy any CA certificates needed to access https and then update the list.
-
-  Ubuntu:
-    Copy certificates to /usr/local/share/ca-certificates and then run
-    sudo update-ca-certificates
-
-  Fedora:
-    Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
-    sudo update-ca-trust
-
-  CentOS
-    Copy certificates (pem format) to /usr/share/pki/ca-trust-source/anchors and then run
-    sudo update-ca-trust enable
-
-
-Update Guest Additions after updating VM Linux kernels
-  sudo /etc/init.d/vboxadd setup
-
-
-Command line interface to Oracle VirtualBox
-
-  List virtual machines
-    VBoxManage list vms
-
-  List running virtual machines
-    VBoxManage list runningvms
-
-  Start virtual machine
-    VBoxHeadless --startvm NAME
-    VBoxManage startvm NAME --type=headless
-
-  Shutdown virtual machine
-    sudo shutdown -h now
-    VBoxManage controlvm NAME poweroff (if shutdown doesn't work)
-
-  Set network addresses in /etc/hosts for easy access
-
-  Updating vms
-    sudo apt-get update
-    sudo apt-get dist-upgrade
-    
+1. `cd ~/scratch/build/pylith-binary`
+2. `mkdir src && pushd src && ln -s $HOME/src/pylith_installer && popd`
+3. `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=8 --macos-target=10.15 --setup`

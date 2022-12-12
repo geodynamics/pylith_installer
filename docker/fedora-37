@@ -1,55 +1,62 @@
+# libz does not appear to be compatible.
 ARG BUILD_ENV=nocerts
-FROM debian:testing as os-update
+FROM fedora:36 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-      g++ \
-      make \
-      file \
-      automake \
-      autoconf \
-      libtool \
-      curl \
-      ssh \
-      python3-dev \
-      libpython3.10 \
-      python3-venv \
-      python3-pip \
-      zlib1g-dev \
-      unzip \
-      git \
-      ca-certificates \
-      libcppunit-dev \
-      libopenmpi-dev \
-      libopenmpi3 \
-      openmpi-bin \
-      openmpi-common \
-      libhdf5-openmpi-103-1 \
-      libhdf5-openmpi-dev \
-      sqlite3 \
-      libsqlite3-0 \
-      libsqlite3-dev \
-      libproj-dev \
-      proj-bin \
-      cmake \
-      swig \
-      lcov \
-      gdb \
-      valgrind \
-      vim-common \
-      vim-runtime \
-      vim-nox
+RUN dnf install -y \
+    gcc \
+    gcc-c++ \
+    make \
+    file \
+    diffutils \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    openssh \
+    python3 \
+    python3-devel \
+    python3-pip \
+    zlib \
+    zlib-devel \
+    blas \
+    blas-devel \
+    lapack \
+    lapack-devel \
+    atlas \
+    atlas-devel \
+    openssl \
+    openssl-libs \
+    unzip \
+    git \
+    ca-certificates \
+    cppunit \
+    cppunit-devel \
+    mpich-devel \
+    hdf5-mpich \
+    hdf5-mpich-devel \
+    sqlite \
+    sqlite-libs \
+    sqlite-devel \
+    proj \
+    proj-devel \
+    cmake \
+    swig \
+    lcov \
+    gdb \
+    valgrind \
+    vim \
+    vim-common
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
 
-ONBUILD COPY docker/certs/ /usr/local/share/ca-certificates
-ONBUILD RUN update-ca-certificates
-ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=DOIRootCA2.pem
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt 
 
 from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
@@ -60,22 +67,20 @@ from build-${BUILD_ENV} as build-deps
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
     PYTHON_VERSION=3.10 \
-    HDF5_INCDIR=/usr/include/hdf5/openmpi \
-    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-    OMPI_MCA_btl_vader_single_copy_mechanism=none
+    HDF5_INCDIR=/usr/include/mpich-x86_64 \
+    HDF5_LIBDIR=/usr/lib64/mpich/lib
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
      TOPBUILD_DIR=${HOME}/build \
-     PATH=${INSTALL_DIR}/bin:$PATH \
-     LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+     PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
-RUN projsync --system-directory --all
 
 # ------------------------------------------------------------------------------
 USER ${TEST_USER}

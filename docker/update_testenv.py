@@ -17,13 +17,14 @@ ENVS = (
     ("debian:testing", "debian-testing"),
     ("ubuntu:18.04", "ubuntu-18.04"),
     ("ubuntu:20.04", "ubuntu-20.04"),
-    ("ubuntu:21.10", "ubuntu-21.10"),
     ("ubuntu:22.04", "ubuntu-22.04"),
-    ("fedora:34", "fedora-34"),
+    ("ubuntu:22.10", "ubuntu-22.10"),
     ("fedora:35", "fedora-35"),
     ("fedora:36", "fedora-36"),
+    ("fedora:37", "fedora-37"),
     ("centos:7", "centos-7"),
     ("rockylinux:8", "rockylinux-8"),
+    ("rockylinux:9", "rockylinux-9"),
     )
 
 app = DockerApp()

@@ -1,0 +1,114 @@
+ARG BUILD_ENV=nocerts
+FROM rockylinux:9 as os-init
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
+# ------------------------------------------------------------------------------
+from os-init as os-certs-doi
+
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
+
+from os-init as os-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+
+# ------------------------------------------------------------------------------
+from os-${BUILD_ENV} as os-update
+
+RUN dnf install -y \
+        gcc \
+	gcc-c++ \
+	redhat-rpm-config \
+	make \
+        file \
+	which \
+	diffutils \
+        automake \
+        autoconf \
+        libtool \
+	curl \
+	libcurl-devel \
+	openssl \
+	openssl-devel \
+        zlib-devel \
+	unzip \
+        git \
+	ca-certificates \
+	python38 \
+	python38-devel \
+	python38-pip \
+	mpich \
+	mpich-devel \
+	cmake \
+	sqlite \
+	sqlite-devel \
+	libtiff \
+	libtiff-devel \
+	gdb \
+	valgrind \
+	vim-common \
+	vim-minimal \
+	dnf-plugins-core
+
+RUN dnf config-manager --set-enabled powertools && \
+    dnf install -y cppunit cppunit-devel && \
+    alternatives --set python3 /usr/bin/python3.8
+    
+# ------------------------------------------------------------------------------
+from os-update as build-deps
+
+ENV TEST_USER=pylith-tester \
+    INSTALL_DIR=/opt/pylith \
+    PYTHON_VERSION=3.8
+
+# Create 'pylith-tester' user
+RUN useradd --create-home --shell /bin/bash $TEST_USER
+ENV  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=${HOME}/src \
+     TOPBUILD_DIR=${HOME}/build \
+     PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
+     HDF5_LIBDIR=${INSTALL_DIR}/lib \
+     HDF5_INCDIR=${INSTALL_DIR}/include    
+RUN mkdir ${INSTALL_DIR} \
+  && chown ${TEST_USER} ${INSTALL_DIR} \
+  && chgrp ${TEST_USER} ${INSTALL_DIR}
+
+# ------------------------------------------------------------------------------
+USER ${TEST_USER}
+ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
+RUN mkdir -p ${TOPSRC_DIR} && \
+    mkdir -p ${TOPBUILD_DIR} && \
+    mkdir -p ${build_dir}
+    
+COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
+    --disable-cmake \
+    --disable-sqlite \
+    --disable-cppunit \
+    --enable-pcre \
+    --enable-swig \
+    --enable-proj \
+    --enable-cftime \
+    --enable-hdf5 \
+    --enable-h5py \
+    --enable-netcdf \
+    --enable-netcdfpy \
+    && make -C dependencies \
+    && rm -r ${build_dir}
+
+
+WORKDIR $HOME
+
+
+CMD /bin/bash

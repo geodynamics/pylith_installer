@@ -2,20 +2,20 @@
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Matthew G. Knepley, University at Buffalo
 #
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
-# See COPYING for license information.
+# See LICENSE.md for license information.
 #
 # ----------------------------------------------------------------------
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [3.0.0-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [3.0.3-0], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -80,7 +80,14 @@ if test "$install_mpi" = mpich ; then
       mpich_sharedarch=osx-gcc ;;
   esac
 fi
-AC_SUBST(mpich_sharedarch)  
+AC_SUBST(mpich_sharedarch)
+AC_ARG_WITH([mpich-options],
+    [AC_HELP_STRING([--with-mpich-options],
+        [MPICH configure options @<:@default=@:>@])],
+	[mpich_options=$withval],
+	[mpich_options=""])
+AC_SUBST(mpich_options)
+
 
 # GIT
 AC_ARG_ENABLE([git],
@@ -134,6 +141,22 @@ AC_ARG_ENABLE([openssl],
 	[install_openssl=no])
 AM_CONDITIONAL([INSTALL_OPENSSL], [test "$install_openssl" = yes])
 
+# CURL
+AC_ARG_ENABLE([curl],
+    [AC_HELP_STRING([--enable-curl],
+        [install curl @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_curl=yes; else install_curl=no; fi],
+	[install_curl=no])
+AM_CONDITIONAL([INSTALL_CURL], [test "$install_curl" = yes])
+
+# libFFI
+AC_ARG_ENABLE([libffi],
+    [AC_HELP_STRING([--enable-libffi],
+        [install libffi @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_libffi=yes; else install_libffi=no; fi],
+	[install_libffi=no])
+AM_CONDITIONAL([INSTALL_LIBFFI], [test "$install_libffi" = yes])
+
 # PYTHON
 AC_ARG_ENABLE([python],
     [AC_HELP_STRING([--enable-python],
@@ -149,6 +172,14 @@ AC_ARG_ENABLE([developer],
 	[if test "$enableval" != no ; then install_developer=yes; else install_developer=no; fi],
 	[install_developer=no])
 AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
+
+# ADDONS
+AC_ARG_ENABLE([addons],
+    [AC_HELP_STRING([--enable-addons],
+        [install Gmsh and matplotlib Python packages @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_addons=yes; else install_addons=no; fi],
+	[install_addons=no])
+AM_CONDITIONAL([INSTALL_ADDONS], [test "$install_addons" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -339,9 +370,9 @@ AC_ARG_ENABLE([petsc],
 AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-f2cblaslapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-ml=1 --download-f2cblaslapack=1"])
+	[petsc_options="--download-chaco=1 --download-f2cblaslapack=1 --download-ml=1"])
 AC_SUBST(petsc_options)
 AC_ARG_WITH([petsc-tarball],
     [AC_HELP_STRING([--with-petsc-tarball],
@@ -363,7 +394,7 @@ AM_CONDITIONAL([INSTALL_PARAMETERSGUI], [test "$install_parametersgui" = yes])
 # ----------------------------------------------------------------------
 # OPTIONS
 # ----------------------------------------------------------------------
-# Debugging
+# debugging
 AC_ARG_WITH([debugging],
     [AC_HELP_STRING([--with-debugging],
         [Generate debugging symbols and use low-level optimization for spatialdata, PETSc, and PyLith builds. @<:@default=no@:>@])],
@@ -506,7 +537,7 @@ fi
 # Python
 if test "$install_python" = yes ; then
   PYTHON=$prefix/bin/python3
-  PYTHON_VERSION=3.9.1
+  PYTHON_VERSION=3.10
   AC_SUBST(PYTHON)
   AC_CHECK_HEADER([zlib.h], [], [
                 AC_MSG_ERROR([Building Python requires zlib. Header file 'zlib.h' not found; maybe you don't have the zlib development package, e.g. 'zlib-dev', installed?])
@@ -608,7 +639,7 @@ if test "$install_swig" = yes ; then
   echo "do nothing" >& /dev/null
 else
   if test "$pylith_git" != no ; then
-    AC_PROG_SWIG([2.0.4], [3.0.2])
+    AC_PROG_SWIG([4.0.0])
   fi
 fi
 
@@ -702,7 +733,7 @@ if test "$install_h5py" = yes ; then
   x=1
 else
   if test "$with_h5py" = yes ; then
-    CIT_PYTHON_MODULE([h5py],[2.0.0])
+    CIT_PYTHON_MODULE([h5py],[3.0.0])
   fi
 fi
 
@@ -751,13 +782,17 @@ if test "$install_petsc" = yes ; then
 
   AC_ARG_VAR(PETSC_DIR, [location of PETSc installation])
   AC_ARG_VAR(PETSC_ARCH, [PETSc configuration])
-  PETSC_DIR=$prefix
+  if test "$install_developer" = yes ; then
+    PETSC_DIR="$(pwd)/cig/petsc-pylith"
+  else
+    PETSC_DIR=$prefix
+  fi
   AC_SUBST(PETSC_DIR)
   PETSC_ARCH=arch-pylith
   AC_SUBST(PETSC_ARCH)
 else
   AC_LANG(C)
-  CIT_PATH_PETSC([3.5.3])
+  CIT_PATH_PETSC([3.18.2])
   CIT_HEADER_PETSC
   CIT_CHECK_LIB_PETSC
 fi
@@ -897,32 +932,39 @@ AC_SUBST(LDFLAGS)
 
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
-TEMPVAR="$prefix/bin"
+TEMP_BINDIR="$prefix/bin"
+echo "if [[ -d $TEMP_BINDIR ]]; then" >> setup.sh
+echo "  source ${TEMP_BINDIR}/activate" >> setup.sh
+echo "else" >> setup.sh
 if test "X${PATH}" = X ; then
-  echo "export PATH=$TEMPVAR" >> setup.sh
+  echo "export PATH=${TEMP_BINDIR}" >> setup.sh
 else
-  echo "export PATH=$TEMPVAR:\${PATH}" >> setup.sh
+  echo "export PATH=${TEMP_BINDIR}:\${PATH}" >> setup.sh
 fi
+TEMP_PATH="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
+if test "X$PYTHONPATH" = X ; then
+  echo "export PYTHONPATH=${TEMP_PATH}" >> setup.sh
+else
+  echo "export PYTHONPATH=${TEMP_PATH}:\${PYTHONPATH}" >> setup.sh
+fi
+echo "fi" >> setup.sh
 
 case $host_os in
   darwin*)
     ;;
   *)
-    TEMPVAR="$prefix/lib:$prefix/lib64"
+    TEMP_PATH="$prefix/lib:$prefix/lib64"
+    if test "$install_developer" = "yes"; then
+     TEMP_PATH="${TEMP_PATH}:${PETSC_DIR}/${PETSC_ARCH}/lib"
+    fi
     if test "X${LD_LIBRARY_PATH}" = X ; then
-      echo "export LD_LIBRARY_PATH=$TEMPVAR" >> setup.sh
+      echo "export LD_LIBRARY_PATH=${TEMP_PATH}" >> setup.sh
     else
-      echo "export LD_LIBRARY_PATH=$TEMPVAR:\${LD_LIBRARY_PATH}" >> setup.sh
+      echo "export LD_LIBRARY_PATH=${TEMP_PATH}:\${LD_LIBRARY_PATH}" >> setup.sh
     fi
     ;;
 esac
 
-TEMPVAR="$prefix/lib/python$PYTHON_VERSION/site-packages:$prefix/lib64/python$PYTHON_VERSION/site-packages"
-if test "X$PYTHONPATH" = X ; then
-  echo "export PYTHONPATH=$TEMPVAR" >> setup.sh
-else
-  echo "export PYTHONPATH=$TEMPVAR:\${PYTHONPATH}" >> setup.sh
-fi
 
 # ----------------------------------------------------------------------
 AC_CONFIG_FILES([Makefile dependencies/Makefile cig/Makefile])
@@ -950,13 +992,20 @@ else
   printf "\n"
 fi
 printf "  cmake: $install_cmake\n"
-printf "  mpi: $install_mpi\n"
+printf "  mpi: $install_mpi"
+if test "$install_mpi" != "mpich" ; then
+  printf "\n"
+else
+  printf ", options: $mpich_options\n"
+fi
 printf "  git: $install_git\n"
 printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
 printf "  openssl: $install_openssl\n"
+printf "  curl: $install_curl\n"
+printf "  libffi: $install_libffi\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
 printf "    h5py: $install_h5py\n"

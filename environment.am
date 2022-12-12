@@ -2,12 +2,12 @@
 #
 # Brad T. Aagaard, U.S. Geological Survey
 # Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
-#
+# Matthew G. Knepley, University at Buffalo
+
 # This code was developed as part of the Computational Infrastructure
 # for Geodynamics (http://geodynamics.org).
 #
-# Copyright (c) 2010-2016 University of California, Davis
+# Copyright (c) 2010-2022 University of California, Davis
 #
 # See COPYING for license information.
 #
@@ -16,7 +16,6 @@
 FETCH_SCRIPT = $(top_srcdir)/bin/fetch.sh
 
 env_flags_deps = CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK" FCFLAGS="$(FCFLAGS)"
-
 
 if WITH_DEBUGGING
 env_flags_cig = CFLAGS="$(CFLAGS) -g -O" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK -g -O" FCFLAGS="$(FCFLAGS) -g -O"
@@ -36,7 +35,7 @@ endif
 PYTHON_SITEPKGS=lib/python$(PYTHON_VERSION)/site-packages
 PYTHON64_SITEPKGS=lib64/python$(PYTHON_VERSION)/site-packages
 if WITH_CERT
-env_flags_python = SSL_CERT_FILE="$(cert_path)/$(cert_file)"  REQUESTS_CA_BUNDLE="$(cert_path)/$(cert_file)"
+env_cert = SSL_CERT_FILE="$(cert_path)/$(cert_file)"  REQUESTS_CA_BUNDLE="$(cert_path)/$(cert_file)"
 endif
 
 # End of file

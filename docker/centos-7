@@ -7,34 +7,32 @@ ENV BUILD_ENV=${BUILD_ENV}
 
 RUN yum install -y \
         gcc \
-	gcc-c++ \
-	make \
+        gcc-c++ \
+        make \
         file \
-	which \
-	diffutils \
-	gettext \
+        which \
+        diffutils \
+        gettext \
         automake \
         autoconf \
         libtool \
         curl \
-	libcurl-devel \
-	openssh \
-	openssl \
-	openssl-devel \
-	libtiff \
-	libtiff-devel \
+        libcurl-devel \
+        openssh \
+        libtiff \
+        libtiff-devel \
         zlib-devel \
-	libffi-devel \
-	unzip \
-	bzip2 \
+        libffi-devel \
+        unzip \
+        bzip2 \
         git \
-	ca-certificates \
-	lcov \
-	gdb \
-	valgrind \
-	vim-common \
-	vim-runtime
-    
+        ca-certificates \
+        lcov \
+        gdb \
+        valgrind \
+        vim-common \
+        vim-runtime
+
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
@@ -50,30 +48,32 @@ ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 from build-${BUILD_ENV} as build-deps
 
 ENV TEST_USER=pylith-tester \
-    INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.9
+        INSTALL_DIR=/opt/pylith \
+        PYTHON_VERSION=3.10 \
+        OMPI_MCA_btl_vader_single_copy_mechanism=none
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
-     TOPBUILD_DIR=${HOME}/build \
-     PATH=${INSTALL_DIR}/bin:$PATH \
-     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
-     HDF5_LIBDIR=${INSTALL_DIR}/lib \
-     HDF5_INCDIR=${INSTALL_DIR}/include    
+        TOPBUILD_DIR=${HOME}/build \
+        PATH=${INSTALL_DIR}/bin:$PATH \
+        LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+        PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
+        HDF5_LIBDIR=${INSTALL_DIR}/lib \
+        HDF5_INCDIR=${INSTALL_DIR}/include \
+        OMPI_MCA_btl_vader_single_copy_mechanism=none
 RUN mkdir ${INSTALL_DIR} \
-  && chown ${TEST_USER} ${INSTALL_DIR} \
-  && chgrp ${TEST_USER} ${INSTALL_DIR}
+        && chown ${TEST_USER} ${INSTALL_DIR} \
+        && chgrp ${TEST_USER} ${INSTALL_DIR}
 
 # ------------------------------------------------------------------------------
 USER ${TEST_USER}
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
 RUN mkdir -p ${TOPSRC_DIR} && \
-    mkdir -p ${TOPBUILD_DIR} && \
-    mkdir -p ${build_dir}
-    
+        mkdir -p ${TOPBUILD_DIR} && \
+        mkdir -p ${build_dir}
+
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
@@ -81,24 +81,25 @@ RUN autoreconf --install --verbose --force
 
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
-    --with-fortran=no --with-make-threads=`nproc` \
-    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
-    --enable-cmake \
-    --disable-sqlite \
-    --enable-gcc \
-    --enable-mpi=openmpi \
-    --enable-cppunit \
-    --enable-python \
-    --enable-pcre \
-    --enable-swig \
-    --enable-sqlite \
-    --enable-proj \
-    --enable-hdf5 \
-    --enable-h5py \
-    --enable-netcdf \
-    --enable-netcdfpy \
-    && make -C dependencies \
-    && rm -r ${build_dir}
+        --with-fortran=no --with-make-threads=`nproc` \
+        --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
+        --enable-cmake \
+        --disable-sqlite \
+        --enable-gcc \
+        --enable-openssl \
+        --enable-mpi=openmpi \
+        --enable-cppunit \
+        --enable-python \
+        --enable-pcre \
+        --enable-swig \
+        --enable-sqlite \
+        --enable-proj \
+        --enable-hdf5 \
+        --enable-h5py \
+        --enable-netcdf \
+        --enable-netcdfpy \
+        && make -C dependencies \
+        && rm -r ${build_dir}
 
 
 WORKDIR $HOME
