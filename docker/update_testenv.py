@@ -15,11 +15,9 @@ from builder import DockerApp
 ENVS = (
     ("debian:stable", "debian-stable"),
     ("debian:testing", "debian-testing"),
-    ("ubuntu:18.04", "ubuntu-18.04"),
     ("ubuntu:20.04", "ubuntu-20.04"),
     ("ubuntu:22.04", "ubuntu-22.04"),
-    ("ubuntu:22.10", "ubuntu-22.10"),
-    ("fedora:35", "fedora-35"),
+    ("ubuntu:23.04", "ubuntu-23.04"),
     ("fedora:36", "fedora-36"),
     ("fedora:37", "fedora-37"),
     ("centos:7", "centos-7"),

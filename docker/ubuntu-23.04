@@ -1,12 +1,12 @@
 ARG BUILD_ENV=nocerts
-FROM debian:testing as os-update
+FROM ubuntu:23.04 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
       g++ \
       make \
       file \
@@ -14,7 +14,6 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
-      ssh \
       python3-dev \
       libpython3.11 \
       python3-venv \
@@ -33,8 +32,9 @@ RUN apt-get update \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \
-      libproj-dev \
       proj-bin \
+      proj-data \
+      libproj-dev \
       cmake \
       swig \
       lcov \
@@ -91,8 +91,8 @@ RUN autoreconf --install --verbose --force
 
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
-    --with-fortran=no --with-make-threads=`nproc` \
-    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
+    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
+    --with-hdf5-incdir=${HDF5_INCDIR} --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
@@ -103,6 +103,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy \
+    && . ./setup.sh \
     && make -C dependencies \
     && rm -r ${build_dir}
 

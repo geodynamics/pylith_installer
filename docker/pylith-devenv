@@ -1,5 +1,5 @@
 ARG BUILD_ENV=nocerts
-FROM ubuntu:20.04 as os-update
+FROM ubuntu:22.04 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
@@ -14,9 +14,9 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
-      libpython3.8 \
+      libpython3.10 \
       python3-dev \
-      python3.8-venv \
+      python3.10-venv \
       python3-pip \
       python3-setuptools \
       zlib1g-dev \
@@ -70,7 +70,7 @@ from build-${BUILD_ENV} as build-deps
 ENV  PYLITH_USER=pylith-dev \
      PYLITHDEPS_DIR=/opt/dependencies \
      DEV_DIR=/opt/pylith \
-     PYTHON_VERSION=3.8 \
+     PYTHON_VERSION=3.10 \
      HDF5_INCDIR=/usr/include/hdf5/mpich \
      HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich \
      PATH_ORIG=${PATH}
@@ -128,7 +128,7 @@ ENV  PETSC_DIR=${TOPSRC_DIR}/petsc \
      PETSC_ARCH=arch-pylith-debug \
      PYLITH_DIR=${INSTALL_DIR} \
      PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
-     PYTHON_INCDIR=/usr/include/python3.8 \
+     PYTHON_INCDIR=/usr/include/python3.10 \
      MPI_INCDIR=/usr/include/x86_64-linux-gnu/mpich \
      PROJ_INCDIR=/usr/include \
      CPPUNIT_INCDIR=/usr/include
