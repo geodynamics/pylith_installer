@@ -16,6 +16,7 @@ RUN dnf install -y \
     autoconf \
     libtool \
     curl \
+    libcurl-devel \
     openssh \
     python3 \
     python3-devel \

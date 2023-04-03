@@ -14,6 +14,7 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
+      libcurl4-openssl-dev \
       python3-dev \
       libpython3.8 \
       python3-venv \
