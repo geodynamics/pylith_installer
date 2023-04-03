@@ -651,16 +651,16 @@ if test "$install_sqlite" = yes ; then
   SQLITE3_LDFLAGS="-L$prefix/lib"
 else
   if test "$with_sqlite_incdir" != no; then
-    SQLITE3_INCLUDES="-I$with_sqlite_incdir"
+    SQLITE3_INCDIR="$with_sqlite_incdir"
   fi
   if test "$with_sqlite_libdir" != no; then
-    SQLITE3_LDFLAGS="-L$with_sqlite_libdir"
+    SQLITE3_LIBDIR="$with_sqlite_libdir"
   fi
   CIT_SQLITE3_HEADER
   CIT_SQLITE3_LIB
 fi
-AC_SUBST(SQLITE3_INCLUDES)
-AC_SUBST(SQLITE3_LDFLAGS)
+AC_SUBST(SQLITE3_INCDIR)
+AC_SUBST(SQLITE3_LIBDIR)
 
 # proj
 if test "$install_proj" = yes ; then
@@ -675,16 +675,16 @@ if test "$install_proj" = yes ; then
     TIFF_LDFLAGS="-L$prefix/lib"
   else
     if test "$with_tiff_incdir" != no; then
-      TIFF_INCLUDES="-I$with_tiff_incdir"
+      TIFF_INCDIR="$with_tiff_incdir"
     fi
     if test "$with_tiff_libdir" != no; then
-      TIFF_LDFLAGS="-L$with_tiff_libdir"
+      TIFF_LIBDIR="$with_tiff_libdir"
     fi
     CIT_TIFF_HEADER
     CIT_TIFF_LIB
   fi
-  AC_SUBST(TIFF_INCLUDES)
-  AC_SUBST(TIFF_LDFLAGS)
+  AC_SUBST(TIFF_INCDIR)
+  AC_SUBST(TIFF_LIBDIR)
 else
   if test "$with_proj_incdir" != no; then
     PROJ_INCLUDES="-I$with_proj_incdir"

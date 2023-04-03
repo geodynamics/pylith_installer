@@ -107,7 +107,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-proj \
     --enable-h5py \
     --enable-netcdf \
-    --enable-netcdfpy \
+    --disable-netcdfpy \
     && make -C dependencies \
     && rm -r ${build_dir}
 
