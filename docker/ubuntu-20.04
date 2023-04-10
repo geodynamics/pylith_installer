@@ -99,6 +99,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-hdf5 \
     --disable-proj \
     --enable-cmake \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --disable-netcdfpy \

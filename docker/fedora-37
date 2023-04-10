@@ -75,13 +75,13 @@ ENV TEST_USER=pylith-tester \
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
-     TOPBUILD_DIR=${HOME}/build \
-     PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
-     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+    TOPBUILD_DIR=${HOME}/build \
+    PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+    LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
-  && chown ${TEST_USER} ${INSTALL_DIR} \
-  && chgrp ${TEST_USER} ${INSTALL_DIR}
+    && chown ${TEST_USER} ${INSTALL_DIR} \
+    && chgrp ${TEST_USER} ${INSTALL_DIR}
 
 # ------------------------------------------------------------------------------
 USER ${TEST_USER}
@@ -89,7 +89,7 @@ ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-in
 RUN mkdir -p ${TOPSRC_DIR} && \
     mkdir -p ${TOPBUILD_DIR} && \
     mkdir -p ${build_dir}
-    
+
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
@@ -106,6 +106,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --disable-netcdfpy \

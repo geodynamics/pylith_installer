@@ -7,47 +7,47 @@ ENV BUILD_ENV=${BUILD_ENV}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-      g++ \
-      make \
-      file \
-      automake \
-      autoconf \
-      libtool \
-      curl \
-      libcurl4 \
-      libcurl4-openssl-dev \
-      openssl \
-      libssl1.1 \
-      libssl-dev \
-      python3-dev \
-      libpython3.9 \
-      python3-venv \
-      python3-pip \
-      zlib1g-dev \
-      unzip \
-      git \
-      ca-certificates \
-      libcppunit-dev \
-      libmpich-dev \
-      mpich \
-      libhdf5-mpich-103 \
-      libhdf5-mpich-dev \
-      sqlite3 \
-      libsqlite3-0 \
-      libsqlite3-dev \
-      libtiff5 \
-      libtiff5-dev \
-      libproj-dev \
-      proj-bin \
-      proj-data \
-      swig \
-      lcov \
-      gdb \
-      valgrind \
-      gnupg2 \
-      vim-common \
-      vim-runtime \
-      vim-nox
+    g++ \
+    make \
+    file \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    libcurl4 \
+    libcurl4-openssl-dev \
+    openssl \
+    libssl1.1 \
+    libssl-dev \
+    python3-dev \
+    libpython3.9 \
+    python3-venv \
+    python3-pip \
+    zlib1g-dev \
+    unzip \
+    git \
+    ca-certificates \
+    libcppunit-dev \
+    libmpich-dev \
+    mpich \
+    libhdf5-mpich-103 \
+    libhdf5-mpich-dev \
+    sqlite3 \
+    libsqlite3-0 \
+    libsqlite3-dev \
+    libtiff5 \
+    libtiff5-dev \
+    libproj-dev \
+    proj-bin \
+    proj-data \
+    swig \
+    lcov \
+    gdb \
+    valgrind \
+    gnupg2 \
+    vim-common \
+    vim-runtime \
+    vim-nox
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
@@ -72,13 +72,13 @@ ENV TEST_USER=pylith-tester \
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
-     TOPBUILD_DIR=${HOME}/build \
-     PATH=${INSTALL_DIR}/bin:$PATH \
-     LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
-     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+    TOPBUILD_DIR=${HOME}/build \
+    PATH=${INSTALL_DIR}/bin:$PATH \
+    LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
+    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
-  && chown ${TEST_USER} ${INSTALL_DIR} \
-  && chgrp ${TEST_USER} ${INSTALL_DIR}
+    && chown ${TEST_USER} ${INSTALL_DIR} \
+    && chgrp ${TEST_USER} ${INSTALL_DIR}
 
 # ------------------------------------------------------------------------------
 USER ${TEST_USER}
@@ -86,7 +86,7 @@ ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-in
 RUN mkdir -p ${TOPSRC_DIR} && \
     mkdir -p ${TOPBUILD_DIR} && \
     mkdir -p ${build_dir}
-    
+
 COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
@@ -104,6 +104,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-proj \
     --enable-developer \
     --enable-cmake \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --disable-netcdfpy \

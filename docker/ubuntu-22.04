@@ -96,6 +96,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --disable-netcdfpy \

@@ -19,8 +19,8 @@ RUN yum install -y \
         curl \
         libcurl-devel \
         openssh \
-	perl-IPC-Cmd \
-	libtiff \
+        perl-IPC-Cmd \
+        libtiff \
         libtiff-devel \
         zlib-devel \
         libffi-devel \
@@ -91,6 +91,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --enable-openssl \
         --enable-mpi=openmpi \
         --enable-cppunit \
+        --enable-catch2 \
         --enable-python \
         --enable-pcre \
         --enable-swig \

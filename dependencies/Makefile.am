@@ -28,6 +28,7 @@ noinst_tmp = \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
+	installed_catch2 \
 	installed_pcre \
 	installed_swig \
 	installed_sqlite \
@@ -53,6 +54,7 @@ noinst_builddirs = \
 	openmpi-build \
 	mpich-build \
 	cppunit-build \
+	catch2-build \
 	swig-build \
 	sqlite-build \
 	tiff-build \
@@ -68,12 +70,13 @@ noinst_srcdirs = \
 	libtool-$(LIBTOOL_VER) \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
-	openssl-${OPENSSL_VER) \
+	openssl-$(OPENSSL_VER) \
 	curl-$(CURL_VER) \
 	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
+	catch2-$(CATCH2_VER) \
 	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
 	sqlite-$(SQLITE_VER) \
@@ -323,7 +326,8 @@ if INSTALL_NETCDFPY
 	$(env_cert) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_cert) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt6 matplotlib
+#	$(env_cert) $(PYTHON) -m pip install coverage autopep8 gmsh matplotlib
+	$(env_cert) $(PYTHON) -m pip install coverage autopep8 matplotlib
 	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
 endif
 if INSTALL_ADDONS
@@ -422,6 +426,29 @@ endif
 
 installed_cppunit:
 	$(MAKE) $(AM_MAKEFLAGS) cppunit
+
+
+# ----------------------------------------------------------------------
+# catch2
+# ----------------------------------------------------------------------
+catch2: installed_compilers
+if INSTALL_CATCH2
+	$(FETCH_SCRIPT) "$(downloader)" catch2-$(CATCH2_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf catch2-$(CATCH2_VER).tar.gz
+	$(MKDIR_P) catch2-build
+	cd catch2-build && \
+		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) ../catch2-$(CATCH2_VER); \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_catch2
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_catch2
+endif
+
+installed_catch2:
+	$(MAKE) $(AM_MAKEFLAGS) catch2
 
 
 # ----------------------------------------------------------------------

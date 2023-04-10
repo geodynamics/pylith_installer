@@ -201,6 +201,26 @@ AC_ARG_WITH([cppunit-libdir],
 	[with_cppunit_libdir=no])
 AC_SUBST(with_cppunit_libdir)
 
+# CATCH2
+AC_ARG_ENABLE([catch2],
+    [AC_HELP_STRING([--enable-catch2],
+        [install Catch2 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_catch2=yes; else install_catch2=no; fi],
+	[install_catch2=yes])
+AM_CONDITIONAL([INSTALL_CATCH2], [test "$install_catch2" = yes])
+AC_ARG_WITH([catch2-incdir],
+    [AC_HELP_STRING([--with-catch2-incdir],
+        [location of Catch2 header files @<:@default=no@:>@])],
+	[with_catch2_incdir=$withval],
+	[with_catch2_incdir=no])
+AC_SUBST(with_catch2_incdir)
+AC_ARG_WITH([catch2-libdir],
+    [AC_HELP_STRING([--with-catch2-libdir],
+        [location of Catch2 library @<:@default=no@:>@])],
+	[with_catch2_libdir=$withval],
+	[with_catch2_libdir=no])
+AC_SUBST(with_catch2_libdir)
+
 # SQLITE
 AC_ARG_ENABLE([sqlite],
     [AC_HELP_STRING([--enable-sqlite],
@@ -408,7 +428,7 @@ if test "$install_cppunit" = yes ; then
 fi
 AC_ARG_WITH([testing],
     [AC_HELP_STRING([--with-testing],
-        [enable testing (requires cppunit) @<:@default=yes@:>@])],
+        [enable testing (requires CppUnit) @<:@default=yes@:>@])],
 	[if test "$withval" = yes; then with_testing=yes; else with_testing=no; fi],
 	[with_testing=yes])
 AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
@@ -615,6 +635,24 @@ else
 fi
 AC_SUBST(CPPUNIT_INCLUDES)
 AC_SUBST(CPPUNIT_LDFLAGS)
+
+# catch2
+if test "$install_catch2" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  if test "$with_testing" = yes ; then
+    if test "$with_catch2_incdir" != no; then
+      CATCH2_INCLUDES="-I$with_catch2_incdir"
+    fi
+    if test "$with_catch2_libdir" != no; then
+      CATCH2_LDFLAGS="-L$with_catch2_libdir"
+    fi
+    CIT_CATCH2_HEADER
+    CIT_CATCH2_LIB
+  fi
+fi
+AC_SUBST(CATCH2_INCLUDES)
+AC_SUBST(CATCH2_LDFLAGS)
 
 # PCRE
 if test "$install_pcre" = yes ; then
@@ -1003,6 +1041,7 @@ printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
+printf "  catch2: $install_catch2\n"
 printf "  openssl: $install_openssl\n"
 printf "  curl: $install_curl\n"
 printf "  libffi: $install_libffi\n"

@@ -96,6 +96,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --disable-cmake \
         --disable-sqlite \
         --disable-cppunit \
+        --enable-catch2 \
         --enable-pcre \
         --enable-swig \
         --enable-proj \
