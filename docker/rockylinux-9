@@ -95,7 +95,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --enable-pcre \
         --enable-swig \
         --enable-proj \
-        --enable-cftime \
         --enable-hdf5 \
         --enable-h5py \
         --enable-netcdf \

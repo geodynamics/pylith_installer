@@ -1,5 +1,10 @@
 # Building for PyLith development
 
+:::{tip}
+Unless you are an experienced PyLith developer, we strongly recommend using the [PyLith development environment Docker image](docker/index.md) rather than using the installer to build _all_ of the dependencies.
+The PyLith development Docker image contains all of the low-level dependencies.
+:::
+
 There are a few modifications to the usual process when using the installer to build for PyLith development.
 There are several configure arguments relevant to using the installer for development:
 
@@ -38,7 +43,7 @@ We use environment variables to set the paths to the desired build.
 
 Prerequisites:
 
-* C/C++-11 compiler
+* C/C++-14 compiler
 * git
 * make
 * fork of PyLith repository
@@ -96,11 +101,11 @@ tar -xf pylith_installer-3.0.3-0.tar.gz
 
 ## Linux
 
-This configuration is for the Ubuntu 20.04 Linux distribution.
+This configuration is for the Ubuntu 22.04 Linux distribution.
 The setup is similar for other Linux distributions.
 Some older distributions may not provide Python 3 packages for the PyLith dependencies.
 
-Install all of the system packages listed in the [user installation for Ubuntu 20.04](../configs/ubuntu.md).
+Install all of the system packages listed in the [user installation for Ubuntu 22.04](../configs/ubuntu.md).
 You will also need to set the `PYTHON_VERSION`, `HDF5_INCDIR`, and `HDF5_LIBDIR` environment variables as in the user installation.
 Then, install the additional packages recommended for development:
 
@@ -136,6 +141,7 @@ $PYLITH_DIR/pylith_installer-3.0.3-0/configure \
     --disable-sqlite \
     --disable-numpy \
     --disable-hdf5 \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy
@@ -161,8 +167,13 @@ We use the Apple clang/clang++ compiler.
 macOS does not provide a standard installation of Python 3, so we use the installer to build Python 3.
 XCode does not contain the autotools suite (automake, autoconf, libtool), so we also use the installer to build autotools.
 
+:::{tip}
+Instead of having the installer build Python 3, a good alternative is to install the macOS Python binary provided by [python.org](https://www.python.org/downloads/macos/).
+In this case you do not need to install OpenSSL, libffi, or Python.
+:::
+
 :::{important}
-When the installer builds Python, it will create a virtual environment for PyLith.
+The installer will create a virtual environment for PyLith.
 You will need to activate this virtual environment for PyLith in every shell (terminal) where you want to build or use PyLith.
 You may want to add `source $PYLITH_DIR/pylith-debug/bin/activate` to your `.bashrc` or local `setup.sh` file.
 :::
@@ -191,6 +202,8 @@ ${HOME}/src/pylith/pylith_installer-3.0.3-0/configure  \
     --enable-python \
     --enable-swig \
     --enable-pcre \
+    --enable-cppunit \
+    --enable-catch2 \
     --enable-tiff \
     --enable-proj \
     --enable-hdf5 \

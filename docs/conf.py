@@ -30,6 +30,7 @@ release = 'v3.0.3-0'
 # ones.
 extensions = [
     "myst_parser",
+    "sphinx_copybutton",
 ]
 myst_enable_extensions = [
     "colon_fence",

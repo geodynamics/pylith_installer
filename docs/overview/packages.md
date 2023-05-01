@@ -13,39 +13,35 @@ The dependencies will be downloaded from <http://geoweb.cse.ucdavis.edu/~buildbo
 * Autotools
   * m4 1.4.17
   * autoconf 2.69
-  * automake 1.16.1
+  * automake 1.16.4
   * libtool 2.4.6
 
 * Gcc compiler
-  * gcc/g++/gfortran 7.3.0
-  * mpc 1.0.3
-  * gmp 6.1.0
-  * mpfr 3.1.4
+  * gcc/g++/gfortran 10.3.0
+  * mpc 1.2.1
+  * gmp 6.2.1
+  * mpfr 4.1.0
 
 * MPI (select one)
-  * MPICH 3.3.2
-  * OpenMPI 4.1.0
+  * MPICH 4.1.1
+  * OpenMPI 4.1.5
 
 * Python
-  * Python 3.9.1
-  * setuptools 51.1.1
-  * Cython 0.29.21
-  * numpy 1.19.5
-  * six 1.15.0
-  * cftime 1.4.1
-  * netCDF (Python) 1.5.5.1
-  * h5py 3.1.0
+  * Python 3.10.10
+  * netCDF (Python) 1.6.3
+  * h5py 3.8.0
 
 * General tools
-  * OpenSSL 1.1.1i
+  * OpenSSL 3.1.0
   * CppUnit 1.15.1
-  * PCRE 8.40
-  * SWIG 4.0.2
-  * SQLITE 3310100
-  * Proj 6.3.0
-  * HDF5 1.12.0
-  * NetCDF 4.7.4
-  * Cmake 3.19.2
+  * Catch2 3.2.2
+  * PCRE 10.42
+  * SWIG 4.1.1
+  * SQLITE 3410200
+  * Proj 9.2.0
+  * HDF5 1.14.0
+  * NetCDF 4.9.2
+  * Cmake 3.26.2
 
 * CIG tools
   * pythia 1.0.0

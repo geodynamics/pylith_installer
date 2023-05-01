@@ -2,9 +2,10 @@ ARG BUILD_ENV=nocerts
 FROM ubuntu:22.04 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
-ARG BUILD_ARCH=aarch64
-ENV BUILD_ENV=${BUILD_ENV}  BUILD_ARCH=${BUILD_ARCH}
-RUN echo "Building for ${BUILD_ARCH}"
+ARG TARGETARCH
+
+ENV BUILD_ENV=${BUILD_ENV} TARGET_PLATFORM=${TARGETPLATFORM}
+RUN echo "Building for ${TARGETARCH}"
 
 RUN apt-get update \
      && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
@@ -66,20 +67,27 @@ from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from build-${BUILD_ENV} as build-deps
+from build-${BUILD_ENV} as arch-amd64
+ONBUILD ENV ARCH_LIBPATH="x86_64-linux-gnu"
+
+from build-${BUILD_ENV} as arch-arm64
+ONBUILD ENV ARCH_LIBPATH="aarch64-linux-gnu"
+
+# ------------------------------------------------------------------------------
+from arch-${TARGETARCH} as setup-env
 
 ENV  PYLITH_USER=pylith-dev \
      PYLITHDEPS_DIR=/opt/dependencies \
      DEV_DIR=/opt/pylith \
      PYTHON_VERSION=3.10 \
      HDF5_INCDIR=/usr/include/hdf5/mpich \
-     HDF5_LIBDIR=/usr/lib/${BUILD_ARCH}-linux-gnu/hdf5/mpich \
+     HDF5_LIBDIR=/usr/lib/${ARCH_LIBPATH}/hdf5/mpich \
      PATH_ORIG=${PATH}
 
 ENV  HOME=/home/$PYLITH_USER \
-     INSTALL_DIR=$DEV_DIR/dest/debug \
-     TOPSRC_DIR=$DEV_DIR/src \
-     TOPBUILD_DIR=$DEV_DIR/build/debug
+     INSTALL_DIR=$DEV_DIR/dest-debug \
+     TOP_SRCDIR=$DEV_DIR/src \
+     TOP_BUILDDIR=$DEV_DIR/build-debug
 
 # Create 'pylith-user'
 RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
@@ -91,6 +99,8 @@ ENV PATH=${PYLITHDEPS_DIR}/bin:$PATH \
      LD_LIBRARY_PATH=${PYLITHDEPS_DIR}/lib \
      PYTHONPATH=${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
 
+# ------------------------------------------------------------------------------
+from setup-env as build-deps
 # PyLith installer
 ENV  src_dir=/opt/pylith-installer/src  build_dir=/opt/pylith-installer/build
 RUN mkdir -p /opt/pylith-installer && mkdir -p ${build_dir}
@@ -120,19 +130,22 @@ RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
      && make -C dependencies \
      && rm -r /opt/pylith-installer
 
+# ------------------------------------------------------------------------------
+from build-deps as setup-workspace
 
 WORKDIR ${HOME}
 USER ${PYLITH_USER}
 
 # Environment variables used in VSCode settings
-ENV  PETSC_DIR=${TOPSRC_DIR}/petsc \
+ENV  PETSC_DIR=${TOP_SRCDIR}/petsc \
      PETSC_ARCH=arch-pylith-debug \
      PYLITH_DIR=${INSTALL_DIR} \
-     PYLITH_BUILDDIR=${TOPBUILD_DIR}/pylith  \
+     PYLITH_BUILDDIR=${TOP_BUILDDIR}/pylith  \
      PYTHON_INCDIR=/usr/include/python3.10 \
-     MPI_INCDIR=/usr/include/${BUILD_ARCH}-linux-gnu/mpich \
+     MPI_INCDIR=/usr/include/${ARCH_LIBPATH}/mpich \
      PROJ_INCDIR=/usr/include \
-     CPPUNIT_INCDIR=/usr/include
+     CPPUNIT_INCDIR=/usr/include \
+     CATCH2_INCDIR=/usr/include
 
 ENV PATH=${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
      LD_LIBRARY_PATH=${PYLITH_DIR}/lib:${PYLITHDEPS_DIR}/lib \

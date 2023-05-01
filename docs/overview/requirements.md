@@ -4,7 +4,7 @@ The installer users a `configure` shell script to generate Makefiles for buildin
 
 The installer requires having the following tools already installed on your system:
 
-* A C/C++ compiler,
+* A C/C++ 14 compiler,
 * Make,
 * Tar archiving utility,
 * Zip archiving utility, and

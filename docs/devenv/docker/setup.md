@@ -59,17 +59,17 @@ We will use the following directory structure for the persistent storage.
     │    └── pylith
     ├── build
     │   ├── pythia-debug
-    │   ├── pythia-opt
+    │   ├── pythia-opt (optional)
     │   ├── spatialdata-debug
-    │   ├── spatialdata-opt
+    │   ├── spatialdata-opt (optional)
     │   ├── pylith-debug
-    │   └── pylith-opt
+    │   └── pylith-opt (optional)
     ├── dest-debug
     │   ├── bin
     │   ├── include
     │   ├── lib
     │   └── share
-    └── dest-opt
+    └── dest-opt (optional)
         ├── bin
         ├── include
         ├── lib
@@ -82,9 +82,9 @@ This directory structure is set up for both a debugging version for development 
 For now, we will only setup the debugging version.
 
 ```{code-block} bash
-cd /opt/pylith
+cd ${DEV_DIR}
 mkdir src
-mkdir -p ${TOPBUILD_DIR} && pushd ${TOPBUILD_DIR} && mkdir pythia-debug spatialdata-debug pylith-debug && popd
+mkdir -p ${TOP_BUILDDIR} && pushd ${TOP_BUILDDIR} && mkdir pythia-debug spatialdata-debug pylith-debug && popd
 mkdir -p ${INSTALL_DIR}
 ```
 
@@ -94,7 +94,7 @@ This creates a local copy of the repositories in the persistent storage volume o
 These are your working copies of the repositories.
 
 ```{code-block} bash
-cd /opt/pylith/src
+cd ${TOP_SRCDIR}
 git clone --recursive https://github.com/geodynamics/pythia.git
 git clone --recursive https://github.com/geodynamics/spatialdata.git
 git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git
@@ -105,45 +105,22 @@ git clone --branch knepley/pylith https://gitlab.com/petsc/petsc.git
 
 For the PyLith repository and any other repositories that you forked, you should set the upstream repository.
 The upstream repository is the central, community repository from which you will get updates.
+We also recommend **never** using the `main` branch in your fork; instead, set your local `main` branch to the `upstream/main` branch.
+This simplifies keeper your local repository in sync with the community repository.
 
 ```{code-block} bash
 # PyLith repository (repeat for other repositories you forked)
-cd /opt/pylith/src/pylith
+cd ${TOP_SRCDIR}/pylith
 git remote add upstream https://github.com/geodynamics/pylith.git
+git fetch upstream
+
+# Checkout the `upstream` main branch
+git checkout -b upstream/main --track upstream/main
+# Remove the local `main` from your fork
+git branch -D main
+# Rename your `upstream/main` to `main`
+git branch -m upstream/main main
 ```
-
-(sec-developer-fork-fix-m4-url)=
-### Fixing path to m4 submodule
-
-For any of the repositories that you forked, you will encounter an error when it tries to clone the `m4` submodule, which has a relative link.
-The error message will be similar to:
-
-```{code-block} bash
-Cloning into '/opt/pylith/src/pylith/m4'...
-remote: Repository not found.
-fatal: repository 'https://github.com/GITHUB_USERNAME/autoconf_cig.git/' not found
-fatal: clone of 'https://github.com/GITHUB_USERNAME/autoconf_cig.git' into submodule path '/opt/pylith/src/pylith/m4' failed
-Failed to clone 'm4'. Retry scheduled
-```
-
-The best workaround is to redirect your local clone to the geodynamics repository.
-You only need to do this once after cloning.
-
-```{code-block} bash
-# Set URLs for submodules in `.git/config` to geodynamics repository (PyLith repository).
-cd /opt/pylith/src/pylith
-git config submodule.m4.url https://github.com/geodynamics/autoconf_cig.git
-git config submodule.templates/friction/m4.url https://github.com/geodynamics/autoconf_cig.git
-git config submodule.templates/materials/m4.url https://github.com/geodynamics/autoconf_cig.git
-
-# Update submodules
-git submodule update
-```
-
-:::{note}
-We use a relative link so that the GitLab mirror works correctly.
-The consequence of using a relative link is that your local clone will look for a corresponding fork of the `autoconf_cig` repository.
-:::
 
 ## Setup Python virtual environment
 
@@ -163,7 +140,7 @@ We build 3 CIG-related dependencies and PyLith:
 3. PETSc
 4. PyLith
 
-Pythia, Spatialdata, and PETSc are not include in the Docker image, because they may need to be updated as part of PyLith development.
+Pythia, Spatialdata, and PETSc are not include in the Docker image, because they need to be updated as part of PyLith development.
 
 :::{tip}
 To speed up the build process, we set the number of make threads to the number of cores `-j$(nproc)`.
@@ -173,9 +150,9 @@ You can often find speedup with up to twice as many threads as the number of cor
 ### Pythia
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/pythia-debug
-pushd ${TOPSRC_DIR}/pythia && autoreconf -if && popd
-${TOPSRC_DIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
+cd ${TOP_BUILDDIR}/pythia-debug
+pushd ${TOP_SRCDIR}/pythia && autoreconf -if && popd
+${TOP_SRCDIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
     CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
 make install
 make check
@@ -184,9 +161,9 @@ make check
 ### Spatialdata
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/spatialdata-debug
-pushd ${TOPSRC_DIR}/spatialdata && autoreconf -if && popd
-${TOPSRC_DIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
+cd ${TOP_BUILDDIR}/spatialdata-debug
+pushd ${TOP_SRCDIR}/spatialdata && autoreconf -if && popd
+${TOP_SRCDIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
     --enable-swig --enable-testing \
 	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
 	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
@@ -198,7 +175,7 @@ make check -j$(nproc)
 ### PETSc
 
 ```{code-block} bash
-cd ${TOPSRC_DIR}/petsc
+cd ${TOP_SRCDIR}/petsc
 python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
     --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
@@ -213,9 +190,9 @@ make check
 ### PyLith
 
 ```{code-block} bash
-cd ${TOPBUILD_DIR}/pylith-debug
-pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
-${TOPSRC_DIR}/pylith/configure --prefix=${PYLITH_DIR} \
+cd ${TOP_BUILDDIR}/pylith-debug
+pushd ${TOP_SRCDIR}/pylith && autoreconf -if && popd
+${TOP_SRCDIR}/pylith/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
     --enable-test-coverage --with-python-coverage=coverage3 \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
@@ -261,22 +238,22 @@ cat /proc/sys/kernel/yama/ptrace_scope
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/) for your computer.
 2. Install the following extensions:
-    * Remote - Containers
-    * C/C++ 
+    * Dev Containers
+    * C/C++
     * Docker
     * Live Share
     * Python
     * Uncrustify
     * Live Share
+    * C++ TestMate
+    * Test Explorer UI
 
 We recommend also installing the following extensions:
 
-* GitHub Pull Requests and Issues
-* GitLens -- Git supercharged
-* Material Icon Theme
 * autoconf
 * Code Spell Checker
 * Markdown all in One
 * markdownlint
+* Material Icon Theme
 * MyST-Markdown
 * Remote-SSH

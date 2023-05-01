@@ -19,6 +19,7 @@ Make sure Docker is running before you start the container.
 2. Click on the Docker extension in the Activity Bar on the far left hand side as illustrated in the [screenshot](docker-attach-vscode).
 3. Find the `pylith-dev-workspace` container. Verify that it is running.
 4. Right-click on the container and select `Attach Visual Studio Code`. This will open a new window. You should see `Container registry.gitlab.com/cig-pylith...` at the left side of the status bar at the bottom of the window.
+5. Open the PyLith source code by selecting `File` -> `Open Folder...` and navigating to `/opt/pylith/src/`. 
 
 :::{figure-md} docker-attach-vscode
 :class: myclass

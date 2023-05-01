@@ -14,7 +14,7 @@ On multi-core and multi-processor systems (not clusters but systems with more th
 
 The default configure options assume you have:
 
-* C and C++ compilers
+* C/C++ 14 compilers
 * Python 3.6 or later
 * MPI
 
