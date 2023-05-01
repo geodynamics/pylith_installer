@@ -38,6 +38,8 @@ RUN apt-get update \
      libproj-dev \
      cmake \
      swig \
+     libgsl27 \
+     libgsl-dev \
      lcov \
      gdb \
      valgrind \

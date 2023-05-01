@@ -537,6 +537,15 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
 
+# Save raw compiler settings
+save_cc=$CC
+save_cxx=$CXX
+AX_CXX_COMPILE_STDCXX(14)
+CC=$save_cc
+CXX=$save_cxx
+AC_SUBST(CC)
+AC_SUBST(CXX)
+
 # GCC
 if test "$install_gcc" = yes ; then
   if test "$install_mpi" = no ; then
@@ -639,10 +648,8 @@ AC_SUBST(CPPUNIT_LDFLAGS)
 # catch2
 if test "$install_catch2" = yes ; then
   echo "do nothing" >& /dev/null
-  AX_CXX_COMPILE_STDCXX(14)
 else
   if test "$with_testing" = yes ; then
-    AX_CXX_COMPILE_STDCXX(14)
     if test "$with_catch2_incdir" != no; then
       CATCH2_INCLUDES="-I$with_catch2_incdir"
     fi
