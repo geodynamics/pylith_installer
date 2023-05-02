@@ -24,10 +24,10 @@ env_flags_cig = CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS) -DMPICH_IGNORE_CXX_SEEK
 endif
 
 if WITH_FORTRAN
-env_compilers = CC=$(CC) CXX=$(CXX) FC=$(FC)
+env_compilers = CC="$(CC)" CXX="$(CXX)" FC="$(FC)"
 env_mpicompilers = CC=mpicc CXX=mpicxx FC=mpif90
 else
-env_compilers = CC=$(CC) CXX=$(CXX)
+env_compilers = CC="$(CC)" CXX="$(CXX)"
 env_mpicompilers = CC=mpicc CXX=mpicxx
 endif
 

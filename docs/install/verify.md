@@ -4,7 +4,7 @@ Run your favorite PyLith example or test problem to insure that PyLith was insta
 
 The output of running `pylith` with no arguments is.
 
-```bash
+```{code-block} bash
  >> {default}::
  -- pyre.inventory(error)
  -- meshimporter.meshioascii.filename <- ''

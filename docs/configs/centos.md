@@ -2,9 +2,8 @@
 
 ## CentOS 7 (similar to Red Hat 7)
 
-CentOS 7 does not (by default) provide a C++11 compiler. As a result,
-we use the installer to build a more recent gcc version and only use a
-few operating system packages to satisfy PyLith dependency requirements.
+CentOS 7 does not (by default) provide a C++14 compiler.
+As a result, we use the installer to build a more recent gcc version and only use a few operating system packages to satisfy PyLith dependency requirements.
 
 ### Operating system packages
 
@@ -61,6 +60,7 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --enable-openssl \
     --enable-mpi=openmpi \
     --enable-cppunit \
+    --enable-catch2 \
     --enable-python \
     --enable-sqlite \
     --enable-proj \
@@ -135,6 +135,74 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --disable-cmake \
     --disable-sqlite \
     --disable-cppunit \
+    --enable-catch2 \
+    --enable-proj \
+    --enable-hdf5 \
+    --enable-h5py \
+    --enable-netcdf \
+    --enable-netcdfpy
+```
+
+## Rocky Linux 9 (similar to RedHat 9)
+
+### Operating system packages
+
+```bash
+dnf install -y  --allowerasing \
+    gcc \
+    gcc-c++ \
+    redhat-rpm-config \
+    make \
+    file \
+    which \
+    diffutils \
+    automake \
+    autoconf \
+    libtool \
+    curl \
+    libcurl-devel \
+    openssl \
+    openssl-devel \
+    zlib-devel \
+    unzip \
+    git \
+    ca-certificates \
+    python3 \
+    python3-devel \
+    python3-pip \
+    mpich \
+    mpich-devel \
+    cmake \
+    sqlite \
+    sqlite-devel \
+    libtiff \
+    libtiff-devel \
+    dnf-plugins-core
+```
+
+### Environment variables
+
+```
+PATH=$PATH:/usr/lib64/mpich/bin
+export PYTHON_VERSION 3.9
+PREFIX_DIR=$HOME/pylith
+export HDF5_LIBDIR=${PREFIX_DIR}/dependencies/lib
+export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
+```
+
+### Configure
+
+```bash
+$HOME/src/pylith/pylith-installer-3.0.-0/configure \
+    --prefix=$PREFIX_DIR \
+    --with-fetch=curl \
+    --with-fortran=no \
+    --with-make-threads=$(nproc) \
+    --with-deps-prefix=${PREFIX_DIR}/dependencies \
+    --disable-cmake \
+    --disable-sqlite \
+    --enable-cppunit \
+    --enable-catch2 \
     --enable-proj \
     --enable-hdf5 \
     --enable-h5py \

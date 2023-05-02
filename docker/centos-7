@@ -19,6 +19,7 @@ RUN yum install -y \
         curl \
         libcurl-devel \
         openssh \
+        perl-IPC-Cmd \
         libtiff \
         libtiff-devel \
         zlib-devel \
@@ -33,6 +34,7 @@ RUN yum install -y \
         vim-common \
         vim-runtime
 
+# OpenSSL 3.1 requires perl-IPC-Cmd
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
@@ -89,6 +91,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --enable-openssl \
         --enable-mpi=openmpi \
         --enable-cppunit \
+        --enable-catch2 \
         --enable-python \
         --enable-pcre \
         --enable-swig \

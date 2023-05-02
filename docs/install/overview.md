@@ -39,16 +39,15 @@ You can trigger a package to be rebuilt by removing the corresponding `PACKAGE-b
 The default settings do not install a compiler suite, Python, or MPI.
 In order for PyLith to work properly, Python and MPI must be built with the same compiler suite used by the PyLith installer to build all of the other dependencies and PyLith itself.
 
-
 If you are using the Python and compiler suite provided by the operating system, these are guaranteed to be compatible.
 The configure tests are relatively simple and detect only major incompatibilities; many small incompatibilities slip through and only show up during the testing phase of the build process.
 
 ### Checking the compiler used to build Python
 
 You can see which compiler was used to build an installed version of Python by starting the Python interpreter (run `python3`) and examining the second line.
-In the following example, we see from the second line that Python was built using clang provided by the macOS which is compatible with gcc 4.2.1.
+In the following example, we see from the second line that Python was built using clang (provided by the macOS).
 
-```bash
+```{code-block} bash
 python3
 
 Python 3.8.3 (default, May 19 2020, 09:28:14)
@@ -60,7 +59,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 Likewise you can often identify which compiler an MPI version is using by running `mpicc -show`.
 In the following example, we see that MPICH was compiled using clang and is installed in `/Users/johndoe/tools/mpich-3.3.2`.
 
-```bash
+```{code-block} bash
+
 mpicc -show
 
 clang -Wl,-flat_namespace -I/Users/johndoe/tools/mpich-3.3.2/include -L/Users/johndoe/tools/mpich-3.3.2/lib -lmpi -lpmpi

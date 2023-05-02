@@ -65,6 +65,7 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-cppunit \
     --disable-sqlite \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-cmake \
     --enable-netcdf \
@@ -86,9 +87,9 @@ apt-get install -y --no-install-recommends \
       curl \
       ssh \
       python3-dev \
-      libpython3.10 \
-      python3-pip \
+      libpython3.11 \
       python3-venv \
+      python3-pip \
       zlib1g-dev \
       unzip \
       git \
@@ -112,7 +113,7 @@ apt-get install -y --no-install-recommends \
 ### Environment variables
 
 ```
-PYTHON_VERSION=3.10
+PYTHON_VERSION=3.11
 HDF5_INCDIR=/usr/include/hdf5/openmpi
 HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 ```
@@ -134,6 +135,7 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy

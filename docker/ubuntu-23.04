@@ -1,5 +1,5 @@
 ARG BUILD_ENV=nocerts
-FROM ubuntu:20.04 as os-update
+FROM ubuntu:23.04 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
@@ -14,9 +14,8 @@ RUN apt-get update \
       autoconf \
       libtool \
       curl \
-      libcurl4-openssl-dev \
       python3-dev \
-      libpython3.8 \
+      libpython3.11 \
       python3-venv \
       python3-pip \
       zlib1g-dev \
@@ -24,19 +23,19 @@ RUN apt-get update \
       git \
       ca-certificates \
       libcppunit-dev \
-      libmpich-dev \
-      mpich \
-      libhdf5-mpich-103 \
-      libhdf5-mpich-dev \
+      libopenmpi-dev \
+      libopenmpi3 \
+      openmpi-bin \
+      openmpi-common \
+      libhdf5-openmpi-103-1 \
+      libhdf5-openmpi-dev \
       sqlite3 \
       libsqlite3-0 \
       libsqlite3-dev \
       proj-bin \
       proj-data \
       libproj-dev \
-      openssl \
-      libssl1.1 \
-      libssl-dev \
+      cmake \
       swig \
       lcov \
       gdb \
@@ -60,9 +59,10 @@ from build-${BUILD_ENV} as build-deps
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.8 \
-    HDF5_INCDIR=/usr/include/hdf5/mpich \
-    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+    PYTHON_VERSION=3.11 \
+    HDF5_INCDIR=/usr/include/hdf5/openmpi \
+    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
+    OMPI_MCA_btl_vader_single_copy_mechanism=none
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
@@ -75,6 +75,7 @@ ENV  TOPSRC_DIR=${HOME}/src \
 RUN mkdir ${INSTALL_DIR} \
   && chown ${TEST_USER} ${INSTALL_DIR} \
   && chgrp ${TEST_USER} ${INSTALL_DIR}
+RUN projsync --system-directory --all
 
 # ------------------------------------------------------------------------------
 USER ${TEST_USER}
@@ -95,10 +96,10 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cppunit \
+    --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
-    --enable-cmake \
     --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \

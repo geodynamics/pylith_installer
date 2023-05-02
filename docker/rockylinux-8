@@ -96,13 +96,14 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --disable-cmake \
         --disable-sqlite \
         --disable-cppunit \
+        --enable-catch2 \
         --enable-pcre \
         --enable-swig \
         --enable-proj \
         --enable-hdf5 \
         --enable-h5py \
         --enable-netcdf \
-        --enable-netcdfpy \
+        --disable-netcdfpy \
         && make -C dependencies \
         && rm -r ${build_dir}
 

@@ -28,6 +28,7 @@ noinst_tmp = \
 	installed_python \
 	installed_mpi \
 	installed_cppunit \
+	installed_catch2 \
 	installed_pcre \
 	installed_swig \
 	installed_sqlite \
@@ -37,7 +38,6 @@ noinst_tmp = \
 	installed_h5py \
 	installed_netcdf \
 	installed_netcdfpy \
-	installed_git
 	installed_cmake
 
 
@@ -50,11 +50,11 @@ noinst_builddirs = \
 	openssl-build \
 	curl-build \
 	libffi-build \
-	git-build \
 	python-build \
 	openmpi-build \
 	mpich-build \
 	cppunit-build \
+	catch2-build \
 	swig-build \
 	sqlite-build \
 	tiff-build \
@@ -70,12 +70,13 @@ noinst_srcdirs = \
 	libtool-$(LIBTOOL_VER) \
 	gcc-$(GCC_VER) \
 	Python-$(PYTHON_VER) \
-	openssl-${OPENSSL_VER) \
+	openssl-$(OPENSSL_VER) \
 	curl-$(CURL_VER) \
 	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
 	cppunit-$(CPPUNIT_VER) \
+	catch2-$(CATCH2_VER) \
 	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
 	sqlite-$(SQLITE_VER) \
@@ -84,13 +85,12 @@ noinst_srcdirs = \
 	h5py-$(H5PY_VER) \
 	netcdf-$(NETCDF_VER) \
 	netCDF4-$(NETCDFPY_VER) \
-	git-$(GIT_VER) \
 	cmake-$(CMAKE_VER)
 
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_git installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -158,27 +158,6 @@ installed_autotools:
 	$(MAKE) $(AM_MAKEFLAGS) autotools
 
 # ----------------------------------------------------------------------
-# git
-# ----------------------------------------------------------------------
-git:
-if INSTALL_GIT
-	$(FETCH_SCRIPT) "$(downloader)" git-$(GIT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf git-$(GIT_VER).tar.gz
-	cd git-$(GIT_VER) && \
-		./configure --prefix=$(prefix) && \
-		make -j$(make_threads) all && \
-		make install && \
-		touch $(abs_builddir)/installed_git
-else
-	@echo "Skipping $@ installation."
-	touch $(abs_builddir)/installed_git
-endif
-
-installed_git:
-	$(MAKE) $(AM_MAKEFLAGS) git
-
-
-# ----------------------------------------------------------------------
 # cmake
 # ----------------------------------------------------------------------
 cmake:
@@ -243,7 +222,7 @@ if INSTALL_OPENSSL
 	$(TAR) -xf openssl-$(OPENSSL_VER).tar.gz
 	$(MKDIR_P) openssl-build
 	cd openssl-build && \
-		../openssl-$(OPENSSL_VER)/config \
+		../openssl-$(OPENSSL_VER)/Configure \
 			--prefix=$(prefix) --openssldir=$(prefix)/share/openssl \
 			$(env_flags_deps) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
@@ -347,8 +326,9 @@ if INSTALL_NETCDFPY
 	$(env_cert) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_cert) $(PYTHON) -m pip install coverage autopep8 gmsh PyQt6 matplotlib
-	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme
+	$(env_cert) $(PYTHON) -m pip install coverage autopep8 matplotlib
+#	$(env_cert) $(PYTHON) -m pip install gmsh
+	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx-copybutton
 endif
 if INSTALL_ADDONS
 	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
@@ -449,15 +429,38 @@ installed_cppunit:
 
 
 # ----------------------------------------------------------------------
+# catch2
+# ----------------------------------------------------------------------
+catch2: installed_compilers
+if INSTALL_CATCH2
+	$(FETCH_SCRIPT) "$(downloader)" catch2-$(CATCH2_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf catch2-$(CATCH2_VER).tar.gz
+	$(MKDIR_P) catch2-build
+	cd catch2-build && \
+		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) ../catch2-$(CATCH2_VER); \
+		make -j $(make_threads) && \
+		make install && \
+		touch $(abs_builddir)/installed_catch2
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_catch2
+endif
+
+installed_catch2:
+	$(MAKE) $(AM_MAKEFLAGS) catch2
+
+
+# ----------------------------------------------------------------------
 # pcre
 # ----------------------------------------------------------------------
 pcre: installed_compilers
 if INSTALL_PCRE
-	$(FETCH_SCRIPT) "$(downloader)" pcre-$(PCRE_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf pcre-$(PCRE_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" pcre2-$(PCRE_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf pcre2-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
-		../pcre-$(PCRE_VER)/configure --prefix=$(prefix) \
+		../pcre2-$(PCRE_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		make -j $(make_threads) && \
@@ -553,19 +556,14 @@ installed_tiff:
 # ----------------------------------------------------------------------
 # proj
 # ----------------------------------------------------------------------
-proj: installed_compilers installed_sqlite installed_tiff installed_curl
+proj: installed_compilers installed_sqlite installed_tiff installed_curl installed_cmake
 if INSTALL_PROJ
 	$(FETCH_SCRIPT) "$(downloader)" proj-$(PROJ_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz
 	$(MKDIR_P) proj-build
 	cd proj-build && \
-		../proj-$(PROJ_VER)/configure --prefix=$(prefix) \
-			SQLITE3_CFLAGS=$(SQLITE3_INCLUDES) SQLITE3_LIBS="$(SQLITE3_LDFLAGS) -lsqlite3" \
-			TIFF_CFLAGS=$(TIFF_INCLUDES) TIFF_LIBS="$(TIFF_LDFLAGS) -ltiff" \
-			$(env_flags_deps) $(env_compilers) \
-			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) TIFF_INCLUDE_DIR=${TIFF_INCDIR} TIFF_LIBRARY=${TIFF_LIBDIR} SQLITE3_INCLUDE_DIR=${SQLITE3_INCDIR} SQLITE3_LIBRARY=${SQLITE3_LIBDIR} -DCMAKE_BUILD_TYPE=Release ../proj-${PROJ_VER} && \
+		make -j$(make_threads) && make install && \
 		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
 
@@ -612,7 +610,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-binary=h5py h5py==$(H5PY_VER) && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -635,7 +633,7 @@ if INSTALL_NETCDF
 		../netcdf-c-$(NETCDF_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_mpicompilers) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
-			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
+			--enable-shared --disable-static --enable-netcdf-4 --disable-dap --disable-libxml2 ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		make -j $(make_threads) && \
 		make install && \
@@ -655,7 +653,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) -m pip install netCDF4==$(NETCDFPY_VER) && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."

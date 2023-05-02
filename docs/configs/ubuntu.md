@@ -70,6 +70,7 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-hdf5 \
     --enable-python \
     --enable-cmake \
+    --enable-catch2 \
     --enable-h5py \
     --enable-proj \
     --enable-netcdf \
@@ -142,6 +143,7 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-hdf5 \
     --disable-proj \
     --enable-cmake \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy
@@ -213,12 +215,13 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy
 ```
 
-## Ubuntu 22.10
+## Ubuntu 23.04
 
 ### Operating system packages
 
@@ -235,7 +238,7 @@ apt-get install -y --no-install-recommends \
       libtool \
       curl \
       python3-dev \
-      libpython3.10 \
+      libpython3.11 \
       python3-venv \
       python3-pip \
       zlib1g-dev \
@@ -264,7 +267,7 @@ apt-get install -y --no-install-recommends \
 ### Environment variables
 
 ```bash
-export PYTHON_VERSION=3.10
+export PYTHON_VERSION=3.11
 export HDF5_INCDIR=/usr/include/hdf5/openmpi
 export HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 PREFIX_DIR=$HOME/pylith
@@ -287,6 +290,7 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
+    --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
     --enable-netcdfpy

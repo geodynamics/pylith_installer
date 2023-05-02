@@ -201,6 +201,26 @@ AC_ARG_WITH([cppunit-libdir],
 	[with_cppunit_libdir=no])
 AC_SUBST(with_cppunit_libdir)
 
+# CATCH2
+AC_ARG_ENABLE([catch2],
+    [AC_HELP_STRING([--enable-catch2],
+        [install Catch2 @<:@default=yes@:>@])],
+	[if test "$enableval" = yes ; then install_catch2=yes; else install_catch2=no; fi],
+	[install_catch2=yes])
+AM_CONDITIONAL([INSTALL_CATCH2], [test "$install_catch2" = yes])
+AC_ARG_WITH([catch2-incdir],
+    [AC_HELP_STRING([--with-catch2-incdir],
+        [location of Catch2 header files @<:@default=no@:>@])],
+	[with_catch2_incdir=$withval],
+	[with_catch2_incdir=no])
+AC_SUBST(with_catch2_incdir)
+AC_ARG_WITH([catch2-libdir],
+    [AC_HELP_STRING([--with-catch2-libdir],
+        [location of Catch2 library @<:@default=no@:>@])],
+	[with_catch2_libdir=$withval],
+	[with_catch2_libdir=no])
+AC_SUBST(with_catch2_libdir)
+
 # SQLITE
 AC_ARG_ENABLE([sqlite],
     [AC_HELP_STRING([--enable-sqlite],
@@ -408,7 +428,7 @@ if test "$install_cppunit" = yes ; then
 fi
 AC_ARG_WITH([testing],
     [AC_HELP_STRING([--with-testing],
-        [enable testing (requires cppunit) @<:@default=yes@:>@])],
+        [enable testing (requires CppUnit) @<:@default=yes@:>@])],
 	[if test "$withval" = yes; then with_testing=yes; else with_testing=no; fi],
 	[with_testing=yes])
 AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
@@ -517,6 +537,15 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
 
+# Save raw compiler settings
+save_cc=$CC
+save_cxx=$CXX
+AX_CXX_COMPILE_STDCXX(14)
+CC=$save_cc
+CXX=$save_cxx
+AC_SUBST(CC)
+AC_SUBST(CXX)
+
 # GCC
 if test "$install_gcc" = yes ; then
   if test "$install_mpi" = no ; then
@@ -616,6 +645,24 @@ fi
 AC_SUBST(CPPUNIT_INCLUDES)
 AC_SUBST(CPPUNIT_LDFLAGS)
 
+# catch2
+if test "$install_catch2" = yes ; then
+  echo "do nothing" >& /dev/null
+else
+  if test "$with_testing" = yes ; then
+    if test "$with_catch2_incdir" != no; then
+      CATCH2_INCLUDES="-I$with_catch2_incdir"
+    fi
+    if test "$with_catch2_libdir" != no; then
+      CATCH2_LDFLAGS="-L$with_catch2_libdir"
+    fi
+    CIT_CATCH2_HEADER
+    CIT_CATCH2_LIB
+  fi
+fi
+AC_SUBST(CATCH2_INCLUDES)
+AC_SUBST(CATCH2_LDFLAGS)
+
 # PCRE
 if test "$install_pcre" = yes ; then
   echo "do nothing" >& /dev/null
@@ -651,16 +698,16 @@ if test "$install_sqlite" = yes ; then
   SQLITE3_LDFLAGS="-L$prefix/lib"
 else
   if test "$with_sqlite_incdir" != no; then
-    SQLITE3_INCLUDES="-I$with_sqlite_incdir"
+    SQLITE3_INCDIR="$with_sqlite_incdir"
   fi
   if test "$with_sqlite_libdir" != no; then
-    SQLITE3_LDFLAGS="-L$with_sqlite_libdir"
+    SQLITE3_LIBDIR="$with_sqlite_libdir"
   fi
   CIT_SQLITE3_HEADER
   CIT_SQLITE3_LIB
 fi
-AC_SUBST(SQLITE3_INCLUDES)
-AC_SUBST(SQLITE3_LDFLAGS)
+AC_SUBST(SQLITE3_INCDIR)
+AC_SUBST(SQLITE3_LIBDIR)
 
 # proj
 if test "$install_proj" = yes ; then
@@ -675,16 +722,16 @@ if test "$install_proj" = yes ; then
     TIFF_LDFLAGS="-L$prefix/lib"
   else
     if test "$with_tiff_incdir" != no; then
-      TIFF_INCLUDES="-I$with_tiff_incdir"
+      TIFF_INCDIR="$with_tiff_incdir"
     fi
     if test "$with_tiff_libdir" != no; then
-      TIFF_LDFLAGS="-L$with_tiff_libdir"
+      TIFF_LIBDIR="$with_tiff_libdir"
     fi
     CIT_TIFF_HEADER
     CIT_TIFF_LIB
   fi
-  AC_SUBST(TIFF_INCLUDES)
-  AC_SUBST(TIFF_LDFLAGS)
+  AC_SUBST(TIFF_INCDIR)
+  AC_SUBST(TIFF_LIBDIR)
 else
   if test "$with_proj_incdir" != no; then
     PROJ_INCLUDES="-I$with_proj_incdir"
@@ -1003,6 +1050,7 @@ printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
 printf "  cppunit: $install_cppunit\n"
+printf "  catch2: $install_catch2\n"
 printf "  openssl: $install_openssl\n"
 printf "  curl: $install_curl\n"
 printf "  libffi: $install_libffi\n"
