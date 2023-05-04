@@ -90,7 +90,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_catch2 installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -328,7 +328,7 @@ endif
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install coverage autopep8 matplotlib
 #	$(env_cert) $(PYTHON) -m pip install gmsh
-	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx-copybutton
+	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton
 endif
 if INSTALL_ADDONS
 	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
@@ -431,13 +431,13 @@ installed_cppunit:
 # ----------------------------------------------------------------------
 # catch2
 # ----------------------------------------------------------------------
-catch2: installed_compilers
+catch2: installed_compilers installed_cmake
 if INSTALL_CATCH2
-	$(FETCH_SCRIPT) "$(downloader)" catch2-$(CATCH2_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf catch2-$(CATCH2_VER).tar.gz
+	$(FETCH_SCRIPT) "$(downloader)" Catch2-$(CATCH2_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf Catch2-$(CATCH2_VER).tar.gz
 	$(MKDIR_P) catch2-build
 	cd catch2-build && \
-		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) ../catch2-$(CATCH2_VER); \
+		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) ../Catch2-$(CATCH2_VER); \
 		make -j $(make_threads) && \
 		make install && \
 		touch $(abs_builddir)/installed_catch2
