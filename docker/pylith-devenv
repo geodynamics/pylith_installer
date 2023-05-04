@@ -87,7 +87,7 @@ ENV  PYLITH_USER=pylith-dev \
 ENV  HOME=/home/$PYLITH_USER \
      INSTALL_DIR=$DEV_DIR/dest-debug \
      TOP_SRCDIR=$DEV_DIR/src \
-     TOP_BUILDDIR=$DEV_DIR/build-debug
+     TOP_BUILDDIR=$DEV_DIR/build
 
 # Create 'pylith-user'
 RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
@@ -140,14 +140,14 @@ USER ${PYLITH_USER}
 ENV  PETSC_DIR=${TOP_SRCDIR}/petsc \
      PETSC_ARCH=arch-pylith-debug \
      PYLITH_DIR=${INSTALL_DIR} \
-     PYLITH_BUILDDIR=${TOP_BUILDDIR}/pylith  \
+     PYLITH_BUILDDIR=${TOP_BUILDDIR}/pylith-debug  \
      PYTHON_INCDIR=/usr/include/python3.10 \
      MPI_INCDIR=/usr/include/${ARCH_LIBPATH}/mpich \
      PROJ_INCDIR=/usr/include \
      CPPUNIT_INCDIR=/usr/include \
      CATCH2_INCDIR=/usr/include
 
-ENV PATH=${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
+ENV PATH=.:${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
      LD_LIBRARY_PATH=${PYLITH_DIR}/lib:${PYLITHDEPS_DIR}/lib \
      PYTHONPATH=${PYLITH_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
 
