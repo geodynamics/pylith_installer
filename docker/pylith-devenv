@@ -147,7 +147,7 @@ ENV  PETSC_DIR=${TOP_SRCDIR}/petsc \
      CPPUNIT_INCDIR=/usr/include \
      CATCH2_INCDIR=/usr/include
 
-ENV PATH=.:${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
+ENV PATH=${PYLITH_DIR}/bin:${PYLITHDEPS_DIR}/bin:${PATH_ORIG} \
      LD_LIBRARY_PATH=${PYLITH_DIR}/lib:${PYLITHDEPS_DIR}/lib \
      PYTHONPATH=${PYLITH_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
 
