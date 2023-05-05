@@ -326,12 +326,14 @@ if INSTALL_NETCDFPY
 	$(env_cert) $(PYTHON) -m pip install cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_cert) $(PYTHON) -m pip install coverage autopep8 matplotlib
-#	$(env_cert) $(PYTHON) -m pip install gmsh
+	$(env_cert) $(PYTHON) -m pip install coverage autopep8
 	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton
 endif
-if INSTALL_ADDONS
-	$(env_cert) $(PYTHON) -m pip install PyQt5 gmsh matplotlib
+if INSTALL_MATPLOTLIB
+	$(env_cert) $(PYTHON) -m pip install PyQt5 matplotlib
+endif
+if INSTALL_GMSH
+	$(env_cert) $(PYTHON) -m pip install gmsh
 endif
 
 installed_python:

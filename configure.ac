@@ -173,13 +173,21 @@ AC_ARG_ENABLE([developer],
 	[install_developer=no])
 AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
 
-# ADDONS
-AC_ARG_ENABLE([addons],
-    [AC_HELP_STRING([--enable-addons],
-        [install Gmsh and matplotlib Python packages @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_addons=yes; else install_addons=no; fi],
-	[install_addons=no])
-AM_CONDITIONAL([INSTALL_ADDONS], [test "$install_addons" = yes])
+# MATPLOTLIB
+AC_ARG_ENABLE([matplotlib],
+    [AC_HELP_STRING([--enable-matplotlib],
+        [install matplotlib Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_matplotlib=yes; else install_matplotlib=no; fi],
+	[install_matplotlib=no])
+AM_CONDITIONAL([INSTALL_MATPLOTLIB], [test "$install_matplotlib" = yes])
+
+# GMSH
+AC_ARG_ENABLE([gmsh],
+    [AC_HELP_STRING([--enable-gmsh],
+        [install Gmsh Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_gmsh=yes; else install_gmsh=no; fi],
+	[install_gmsh=no])
+AM_CONDITIONAL([INSTALL_GMSH], [test "$install_gmsh" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],

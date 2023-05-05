@@ -69,9 +69,12 @@ ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 # ------------------------------------------------------------------------------
 from build-${BUILD_ENV} as arch-amd64
 ONBUILD ENV ARCH_LIBPATH="x86_64-linux-gnu"
+ONBUILD ENV GMSH_OPTION="--enable-gmsh"
 
 from build-${BUILD_ENV} as arch-arm64
 ONBUILD ENV ARCH_LIBPATH="aarch64-linux-gnu"
+ONBUILD ENV GMSH_OPTION="--disable-gmsh"
+# gmsh not available on linux/arm64
 
 # ------------------------------------------------------------------------------
 from arch-${TARGETARCH} as setup-env
@@ -127,6 +130,8 @@ RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
      --enable-netcdf \
      --enable-netcdfpy \
      --enable-developer \
+     --enable-matplotlib \
+     ${GMSH_option} \
      && make -C dependencies \
      && rm -r /opt/pylith-installer
 
