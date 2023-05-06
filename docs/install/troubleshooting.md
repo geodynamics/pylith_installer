@@ -29,6 +29,15 @@ rm -r $HOME/build/pylith and $HOME/pylith
 
 If the `configure` for one the dependencies fails, examine the `config.log` file in the build directory for that package. For example, `netcdf-build/config.log`. You will need to scroll up from the bottom to see why a test failed.
 
+## Error messages
+
+```{code-block} bash
+---
+caption: Error associated with buggy automake
+---
+src/pylith/tests/src/.deps/driver_cppunit.Po: No such file or directory
+```
+
 ## Requesting help
 
 If you get stuck and need help diagnosing a build failure, please use the [CIG community forum](https://community.geodynamics.org/c/pylith/). Be sure to include the following information:

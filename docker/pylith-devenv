@@ -69,9 +69,12 @@ ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 # ------------------------------------------------------------------------------
 from build-${BUILD_ENV} as arch-amd64
 ONBUILD ENV ARCH_LIBPATH="x86_64-linux-gnu"
+ONBUILD ENV GMSH_OPTION="--enable-gmsh"
 
 from build-${BUILD_ENV} as arch-arm64
 ONBUILD ENV ARCH_LIBPATH="aarch64-linux-gnu"
+ONBUILD ENV GMSH_OPTION="--disable-gmsh"
+# gmsh not available on linux/arm64
 
 # ------------------------------------------------------------------------------
 from arch-${TARGETARCH} as setup-env
@@ -87,7 +90,7 @@ ENV  PYLITH_USER=pylith-dev \
 ENV  HOME=/home/$PYLITH_USER \
      INSTALL_DIR=$DEV_DIR/dest-debug \
      TOP_SRCDIR=$DEV_DIR/src \
-     TOP_BUILDDIR=$DEV_DIR/build-debug
+     TOP_BUILDDIR=$DEV_DIR/build
 
 # Create 'pylith-user'
 RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
@@ -127,6 +130,8 @@ RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
      --enable-netcdf \
      --enable-netcdfpy \
      --enable-developer \
+     --enable-matplotlib \
+     ${GMSH_option} \
      && make -C dependencies \
      && rm -r /opt/pylith-installer
 
@@ -140,7 +145,7 @@ USER ${PYLITH_USER}
 ENV  PETSC_DIR=${TOP_SRCDIR}/petsc \
      PETSC_ARCH=arch-pylith-debug \
      PYLITH_DIR=${INSTALL_DIR} \
-     PYLITH_BUILDDIR=${TOP_BUILDDIR}/pylith  \
+     PYLITH_BUILDDIR=${TOP_BUILDDIR}/pylith-debug  \
      PYTHON_INCDIR=/usr/include/python3.10 \
      MPI_INCDIR=/usr/include/${ARCH_LIBPATH}/mpich \
      PROJ_INCDIR=/usr/include \

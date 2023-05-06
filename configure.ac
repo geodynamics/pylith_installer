@@ -173,13 +173,21 @@ AC_ARG_ENABLE([developer],
 	[install_developer=no])
 AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
 
-# ADDONS
-AC_ARG_ENABLE([addons],
-    [AC_HELP_STRING([--enable-addons],
-        [install Gmsh and matplotlib Python packages @<:@default=no@:>@])],
-	[if test "$enableval" != no ; then install_addons=yes; else install_addons=no; fi],
-	[install_addons=no])
-AM_CONDITIONAL([INSTALL_ADDONS], [test "$install_addons" = yes])
+# MATPLOTLIB
+AC_ARG_ENABLE([matplotlib],
+    [AC_HELP_STRING([--enable-matplotlib],
+        [install matplotlib Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_matplotlib=yes; else install_matplotlib=no; fi],
+	[install_matplotlib=no])
+AM_CONDITIONAL([INSTALL_MATPLOTLIB], [test "$install_matplotlib" = yes])
+
+# GMSH
+AC_ARG_ENABLE([gmsh],
+    [AC_HELP_STRING([--enable-gmsh],
+        [install Gmsh Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_gmsh=yes; else install_gmsh=no; fi],
+	[install_gmsh=no])
+AM_CONDITIONAL([INSTALL_GMSH], [test "$install_gmsh" = yes])
 
 # CPPUNIT
 AC_ARG_ENABLE([cppunit],
@@ -537,15 +545,6 @@ AC_PROG_CPP
 AC_PROG_CXX
 AC_PROG_CXXCPP
 
-# Save raw compiler settings
-save_cc=$CC
-save_cxx=$CXX
-AX_CXX_COMPILE_STDCXX(14)
-CC=$save_cc
-CXX=$save_cxx
-AC_SUBST(CC)
-AC_SUBST(CXX)
-
 # GCC
 if test "$install_gcc" = yes ; then
   if test "$install_mpi" = no ; then
@@ -558,10 +557,18 @@ if test "$install_gcc" = yes ; then
     AC_SUBST(FC)
   fi
 else
+  # Save raw compiler settings
+  save_cc=$CC
+  save_cxx=$CXX
+  AX_CXX_COMPILE_STDCXX(14)
+  CC=$save_cc
+  CXX=$save_cxx
   if test "$with_fortran" = yes ; then
     AC_PROG_FC
   fi
 fi
+AC_SUBST(CC)
+AC_SUBST(CXX)
 
 # Python
 if test "$install_python" = yes ; then
