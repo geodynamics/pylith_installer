@@ -16,7 +16,7 @@ The default configure options assume you have:
 
 * C/C++ 14 compilers
 * Python 3.6 or later
-* automake 1.14 or later
+* automake 1.16 or later
 * MPI
 
 In this case, you simply specify the number of threads and the destination directory:
