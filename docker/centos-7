@@ -88,6 +88,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --enable-cmake \
         --disable-sqlite \
         --enable-gcc \
+        --enable-autotools \
         --enable-openssl \
         --enable-mpi=openmpi \
         --enable-cppunit \
