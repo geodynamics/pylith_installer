@@ -4,6 +4,7 @@
 
 CentOS 7 does not (by default) provide a C++14 compiler.
 As a result, we use the installer to build a more recent gcc version and only use a few operating system packages to satisfy PyLith dependency requirements.
+Additionally, the automake (v1.13.4) has a bug related to dependencies, so we also build the autotools suite (m4, autoconf, automake, libtool).
 
 ### Operating system packages
 
@@ -57,6 +58,7 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --disable-cmake \
     --disable-sqlite \
     --enable-gcc \
+    --enable-autotools \
     --enable-openssl \
     --enable-mpi=openmpi \
     --enable-cppunit \
