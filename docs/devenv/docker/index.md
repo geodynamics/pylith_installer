@@ -13,15 +13,15 @@ In addition to the PyLith dependencies, the Docker image includes the following 
 * uncrustify (C++ code formatter)
 * autopep8 (Python code formatter)
 * Sphinx with MyST (documentation tools)
-* matplotlib (Python plotting; not available for arm64)
+* matplotlib (Python plotting)
 * gmsh (Mesh generation; not available for arm64)
 
 :::{important}
-The Docker image for the arm64 architecture (i.e., Apple M processors) is missing several Python packages.
-Most Python packages for Linux are built only for the x86_64 architecture (Intel processors).
-Consequently, we cannot provide Gmsh or matplotlib within the Docker container for the arm64 architecture.
-You will need to run matplotlib and Gmsh _outside_ the container or use the amd64 container (runs in emulation mode and is significantly slower).
+Docker images use the Linux operating system, and most Python packages that require platform specific libraries are built only for the x86_64 architecture (Intel processors).
+Consequently, we cannot provide Gmsh within the Docker container for the arm64 architecture.
+You will need to run Gmsh _outside_ the container or use the amd64 (x86_64) container (runs in emulation mode and is significantly slower).
 Alternatively, you can use the installer utility; this will allow you to install Python packages using the macOS arm64 architecture.
+Similarly, matplotlib cannot be used interactively within the Docker container, because the libraries for the interactive matplotlib backends are not available.
 :::
 
 The Docker image also defines the environment:
