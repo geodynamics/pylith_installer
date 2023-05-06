@@ -130,7 +130,6 @@ RUN ${src_dir}/configure --prefix=${PYLITHDEPS_DIR} --with-fetch=curl \
      --enable-netcdf \
      --enable-netcdfpy \
      --enable-developer \
-     --enable-matplotlib \
      ${GMSH_option} \
      && make -C dependencies \
      && rm -r /opt/pylith-installer

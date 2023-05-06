@@ -330,7 +330,7 @@ if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton
 endif
 if INSTALL_MATPLOTLIB
-	$(env_cert) $(PYTHON) -m pip install PyQt5 matplotlib
+	$(env_cert) $(PYTHON) -m pip install PyQt6 matplotlib
 endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install gmsh

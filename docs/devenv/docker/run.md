@@ -5,13 +5,27 @@
 Whenever you need to restart the `pylith-dev-workspace` Docker container, simply run
 
 ```{code-block} bash
+---
+caption: Run development environment _without_ support for GUI applications
+---
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
+```
+
+```{code-block} bash
+---
+caption: Run development environment _with_ support for GUI applications
+---
+xhost +$(hostname).local
+docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:0 \
+    -v pylith-dev:/opt/pylith \
     registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
 :::{important}
 Make sure Docker is running before you start the container.
 :::
+
 
 ## Attach VS Code to the Docker container
 
