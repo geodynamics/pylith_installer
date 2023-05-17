@@ -84,7 +84,7 @@ For now, we will only setup the debugging version.
 ```{code-block} bash
 cd ${DEV_DIR}
 mkdir src
-mkdir -p ${TOP_BUILDDIR} && pushd ${TOP_BUILDDIR} && mkdir pythia-debug spatialdata-debug pylith-debug && popd
+mkdir -p ${TOPBUILD_DIR} && pushd ${TOPBUILD_DIR} && mkdir pythia-debug spatialdata-debug pylith-debug && popd
 mkdir -p ${INSTALL_DIR}
 ```
 
@@ -94,7 +94,7 @@ This creates a local copy of the repositories in the persistent storage volume o
 These are your working copies of the repositories.
 
 ```{code-block} bash
-cd ${TOP_SRCDIR}
+cd ${TOPSRC_DIR}
 git clone --recursive https://github.com/geodynamics/pythia.git
 git clone --recursive https://github.com/geodynamics/spatialdata.git
 git clone --recursive https://github.com/GITHUB_USERNAME/pylith.git
@@ -110,7 +110,7 @@ This simplifies keeper your local repository in sync with the community reposito
 
 ```{code-block} bash
 # PyLith repository (repeat for other repositories you forked)
-cd ${TOP_SRCDIR}/pylith
+cd ${TOPSRC_DIR}/pylith
 git remote add upstream https://github.com/geodynamics/pylith.git
 git fetch upstream
 
@@ -150,8 +150,8 @@ You can often find speedup with up to twice as many threads as the number of cor
 ### Pythia
 
 ```{code-block} bash
-cd ${TOP_BUILDDIR}/pythia-debug
-pushd ${TOP_SRCDIR}/pythia && autoreconf -if && popd
+cd ${TOPBUILD_DIR}/pythia-debug
+pushd ${TOPSRC_DIR}/pythia && autoreconf -if && popd
 ${TOP_SRCDIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
     CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
 make install
@@ -161,8 +161,8 @@ make check
 ### Spatialdata
 
 ```{code-block} bash
-cd ${TOP_BUILDDIR}/spatialdata-debug
-pushd ${TOP_SRCDIR}/spatialdata && autoreconf -if && popd
+cd ${TOPBUILD_DIR}/spatialdata-debug
+pushd ${TOPSRC_DIR}/spatialdata && autoreconf -if && popd
 ${TOP_SRCDIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
     --enable-swig --enable-testing \
 	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
@@ -175,7 +175,7 @@ make check -j$(nproc)
 ### PETSc
 
 ```{code-block} bash
-cd ${TOP_SRCDIR}/petsc
+cd ${TOPSRC_DIR}/petsc
 python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
     --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
@@ -190,9 +190,9 @@ make check
 ### PyLith
 
 ```{code-block} bash
-cd ${TOP_BUILDDIR}/pylith-debug
-pushd ${TOP_SRCDIR}/pylith && autoreconf -if && popd
-${TOP_SRCDIR}/pylith/configure --prefix=${PYLITH_DIR} \
+cd ${TOPBUILD_DIR}/pylith-debug
+pushd ${TOPSRC_DIR}/pylith && autoreconf -if && popd
+${TOPSRC_DIR}/pylith/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
     --enable-test-coverage --with-python-coverage=coverage3 \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
