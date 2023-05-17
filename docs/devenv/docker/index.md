@@ -34,8 +34,8 @@ The Docker image also defines the environment:
 | `HOME`               |        `/home/${PYLITH_USER}`         | Home directory for user                                 |
 | `ARCH_LIBPATH`       |  `x86_64-linux-gnu` or `aarch64-linux-gnu` | Architecture dependent path                        |
 | `INSTALL_DIR`        |       `${DEV_DIR}/dest-debug`         | Directory where code is installed                       |
-| `TOP_SRCDIR`         |           `${DEV_DIR}/src`            | Top-level directory for source code                     |
-| `TOP_BUILDDIR`       |       `${DEV_DIR}/build`              | Top-level directory for building                        |
+| `TOPSRC_DIR`         |           `${DEV_DIR}/src`            | Top-level directory for source code                     |
+| `TOPBUILD_DIR`       |       `${DEV_DIR}/build`              | Top-level directory for building                        |
 | `PETSC_DIR`          |         `${TOPSRC_DIR}/petsc`         | Directory for PETSc                                     |
 | `PETSC_ARCH`         |          `arch-pylith-debug`          | Build label for PETSc debugging configuration           |
 | `PYLITH_BUILDDIR`    |       `${TOPBUILD_DIR}/pylith-debug`  | Top-level directory where we build PyLith [^vscode]     |
