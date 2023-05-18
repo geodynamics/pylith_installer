@@ -37,10 +37,37 @@ Running the command below will:
 2. Mount the docker volume with persistent storage at `/opt/pylith`. 
 3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
 
+The Docker image to use depends on the processor.
+Use the amd64 image for a computer running Linux, Windows, or macOS with an Intel processor.
+Use the arm64 image for a Mac running with an Apple M processor.
+
+::::{tab-set}
+
+:::{tab-item} amd64 (Intel)
+
 ```{code-block} bash
+---
+caption: Linux, Windows, or macOS with Intel processor
+---
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-amd64
 ```
+
+:::
+
+:::{tab-item} arm64 (Apple)
+
+```{code-block} bash
+---
+caption: Apple M processor
+---
+docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-arm64
+```
+
+:::
+
+::::
 
 :::{warning}
 Closing the `pylith-dev-workspace` Docker container interactive shell (terminal) will stop the container. Simply run the command again to restart the container.
@@ -216,7 +243,9 @@ The fix is to run the container in privileged mode as root and restart the `proc
 
 ```{code-block} bash
 # Run docker image in privileged mode as root.
-docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+# IMPORTANT: In this example, we use the Docker image for an Intel processor.
+#            Change `amd64` to `arm64` if your computer has an Apple M processor.
+docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-amd64 /bin/bash
 
 # Verify ptrace setting needs updating
 cat /proc/sys/kernel/yama/ptrace_scope

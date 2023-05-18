@@ -21,7 +21,7 @@ copyright = '2010-2023, University of California, Davis'
 author = 'Brad T. Aagaard'
 
 # The full version, including alpha/beta/rc tags
-release = 'v3.0.3-0'
+release = 'v3.0.3-1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,11 +31,13 @@ release = 'v3.0.3-0'
 # ones.
 extensions = [
     "myst_parser",
+    "sphinx_design",
     "sphinx_copybutton",
 ]
 myst_enable_extensions = [
     "colon_fence",
     "deflist",
+    "fieldlist",
     "substitution",
 ]
 

@@ -173,6 +173,14 @@ AC_ARG_ENABLE([developer],
 	[install_developer=no])
 AM_CONDITIONAL([INSTALL_DEVELOPER], [test "$install_developer" = yes])
 
+# PYQT
+AC_ARG_ENABLE([pyqt],
+    [AC_HELP_STRING([--enable-pyqt],
+        [install pyqt Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_pyqt=yes; else install_pyqt=no; fi],
+	[install_pyqt=no])
+AM_CONDITIONAL([INSTALL_PYQT], [test "$install_pyqt" = yes])
+
 # MATPLOTLIB
 AC_ARG_ENABLE([matplotlib],
     [AC_HELP_STRING([--enable-matplotlib],

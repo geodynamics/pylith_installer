@@ -329,8 +329,11 @@ if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install coverage autopep8
 	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton
 endif
+if INSTALL_PYQT
+	$(env_cert) $(PYTHON) -m pip install PyQt6
+endif
 if INSTALL_MATPLOTLIB
-	$(env_cert) $(PYTHON) -m pip install PyQt6 matplotlib
+	$(env_cert) $(PYTHON) -m pip install matplotlib
 endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install gmsh
