@@ -6,54 +6,28 @@ Whenever you need to restart the `pylith-dev-workspace` Docker container, simply
 
 ::::{tab-set}
 
-:::{tab-item} amd64 (Intel) without GUI
+:::{tab-item} No GUI applications
 
 ```{code-block} bash
 ---
-caption: Run development environment _without_ support for GUI applications on Linux, Windows, or macOS with Intel processor.
+caption: Run development environment _without_ support for GUI applications.
 ---
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-amd64
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
 :::
 
-:::{tab-item} arm64 (Apple) without GUI
+:::{tab-item} With GUI applications
 
 ```{code-block} bash
 ---
-caption: Run development environment _without_ support for GUI applications on macOS with Apple M processor.
----
-docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-arm64
-```
-
-:::
-
-:::{tab-item} amd64 (Intel) with GUI
-
-```{code-block} bash
----
-caption: Run development environment _with_ support for GUI applications on Linux, Windows, or macOS with Intel processor.
+caption: Run development environment _with_ support for GUI applications.
 ---
 xhost +$(hostname).local
 docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:0 \
     -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-amd64
-```
-
-:::
-
-:::{tab-item} arm64 (Apple) with GUI
-
-```{code-block} bash
----
-caption: Run development environment _with_ support for GUI applications on macOS with Apple M processor.
----
-xhost +$(hostname).local
-docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:0 \
-    -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv-arm64
+    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
 ```
 
 :::
