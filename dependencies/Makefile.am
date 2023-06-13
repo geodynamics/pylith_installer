@@ -327,7 +327,7 @@ if INSTALL_NETCDFPY
 endif
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install coverage autopep8
-	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton
+	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
 endif
 if INSTALL_PYQT
 	$(env_cert) $(PYTHON) -m pip install PyQt6

@@ -52,9 +52,13 @@ RUN apt-get update \
      linux-tools-common \
      vim-common \
      vim-runtime \
-     vim-nox
+     vim-nox \
+     xterm
 
-RUN echo "kernel.yama.ptrace_scope = 0" > /etc/sysctl.d/10-ptrace.conf
+RUN echo "kernel.yama.ptrace_scope = 0" > /etc/sysctl.d/10-ptrace.conf && service procps restart
+
+# Set DMAV_FORK_SAFE=1 to allow use of --petsc.start_in_debugger with PyLith
+ENV RDMAV_FORK_SAFE=1
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
