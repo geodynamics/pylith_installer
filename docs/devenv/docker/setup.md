@@ -210,6 +210,11 @@ make check -j$(nproc)
 
 ## Reset `ptrace` Flag
 
+:::{tip}
+This step should no longer be needed.
+We are keeping it in the documentation for reference in case you are still using an older image.
+:::
+
 Attaching the debugger to a forked process can result in the following error:
 
 ```{code-block}
@@ -263,3 +268,12 @@ We recommend also installing the following extensions:
 * Material Icon Theme
 * MyST-Markdown
 * Remote-SSH
+* Git Graph
+* Git Lens
+  
+:::{note}
+Git Lens provides a more substantial GUI to Git.
+If you are new to Git, you may find the GUI more intuitive than the command line.
+Git Lens has some add-on features that require subscriptions.
+If you find notifications for these add-ons annoying, you can easily disable or uninstall the Git Lens extension.
+:::
