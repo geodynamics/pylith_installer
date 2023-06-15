@@ -21,6 +21,8 @@ EXTRA_DIST = \
 	devenv/docker/setup.md \
 	devenv/docker/run.md \
 	devenv/docker/update.md \
+	devenv/docker/gmsh.md \
+	devenv/docker/quickref.md \
 	devenv/images/docker-attach-vscode.png \
 	install/index.md \
 	install/configure.md \
