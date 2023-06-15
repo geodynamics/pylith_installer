@@ -56,4 +56,6 @@ maxdepth: 1
 setup.md
 run.md
 update.md
+gmsh.md
+quickref.md
 :::
