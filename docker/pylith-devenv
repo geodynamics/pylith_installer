@@ -12,6 +12,7 @@ RUN apt-get update \
      g++ \
      make \
      file \
+     locales \
      automake \
      autoconf \
      libtool \
@@ -55,6 +56,7 @@ RUN apt-get update \
      vim-nox \
      xterm
 
+RUN locale-gen en_US.UTF-8
 RUN echo "kernel.yama.ptrace_scope = 0" > /etc/sysctl.d/10-ptrace.conf && service procps restart
 
 # Set DMAV_FORK_SAFE=1 to allow use of --petsc.start_in_debugger with PyLith
