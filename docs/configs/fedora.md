@@ -35,8 +35,6 @@ dnf install -y \
     unzip \
     git \
     ca-certificates \
-    cppunit \
-    cppunit-devel \
     mpich-devel \
     hdf5-mpich \
     hdf5-mpich-devel \
@@ -70,7 +68,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
@@ -116,8 +113,6 @@ dnf install -y \
     unzip \
     git \
     ca-certificates \
-    cppunit \
-    cppunit-devel \
     mpich-devel \
     hdf5-mpich \
     hdf5-mpich-devel \
@@ -151,7 +146,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
@@ -197,8 +191,6 @@ dnf install -y \
     unzip \
     git \
     ca-certificates \
-    cppunit \
-    cppunit-devel \
     mpich-devel \
     hdf5-mpich \
     hdf5-mpich-devel \
@@ -232,7 +224,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \

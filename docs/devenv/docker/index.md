@@ -44,7 +44,6 @@ The Docker image also defines the environment:
 | `PYTHON_INCDIR`      |       `/usr/include/python3.10`       | Directory containing Python header files [^vscode]      |
 | `MPI_INCDIR`         | `/usr/include/${ARCH_LIBPATH}/mpich`  | Directory containing MPI header files [^vscode]         |
 | `PROJ_INCDIR`        |            `/usr/include`             | Directory containing Proj header files [^vscode]        |
-| `CPPUNIT_INCDIR`     |            `/usr/include`             | Directory containing CppUnit header files [^vscode]     |
 | `CATCH_INCDIR`       |            `/usr/include`             | Directory containing Catch2 header files [^vscode]      |
 
 [^vscode]: Environment variables used in Visual Studio Code workspace settings.

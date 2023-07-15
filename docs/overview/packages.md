@@ -33,7 +33,6 @@ The dependencies will be downloaded from <http://geoweb.cse.ucdavis.edu/~buildbo
 
 * General tools
   * OpenSSL 3.1.0
-  * CppUnit 1.15.1
   * Catch2 3.2.2
   * PCRE 10.42
   * SWIG 4.1.1

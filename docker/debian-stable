@@ -27,7 +27,6 @@ RUN apt-get update \
     unzip \
     git \
     ca-certificates \
-    libcppunit-dev \
     libmpich-dev \
     mpich \
     libhdf5-mpich-103 \
@@ -99,7 +98,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-hdf5 \
-    --disable-cppunit \
     --disable-sqlite \
     --disable-proj \
     --enable-developer \

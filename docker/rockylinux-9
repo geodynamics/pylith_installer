@@ -90,7 +90,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
         --disable-cmake \
         --disable-sqlite \
-        --enable-cppunit \
         --enable-catch2 \
         --enable-pcre \
         --enable-swig \

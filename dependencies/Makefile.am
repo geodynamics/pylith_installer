@@ -27,7 +27,6 @@ noinst_tmp = \
 	installed_libffi \
 	installed_python \
 	installed_mpi \
-	installed_cppunit \
 	installed_catch2 \
 	installed_pcre \
 	installed_swig \
@@ -53,7 +52,6 @@ noinst_builddirs = \
 	python-build \
 	openmpi-build \
 	mpich-build \
-	cppunit-build \
 	catch2-build \
 	swig-build \
 	sqlite-build \
@@ -75,7 +73,6 @@ noinst_srcdirs = \
 	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
-	cppunit-$(CPPUNIT_VER) \
 	catch2-$(CATCH2_VER) \
 	pcre-$(PCRE_VER) \
 	swig-$(SWIG_VER) \
@@ -90,7 +87,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_cppunit installed_catch2 installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_catch2 installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -406,31 +403,6 @@ mpich: installed_compilers
 		make install && \
 		touch $(abs_builddir)/installed_mpi
 	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
-
-
-# ----------------------------------------------------------------------
-# cppunit
-# ----------------------------------------------------------------------
-cppunit: installed_compilers
-if INSTALL_CPPUNIT
-	$(FETCH_SCRIPT) "$(downloader)" cppunit-$(CPPUNIT_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf cppunit-$(CPPUNIT_VER).tar.gz
-	$(MKDIR_P) cppunit-build
-	cd cppunit-build && \
-		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) \
-			$(env_flags_deps) $(env_compilers) \
-			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
-		touch $(abs_builddir)/installed_cppunit
-
-else
-	@echo "$@ already installed. Skipping installation."
-	touch $(abs_builddir)/installed_cppunit
-endif
-
-installed_cppunit:
-	$(MAKE) $(AM_MAKEFLAGS) cppunit
 
 
 # ----------------------------------------------------------------------

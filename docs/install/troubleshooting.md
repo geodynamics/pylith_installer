@@ -35,7 +35,7 @@ If the `configure` for one the dependencies fails, examine the `config.log` file
 ---
 caption: Error associated with buggy automake
 ---
-src/pylith/tests/src/.deps/driver_cppunit.Po: No such file or directory
+src/pylith/tests/src/.deps/driver_catch2.Po: No such file or directory
 ```
 
 ## Requesting help

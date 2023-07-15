@@ -91,7 +91,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --enable-autotools \
         --enable-openssl \
         --enable-mpi=openmpi \
-        --enable-cppunit \
         --enable-catch2 \
         --enable-python \
         --enable-pcre \

@@ -55,7 +55,7 @@ all: installed_pythia installed_spatialdata installed_petsc installed_pylith ins
 # ----------------------------------------------------------------------
 # pythia
 # ----------------------------------------------------------------------
-pythia:
+pythia: installed_catch2
 if INSTALL_PYTHIA
 if USE_PYLITH_GIT
 	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
@@ -104,8 +104,8 @@ endif
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
 			--prefix=$(prefix) $(env_flags_cig) $(env_compilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES)" \
-			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS)" \
+			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
 		make -j$(make_threads) && \
 		make install
@@ -204,8 +204,8 @@ endif
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
                         $(env_flags_cig) $(env_mpicompilers) \
-			CPPFLAGS="$(CPPFLAGS) $(CPPUNIT_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
-			LDFLAGS="$(LDFLAGS) $(CPPUNIT_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
+			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
 		make -j $(make_threads) && \
 		make install

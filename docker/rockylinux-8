@@ -52,9 +52,7 @@ RUN dnf install -y \
         vim-minimal \
         dnf-plugins-core
 
-RUN dnf config-manager --set-enabled powertools && \
-        dnf install -y cppunit cppunit-devel && \
-        alternatives --set python3 /usr/bin/python3.8
+RUN alternatives --set python3 /usr/bin/python3.8
 
 # ------------------------------------------------------------------------------
 from os-update as build-deps
@@ -95,7 +93,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
         --disable-cmake \
         --disable-sqlite \
-        --disable-cppunit \
         --enable-catch2 \
         --enable-pcre \
         --enable-swig \

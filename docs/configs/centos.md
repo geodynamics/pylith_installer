@@ -61,7 +61,6 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --enable-autotools \
     --enable-openssl \
     --enable-mpi=openmpi \
-    --enable-cppunit \
     --enable-catch2 \
     --enable-python \
     --enable-sqlite \
@@ -110,9 +109,6 @@ dnf install -y \
 #
 # Use python3.8 for python3	
 alternatives --set python3 /usr/bin/python3.8
-#
-# We enable use of the powertools repository so that we can install CppUnit.
-dnf config-manager --set-enabled powertools && dnf install -y cppunit cppunit-devel
 ```
 
 ### Environment variables
@@ -136,7 +132,6 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-cmake \
     --disable-sqlite \
-    --disable-cppunit \
     --enable-catch2 \
     --enable-proj \
     --enable-hdf5 \
@@ -203,7 +198,6 @@ $HOME/src/pylith/pylith-installer-3.0.-0/configure \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-cmake \
     --disable-sqlite \
-    --enable-cppunit \
     --enable-catch2 \
     --enable-proj \
     --enable-hdf5 \
