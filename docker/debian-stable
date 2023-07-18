@@ -17,10 +17,10 @@ RUN apt-get update \
     libcurl4 \
     libcurl4-openssl-dev \
     openssl \
-    libssl1.1 \
+    libssl3 \
     libssl-dev \
     python3-dev \
-    libpython3.9 \
+    libpython3.11 \
     python3-venv \
     python3-pip \
     zlib1g-dev \
@@ -29,17 +29,17 @@ RUN apt-get update \
     ca-certificates \
     libmpich-dev \
     mpich \
-    libhdf5-mpich-103 \
+    libhdf5-mpich-103-1 \
     libhdf5-mpich-dev \
     sqlite3 \
     libsqlite3-0 \
     libsqlite3-dev \
-    libtiff5 \
     libtiff5-dev \
     libproj-dev \
     proj-bin \
     proj-data \
     swig \
+    cmake \
     lcov \
     gdb \
     valgrind \
@@ -63,7 +63,7 @@ from build-${BUILD_ENV} as build-deps
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.9 \
+    PYTHON_VERSION=3.11 \
     HDF5_INCDIR=/usr/include/hdf5/mpich \
     HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 
@@ -99,9 +99,9 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --disable-mpi \
     --disable-hdf5 \
     --disable-sqlite \
+    --disable-cmake \
     --disable-proj \
     --enable-developer \
-    --enable-cmake \
     --enable-catch2 \
     --enable-h5py \
     --enable-netcdf \
