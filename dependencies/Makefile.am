@@ -128,26 +128,26 @@ if INSTALL_AUTOTOOLS
 	mkdir -p m4-build
 	cd m4-build && \
 		../m4-$(M4_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
-		make -j$(make_threads) && \
-		make install
+		$(MAKE) -j$(make_threads) && \
+		$(MAKE) install
 	$(TAR) -xf autoconf-$(AUTOCONF_VER).tar.gz
 	mkdir -p autoconf-build
 	cd autoconf-build && \
 		../autoconf-$(AUTOCONF_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
-		make -j$(make_threads) && \
-		make install
+		$(MAKE) -j$(make_threads) && \
+		$(MAKE) install
 	$(TAR) -xf automake-$(AUTOMAKE_VER).tar.gz
 	mkdir -p automake-build
 	cd automake-build && \
 		../automake-$(AUTOMAKE_VER)/configure --prefix=$(prefix) $(env_flags_deps) && \
-		make -j$(make_threads) && \
-		make install
+		$(MAKE) -j$(make_threads) && \
+		$(MAKE) install
 	$(TAR) -xf libtool-$(LIBTOOL_VER).tar.gz
 	mkdir -p libtool-build
 	cd libtool-build && \
 		../libtool-$(LIBTOOL_VER)/configure --prefix=$(prefix)  $(env_flags_deps) && \
-		make -j$(make_threads) && \
-		make install && \
+		$(MAKE) -j$(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_autotools
 else
 	@echo "$@ already installed. Skipping installation."
@@ -166,8 +166,8 @@ if INSTALL_GIT
 	$(TAR) -xf git-$(GIT_VER).tar.gz
 	cd git-$(GIT_VER) && \
 		./configure --prefix=$(prefix) && \
-		make -j$(make_threads) all && \
-		make install && \
+		$(MAKE) -j$(make_threads) all && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_git
 else
 	@echo "Skipping $@ installation."
@@ -186,7 +186,7 @@ if INSTALL_CMAKE
 	$(FETCH_SCRIPT) "$(downloader)" cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
-		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix) && make -j$(make_threads) && make install && \
+		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix) && $(MAKE) -j$(make_threads) && $(MAKE) install && \
 		touch $(abs_builddir)/installed_cmake
 else
 	@echo "Skipping $@ installation."
@@ -220,8 +220,8 @@ if INSTALL_GCC
 			--disable-multilib \
 			--enable-languages=$(gcc_languages) \
 			$(env_flags_deps) && \
-		make -j $(make_threads) $(env_flags_deps) && \
-		make install && \
+		$(MAKE) -j $(make_threads) $(env_flags_deps) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_compilers
 
 else
@@ -248,8 +248,8 @@ if INSTALL_OPENSSL
 			$(env_flags_deps) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
 			shared ; \
-		make -j $(make_threads) && \
-		make install_sw && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install_sw && \
 		touch $(abs_builddir)/installed_openssl
 
 else
@@ -274,8 +274,8 @@ if INSTALL_CURL
 			--enable-shared --with-openssl --disable-ldap \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_curl
 
 else
@@ -300,8 +300,8 @@ if INSTALL_LIBFFI
 			--enable-shared \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_libffi
 
 else
@@ -329,8 +329,8 @@ endif
 			--enable-shared --enable-optimizations $(OPENSSL) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		$(LN_S) $(prefix)/bin/python3 $(prefix)/bin/python && \
 		touch $(abs_builddir)/installed_python
 else
@@ -391,8 +391,8 @@ openmpi: installed_compilers
 		../openmpi-$(OPENMPI_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_mpi
 	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
@@ -417,8 +417,8 @@ mpich: installed_compilers
 			 $(mpich_options) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_mpi
 	if [ ! -x $(prefix)/bin/mpirun ]; then cd $(prefix)/bin && $(LN_S) mpiexec mpirun; fi
 
@@ -435,8 +435,8 @@ if INSTALL_CPPUNIT
 		../cppunit-$(CPPUNIT_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_cppunit
 
 else
@@ -460,8 +460,8 @@ if INSTALL_PCRE
 		../pcre-$(PCRE_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_pcre
 else
 	@echo "$@ already installed. Skipping installation."
@@ -484,8 +484,8 @@ if INSTALL_SWIG
 		../swig-$(SWIG_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS) $(PCRE_INCLUDES)" LDFLAGS="$(LDFLAGS) $(PCRE_LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_swig
 else
 if WITH_SWIG
@@ -512,8 +512,8 @@ if INSTALL_SQLITE
 		../sqlite-autoconf-$(SQLITE_VER)/configure --prefix=$(prefix) \
 			--enable-shared $(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_sqlite
 
 else
@@ -537,8 +537,8 @@ if INSTALL_TIFF
 		../tiff-$(TIFF_VER)/configure --prefix=$(prefix) \
 			--enable-shared $(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_tiff
 
 else
@@ -564,8 +564,8 @@ if INSTALL_PROJ
 			TIFF_CFLAGS=$(TIFF_INCLUDES) TIFF_LIBS="$(TIFF_LDFLAGS) -ltiff" \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
 
@@ -595,8 +595,8 @@ if INSTALL_HDF5
 			--disable-static$(hdf5_options) \
 			$(env_flags_deps) $(env_mpicompilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_hdf5
 else
 	@echo "$@ already installed. Skipping installation."
@@ -612,7 +612,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/h5py-$(H5PY_VER).tar.gz && \
+	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-binary=h5py h5py && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
@@ -637,8 +637,8 @@ if INSTALL_NETCDF
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
-		make -j $(make_threads) && \
-		make install && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_netcdf
 
 else
@@ -655,7 +655,10 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
 if INSTALL_NETCDFPY
-	HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) -m pip install $(DEPS_URL)/netCDF4-$(NETCDFPY_VER).tar.gz && \
+	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
+	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
+	cd netCDF4-$(NETCDFPY_VER) && \
+		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) setup.py install && \
 		touch $(abs_builddir)/installed_netcdfpy
 else
 	@echo "$@ already installed. Skipping installation."
