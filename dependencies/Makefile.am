@@ -341,7 +341,7 @@ endif
 python_postinstall:
 	python3 -m venv $(prefix)
 	$(env_cert) $(PYTHON) -m pip install --upgrade pip setuptools certifi
-	$(env_cert) $(PYTHON) -m pip install numpy
+	$(env_cert) $(PYTHON) -m pip install numpy==1.23.4
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
 	$(env_cert) $(PYTHON) -m pip install cftime
