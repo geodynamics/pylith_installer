@@ -68,8 +68,8 @@ endif
 	cd pythia-build && \
 		../pythia-$(PYTHIA_VER)/configure --enable-testing \
 			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
-		make && \
-		make install && \
+		$(MAKE) && \
+		$(MAKE) install && \
 		touch $(abs_builddir)/installed_pythia
 
 else
@@ -107,11 +107,11 @@ endif
 			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
-		make -j$(make_threads) && \
-		make install
+		$(MAKE) -j$(make_threads) && \
+		$(MAKE) install
 if WITH_TESTING
 	cd spatialdata-build && \
-		make -j$(make_threads) check && \
+		$(MAKE) -j$(make_threads) check && \
 		touch $(abs_builddir)/installed_spatialdata
 else
 	touch $(abs_builddir)/installed_spatialdata
@@ -160,18 +160,16 @@ endif
 			$(petsc_options) $(env_flags_cig) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR_BUILD)  PETSC_ARCH=$(PETSC_ARCH) && \
-		make -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH)
+		$(MAKE) -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH)
 
 petsc:
 if INSTALL_PETSC
 if INSTALL_DEVELOPER
-	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
-		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
+	$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
 else
-	$(MAKE) $(AM_MAKEFLAGS) build_petsc && \
-		make PETSC_DIR=$(PETSC_DIR_BUILD) install && \
-		make PETSC_DIR=$(PETSC_DIR_BUILD) check && \
+	$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) install && \
+		$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
 endif
 else
@@ -180,6 +178,7 @@ else
 endif
 
 installed_petsc:
+	$(MAKE) $(AM_MAKEFLAGS) build_petsc
 	$(MAKE) $(AM_MAKEFLAGS) petsc
 
 
@@ -207,11 +206,11 @@ endif
 			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
-		make -j $(make_threads) && \
-		make install
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install
 if WITH_TESTING
 	cd pylith-build && \
-		make -j $(make_threads) check && \
+		$(MAKE) -j $(make_threads) check && \
 		touch $(abs_builddir)/installed_pylith
 else
 	touch $(abs_builddir)/installed_pylith
