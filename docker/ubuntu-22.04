@@ -105,5 +105,8 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
 
 WORKDIR $HOME
 
+LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
+LABEL org.opencontainers.image.description="Ubuntu 22.04 CI test environment"
+LABEL org.opencontainers.image.licenses=MIT
 
 CMD /bin/bash
