@@ -1,6 +1,6 @@
 # libz does not appear to be compatible.
 ARG BUILD_ENV=nocerts
-FROM fedora:36 as os-update
+FROM fedora:37 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
