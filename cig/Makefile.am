@@ -55,7 +55,7 @@ all: installed_pythia installed_spatialdata installed_petsc installed_pylith ins
 # ----------------------------------------------------------------------
 # pythia
 # ----------------------------------------------------------------------
-pythia: installed_catch2
+pythia:
 if INSTALL_PYTHIA
 if USE_PYLITH_GIT
 	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
