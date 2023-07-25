@@ -61,7 +61,7 @@ from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from build-${BUILD_ENV} as build-deps
+from build-${BUILD_ENV} as build-env
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
@@ -81,7 +81,7 @@ RUN mkdir ${INSTALL_DIR} \
     && chown ${TEST_USER} ${INSTALL_DIR} \
     && chgrp ${TEST_USER} ${INSTALL_DIR}
 
-# ------------------------------------------------------------------------------
+
 USER ${TEST_USER}
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
 RUN mkdir -p ${TOPSRC_DIR} && \
@@ -92,6 +92,9 @@ COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
+
+# ------------------------------------------------------------------------------
+from build-env as build-deps
 
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
