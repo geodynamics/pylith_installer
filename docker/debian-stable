@@ -78,6 +78,7 @@ ENV  TOPSRC_DIR=${HOME}/src \
 RUN mkdir ${INSTALL_DIR} \
     && chown ${TEST_USER} ${INSTALL_DIR} \
     && chgrp ${TEST_USER} ${INSTALL_DIR}
+RUN projsync --system-directory --all
 
 
 USER ${TEST_USER}
