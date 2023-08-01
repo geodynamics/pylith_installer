@@ -197,26 +197,6 @@ AC_ARG_ENABLE([gmsh],
 	[install_gmsh=no])
 AM_CONDITIONAL([INSTALL_GMSH], [test "$install_gmsh" = yes])
 
-# CPPUNIT
-AC_ARG_ENABLE([cppunit],
-    [AC_HELP_STRING([--enable-cppunit],
-        [install CppUnit @<:@default=yes@:>@])],
-	[if test "$enableval" = yes ; then install_cppunit=yes; else install_cppunit=no; fi],
-	[install_cppunit=yes])
-AM_CONDITIONAL([INSTALL_CPPUNIT], [test "$install_cppunit" = yes])
-AC_ARG_WITH([cppunit-incdir],
-    [AC_HELP_STRING([--with-cppunit-incdir],
-        [location of cppunit header files @<:@default=no@:>@])],
-	[with_cppunit_incdir=$withval],
-	[with_cppunit_incdir=no])
-AC_SUBST(with_cppunit_incdir)
-AC_ARG_WITH([cppunit-libdir],
-    [AC_HELP_STRING([--with-cppunit-libdir],
-        [location of cppunit library @<:@default=no@:>@])],
-	[with_cppunit_libdir=$withval],
-	[with_cppunit_libdir=no])
-AC_SUBST(with_cppunit_libdir)
-
 # CATCH2
 AC_ARG_ENABLE([catch2],
     [AC_HELP_STRING([--enable-catch2],
@@ -439,12 +419,12 @@ AC_ARG_WITH([debugging],
 AM_CONDITIONAL([WITH_DEBUGGING], [test "$with_debugging" = yes])
 
 # TESTING
-if test "$install_cppunit" = yes ; then
+if test "$install_catch2" = yes ; then
   with_testing=yes
 fi
 AC_ARG_WITH([testing],
     [AC_HELP_STRING([--with-testing],
-        [enable testing (requires CppUnit) @<:@default=yes@:>@])],
+        [enable testing (requires Catch2) @<:@default=yes@:>@])],
 	[if test "$withval" = yes; then with_testing=yes; else with_testing=no; fi],
 	[with_testing=yes])
 AM_CONDITIONAL([WITH_TESTING], [test "$with_testing" = yes])
@@ -641,24 +621,6 @@ else
     fi
   fi
 fi
-
-# cppunit
-if test "$install_cppunit" = yes ; then
-  echo "do nothing" >& /dev/null
-else
-  if test "$with_testing" = yes ; then
-    if test "$with_cppunit_incdir" != no; then
-      CPPUNIT_INCLUDES="-I$with_cppunit_incdir"
-    fi
-    if test "$with_cppunit_libdir" != no; then
-      CPPUNIT_LDFLAGS="-L$with_cppunit_libdir"
-    fi
-    CIT_CPPUNIT_HEADER
-    CIT_CPPUNIT_LIB
-  fi
-fi
-AC_SUBST(CPPUNIT_INCLUDES)
-AC_SUBST(CPPUNIT_LDFLAGS)
 
 # catch2
 if test "$install_catch2" = yes ; then
@@ -1064,7 +1026,6 @@ printf "  git: $install_git\n"
 printf "  autotools: $install_autotools\n"
 printf "  pcre: $install_pcre\n"
 printf "  swig: $install_swig\n"
-printf "  cppunit: $install_cppunit\n"
 printf "  catch2: $install_catch2\n"
 printf "  openssl: $install_openssl\n"
 printf "  curl: $install_curl\n"

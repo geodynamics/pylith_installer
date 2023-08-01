@@ -136,7 +136,6 @@ $PYLITH_DIR/pylith_installer-3.0.3-0/configure \
     --prefix=$PYLITH_DIR/pylith-debug \
     --with-hdf5-incdir=${HDF5_INCDIR} \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-numpy \
@@ -202,7 +201,6 @@ ${HOME}/src/pylith/pylith_installer-3.0.3-0/configure  \
     --enable-python \
     --enable-swig \
     --enable-pcre \
-    --enable-cppunit \
     --enable-catch2 \
     --enable-tiff \
     --enable-proj \

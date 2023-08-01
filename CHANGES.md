@@ -1,5 +1,16 @@
 See <https://github.com/geodynamics/pylith_installer/commits/main> for the complete log of changes made to PyLith Installer.
 
+## Version 3.1.0-0
+
+* Update versions of dependencies.
+  * catch2 3.3.2
+
+## Version 3.0.3-1
+
+* Bugfixes
+  * Switch netCDF4 build from pip to `python setup.py install` to avoid Python module import failure.
+  * Use current PyPI version for h5py (avoids incompatibilities between cython and pinned 5py version).
+
 ## Version 3.0.3-0
 
 * Install PyLith to Python virtual environment and use pip to install Python modules (setuptools, certifi, numpy, cftime).

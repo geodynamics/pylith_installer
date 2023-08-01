@@ -34,8 +34,6 @@ RUN dnf install -y \
     unzip \
     git \
     ca-certificates \
-    cppunit \
-    cppunit-devel \
     mpich-devel \
     hdf5-mpich \
     hdf5-mpich-devel \
@@ -63,7 +61,7 @@ from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from build-${BUILD_ENV} as build-deps
+from build-${BUILD_ENV} as build-env
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
@@ -83,7 +81,7 @@ RUN mkdir ${INSTALL_DIR} \
     && chown ${TEST_USER} ${INSTALL_DIR} \
     && chgrp ${TEST_USER} ${INSTALL_DIR}
 
-# ------------------------------------------------------------------------------
+
 USER ${TEST_USER}
 ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
 RUN mkdir -p ${TOPSRC_DIR} && \
@@ -95,13 +93,15 @@ COPY --chown=pylith-tester:pylith-tester . ${src_dir}
 WORKDIR ${src_dir}
 RUN autoreconf --install --verbose --force
 
+# ------------------------------------------------------------------------------
+from build-env as build-deps
+
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --with-make-threads=`nproc` \
     --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
@@ -116,5 +116,8 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
 
 WORKDIR $HOME
 
+LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
+LABEL org.opencontainers.image.description="Fedora 38 CI test environment"
+LABEL org.opencontainers.image.licenses=MIT
 
 CMD /bin/bash

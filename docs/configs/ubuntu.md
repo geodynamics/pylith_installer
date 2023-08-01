@@ -28,8 +28,6 @@ apt-get install -y --no-install-recommends \
       unzip \
       git \
       ca-certificates \
-      libcppunit-1.14.0 \
-      libcppunit-dev \
       libopenmpi-dev \
       libopenmpi2 \
       openmpi-bin \
@@ -64,7 +62,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
@@ -101,7 +98,6 @@ apt-get install -y --no-install-recommends \
       unzip \
       git \
       ca-certificates \
-      libcppunit-dev \
       libmpich-dev \
       mpich \
       libhdf5-mpich-103 \
@@ -138,7 +134,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
@@ -173,7 +168,6 @@ apt-get install -y --no-install-recommends \
       unzip \
       git \
       ca-certificates \
-      libcppunit-dev \
       libmpich-dev \
       mpich \
       libhdf5-mpich-103 \
@@ -211,7 +205,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-sqlite \
     --disable-hdf5 \
     --disable-proj \
@@ -245,7 +238,6 @@ apt-get install -y --no-install-recommends \
       unzip \
       git \
       ca-certificates \
-      libcppunit-dev \
       libopenmpi-dev \
       libopenmpi3 \
       openmpi-bin \
@@ -285,7 +277,6 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-deps-prefix=${PREFIX_DIR}/dependencies \
     --disable-mpi \
-    --disable-cppunit \
     --disable-cmake \
     --disable-sqlite \
     --disable-hdf5 \
