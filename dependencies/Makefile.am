@@ -539,7 +539,7 @@ if INSTALL_PROJ
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz
 	$(MKDIR_P) proj-build
 	cd proj-build && \
-cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) TIFF_INCLUDE_DIR=${TIFF_INCDIR} TIFF_LIBRARY=${TIFF_LIBDIR} SQLITE3_INCLUDE_DIR=${SQLITE3_INCDIR} SQLITE3_LIBRARY=${SQLITE3_LIBDIR} -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release ../proj-${PROJ_VER} && \
+cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_INSTALL_NAME_DIR=$(prefix)/lib TIFF_INCLUDE_DIR=${TIFF_INCDIR} TIFF_LIBRARY=${TIFF_LIBDIR} SQLITE3_INCLUDE_DIR=${SQLITE3_INCDIR} SQLITE3_LIBRARY=${SQLITE3_LIBDIR} -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release ../proj-${PROJ_VER} && \
 		$(MAKE) -j$(make_threads) && $(MAKE) install && \
 		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
@@ -610,7 +610,7 @@ if INSTALL_NETCDF
 		../netcdf-c-$(NETCDF_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_mpicompilers) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
-			--enable-shared --disable-static --enable-netcdf-4 --disable-dap --disable-libxml2 ; \
+			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		$(MAKE) -j $(make_threads) && \
 		$(MAKE) install && \
