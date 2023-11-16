@@ -610,7 +610,7 @@ if INSTALL_NETCDF
 		../netcdf-c-$(NETCDF_VER)/configure --prefix=$(prefix) \
 			$(env_flags_deps) $(env_mpicompilers) \
 			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
-			--enable-shared --disable-static --enable-netcdf-4 --disable-dap ; \
+			--enable-shared --disable-static --enable-netcdf-4 --disable-dap4 $(NETCDF_OPTIONS) ; \
 		sed -e "s/-l //g" libtool > libtool.tmp && mv -f libtool.tmp libtool; \
 		$(MAKE) -j $(make_threads) && \
 		$(MAKE) install && \
