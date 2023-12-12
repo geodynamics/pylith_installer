@@ -527,6 +527,7 @@ AC_SUBST(petsc_git)
 # ----------------------------------------------------------------------
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
+AC_CANONICAL_HOST
 
 AC_PROG_CC
 AC_PROG_CPP
@@ -783,6 +784,19 @@ AC_SUBST(NETCDF_INCDIR)
 AC_SUBST(NETCDF_LIBDIR)
 AC_SUBST(NETCDF_INCLUDES)
 AC_SUBST(NETCDF_LDFLAGS)
+case $host_os in
+  darwin*)
+    NETCDF_OPTIONS=""
+    ;;
+  linux*)
+    NETCDF_OPTIONS="--disable-libxml2"
+    ;;
+  *)
+    NETCDF_OPTIONS=""
+  ;;
+esac
+AC_SUBST(NETCDF_OPTIONS)
+
 
 # NETCDF4 (python)
 if test "$install_netcdfpy" = yes ; then
@@ -939,7 +953,6 @@ fi
 
 
 # ----------------------------------------------------------------------
-AC_CANONICAL_HOST
 # Setup environment so dependencies are used in build
 CPPFLAGS="-I$prefix/include $CPPFLAGS"
 
