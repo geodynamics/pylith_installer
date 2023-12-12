@@ -1,17 +1,12 @@
-# ----------------------------------------------------------------------
+# =================================================================================================
+# This code is part of PyLith, developed through the Computational Infrastructure
+# for Geodynamics (https://geodynamics.org).
 #
-# Brad T. Aagaard, U.S. Geological Survey
-# Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# All rights reserved.
 #
-# This code was developed as part of the Computational Infrastructure
-# for Geodynamics (http://geodynamics.org).
-#
-# Copyright (c) 2010-2023 University of California, Davis
-#
-# See COPYING for license information.
-#
-# ----------------------------------------------------------------------
+# See https://mit-license.org/ and LICENSE.md and for license information. 
+# =================================================================================================
 
 include $(top_srcdir)/packages.am
 include $(top_srcdir)/environment.am
@@ -165,10 +160,10 @@ endif
 petsc:
 if INSTALL_PETSC
 if INSTALL_DEVELOPER
-	$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) check && \
+	cd petsc-pylith && $(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
 else
-	$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) install && \
+	cd petsc-pylith && $(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) install && \
 		$(MAKE) PETSC_DIR=$(PETSC_DIR_BUILD) check && \
 		touch $(abs_builddir)/installed_petsc
 endif

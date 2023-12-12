@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
+# =================================================================================================
+# This code is part of PyLith, developed through the Computational Infrastructure
+# for Geodynamics (https://geodynamics.org).
 #
-# ----------------------------------------------------------------------
+# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# All rights reserved.
 #
-# Brad T. Aagaard, U.S. Geological Survey
-# Charles A. Williams, GNS Science
-# Matthew G. Knepley, University at Buffalo
-#
-# This code was developed as part of the Computational Infrastructure
-# for Geodynamics (http://geodynamics.org).
-#
-# Copyright (c) 2010-2023 University of California, Davis
-#
-# See LICENSE.md for license information.
-#
-# ----------------------------------------------------------------------
+# See https://mit-license.org/ and LICENSE.md and for license information. 
+# =================================================================================================
 #
 # Create binary tarballs on Unix style systems.
 #
+# macOS: PYLITH_INSTALLER_PATH=$PATH_TO_AUTOTOOLS
+#
 # Step 1: Clone pylith_installer repository.
 # Step 2: Use this utility to create tarballs.
-#   Source setup.sh after running --configure.
 
 import os
 import stat
@@ -328,6 +323,7 @@ class MakeBinaryApp:
 
         # autoreconf
         os.chdir(self.src_dir)
+        self._set_environ()
         cmd = ("autoreconf", "--install", "--force", "--verbose")
         self._run_cmd(cmd)
 
@@ -344,13 +340,12 @@ class MakeBinaryApp:
 
         cmd += config_args
         cmd += ("--with-petsc-options=" + " ".join(petscOptions),)
-        self._set_environ()
         self._run_cmd(cmd)
 
     def build(self):
         os.chdir(self.build_dir)
         self._set_environ()
-        self._run_cmd( ("make",) )       
+        self._run_cmd( ("make",) )
 
     def package(self):
         if self.os == "Darwin":

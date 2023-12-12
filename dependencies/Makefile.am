@@ -1,17 +1,12 @@
-# ----------------------------------------------------------------------
+# =================================================================================================
+# This code is part of PyLith, developed through the Computational Infrastructure
+# for Geodynamics (https://geodynamics.org).
 #
-# Brad T. Aagaard, U.S. Geological Survey
-# Charles A. Williams, GNS Science
-# Matthew G. Knepley, University of Chicago
+# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# All rights reserved.
 #
-# This code was developed as part of the Computational Infrastructure
-# for Geodynamics (http://geodynamics.org).
-#
-# Copyright (c) 2010-2023 University of California, Davis
-#
-# See COPYING for license information.
-#
-# ----------------------------------------------------------------------
+# See https://mit-license.org/ and LICENSE.md and for license information. 
+# =================================================================================================
 
 include $(top_srcdir)/packages.am
 include $(top_srcdir)/environment.am
@@ -393,9 +388,7 @@ mpich: installed_compilers
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
 		../mpich-$(MPICH_VER)/configure --prefix=$(prefix) \
-			--enable-shared \
-			--enable-sharedlibs=$(mpich_sharedarch) \
-			--disable-static --disable-mpe \
+			--enable-shared --disable-static \
 			 $(mpich_options) \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
