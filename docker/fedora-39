@@ -34,9 +34,9 @@ RUN dnf install -y \
     unzip \
     git \
     ca-certificates \
-    mpich-devel \
-    hdf5-mpich \
-    hdf5-mpich-devel \
+    openmpi-devel \
+    hdf5-openmpi \
+    hdf5-openmpi-devel \
     sqlite \
     sqlite-libs \
     sqlite-devel \
@@ -66,15 +66,15 @@ from build-${BUILD_ENV} as build-env
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
     PYTHON_VERSION=3.12 \
-    HDF5_INCDIR=/usr/include/mpich-x86_64 \
-    HDF5_LIBDIR=/usr/lib64/mpich/lib
+    HDF5_INCDIR=/usr/include/openmpi-x86_64 \
+    HDF5_LIBDIR=/usr/lib64/openmpi/lib
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
     TOPBUILD_DIR=${HOME}/build \
-    PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+    PATH=${INSTALL_DIR}/bin:/usr/lib64/openmpi/bin:$PATH \
     LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
