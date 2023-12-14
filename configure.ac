@@ -1,21 +1,16 @@
-# ----------------------------------------------------------------------
+# =================================================================================================
+# This code is part of PyLith, developed through the Computational Infrastructure
+# for Geodynamics (https://geodynamics.org).
 #
-# Brad T. Aagaard, U.S. Geological Survey
-# Charles A. Williams, GNS Science
-# Matthew G. Knepley, University at Buffalo
+# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# All rights reserved.
 #
-# This code was developed as part of the Computational Infrastructure
-# for Geodynamics (http://geodynamics.org).
-#
-# Copyright (c) 2010-2023 University of California, Davis
-#
-# See LICENSE.md for license information.
-#
-# ----------------------------------------------------------------------
+# See https://mit-license.org/ and LICENSE.md and for license information. 
+# =================================================================================================
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [3.0.3-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [4.0.0-0], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -585,7 +580,7 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([3.7])
+  AM_PATH_PYTHON([3.8])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED
