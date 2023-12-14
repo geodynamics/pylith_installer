@@ -1,6 +1,9 @@
 Binary version is distributed via tarballs that are generated using
 the build.py script.
 
+export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"
+
+
 ## Linux
 
 1. `docker volume create pylith-binary`
