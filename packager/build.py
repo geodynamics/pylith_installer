@@ -223,7 +223,7 @@ class MakeBinaryApp:
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
-        self.python_version = "3.9" # :KLUDGE:
+        self.python_version = "3.10" # :KLUDGE:
         self.env = None
 
     def main(self):
