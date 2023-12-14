@@ -580,7 +580,7 @@ if test "$install_python" = yes ; then
   fi
   install_spatialdata=yes
 else
-  AM_PATH_PYTHON([3.7])
+  AM_PATH_PYTHON([3.8])
   CIT_PYTHON_SYSCONFIG
   CIT_CHECK_PYTHON_HEADER
   CIT_CHECK_PYTHON_SHARED
