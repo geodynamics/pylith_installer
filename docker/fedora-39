@@ -67,7 +67,8 @@ ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
     PYTHON_VERSION=3.12 \
     HDF5_INCDIR=/usr/include/openmpi-x86_64 \
-    HDF5_LIBDIR=/usr/lib64/openmpi/lib
+    HDF5_LIBDIR=/usr/lib64/openmpi/lib \
+    FI_PROVIDER=^psm3
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
@@ -117,7 +118,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
 WORKDIR $HOME
 
 LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
-LABEL org.opencontainers.image.description="Fedora 38 CI test environment"
+LABEL org.opencontainers.image.description="Fedora 39 CI test environment"
 LABEL org.opencontainers.image.licenses=MIT
 
 CMD /bin/bash
