@@ -1,7 +1,7 @@
 Binary version is distributed via tarballs that are generated using
 the build.py script.
 
-export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"
+`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
 
 
 ## Linux
@@ -16,7 +16,7 @@ export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CE
 
 ## macOS
 
-export PYLITH_INSTALLER_PATH=/Users/baagaard/software/unix/autotools/clang-14.0/bin
+`export PYLITH_INSTALLER_PATH=/Users/baagaard/software/unix/autotools/clang-14.0/bin`
 
 1. `cd ~/scratch/build/pylith-binary`
 2. `mkdir src && pushd src && ln -s $HOME/src/pylith_installer && popd`
