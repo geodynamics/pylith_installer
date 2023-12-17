@@ -24,7 +24,8 @@ import argparse
 import pathlib
 import tarfile
 import platform
-from distutils.sysconfig import parse_makefile
+
+PYTHON_VERSION = "3.10" # :KLUDGE:
 
 class Darwin:
 
@@ -98,11 +99,21 @@ class Packager:
         print("Running '%s'..." % " ".join(cmd))
         subprocess.check_call(cmd)
 
-    def _get_makeinfo(self):
+    def _parse_makefile_vars(self):
         os.chdir(self.build_dir)
-        makefile = parse_makefile("Makefile")
+        vars = {}
+        with open("Makefile") as fin:
+            lines = fin.readlines()
+        for line in lines:
+            if len(line.split("=")) == 2 and not "$" in line:
+                key, value = line.split("=")
+                vars[key.strip()] = value.strip()
+        print(vars)
+        return vars
+
+    def _get_makeinfo(self):
+        makefile = self._parse_makefile_vars()
         self.make = {
-            "package_name": makefile["PACKAGE_NAME"],
             "package": makefile["PACKAGE"],
             "version": makefile["VERSION"],
             "src_dir": makefile["abs_top_srcdir"],
@@ -128,6 +139,8 @@ class Packager:
             with open(filename, "r") as fin, open(filename_tmp, "w") as fout:
                 line0 = fin.readline()
                 line0 = line0.replace(old_path, new_path)
+                line0 = line0.replace("python\n", "nemesis\n")
+                line0 = line0.replace("python3\n", "nemesis\n")
                 fout.write(line0)
                 fout.writelines(fin.readlines())
             os.replace(filename_tmp, filename)
@@ -144,7 +157,8 @@ class Packager:
                     line = fin.readline()
                 except UnicodeDecodeError:
                     continue
-                if line.startswith(f"#!{old_path}"):
+                import pdb; pdb.set_trace()
+                if line.startswith(f"#!{old_path}") or line.endswith("python\n") or line.endswith("python3\n"):
                     _rewrite(filename)
 
     def _update_linking(self, dist_name, tfilename):
@@ -223,7 +237,7 @@ class MakeBinaryApp:
         sysname, hostname, release, version, machine = os.uname()
         self.os = sysname
         self.arch = machine
-        self.python_version = "3.10" # :KLUDGE:
+        self.python_version = PYTHON_VERSION
         self.env = None
 
     def main(self):
