@@ -23,14 +23,9 @@ yum install -y \
     curl \
     curl-devel \
     openssh \
-    openssl \
-    openssl-devel \
+    perl-IPC-Cmd \
     libtiff \
     libtiff-devel \
-    sqlite \
-    sqlite-devel \
-    zlib-devel \
-    libffi-devel \
     unzip \
     bzip2 \
     git \
@@ -49,14 +44,12 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.-0/configure \
+$HOME/src/pylith/pylith-installer-4.0.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
     --with-make-threads=$(nproc) \
-    --with-deps-prefix=${PREFIX_DIR}/dependencies \
-    --disable-cmake \
-    --disable-sqlite \
+    --enable-cmake \
     --enable-gcc \
     --enable-autotools \
     --enable-openssl \
@@ -124,7 +117,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.-0/configure \
+$HOME/src/pylith/pylith-installer-4.0.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -190,7 +183,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.-0/configure \
+$HOME/src/pylith/pylith-installer-4.0.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \

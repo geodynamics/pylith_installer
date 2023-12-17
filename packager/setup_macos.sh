@@ -12,6 +12,6 @@ if test ! -f bin/pylith; then
 else
     export PYTHONHOME="$pylith"
     export PATH="$pylith/bin:/bin:/usr/bin:/sbin/:/usr/sbin:$PATH"
-    export PYTHONPATH="$pylith/lib/python3.9/site-packages"
+    export PYTHONPATH="$pylith/lib/python3.10/site-packages"
     echo "Ready to run PyLith."
 fi

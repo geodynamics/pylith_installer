@@ -407,7 +407,7 @@ if INSTALL_CATCH2
 	$(TAR) -xf Catch2-$(CATCH2_VER).tar.gz
 	$(MKDIR_P) catch2-build
 	cd catch2-build && \
-		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) ../Catch2-$(CATCH2_VER); \
+		$(env_compilers) cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_POSITION_INDEPENDENT_CODE=ON ../Catch2-$(CATCH2_VER); \
 		$(MAKE) -j $(make_threads) && \
 		$(MAKE) install && \
 		touch $(abs_builddir)/installed_catch2

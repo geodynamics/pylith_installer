@@ -16,10 +16,10 @@ apt-get install -y --no-install-recommends \
       libcurl4 \
       libcurl4-openssl-dev \
       openssl \
-      libssl1.1 \
+      libssl3 \
       libssl-dev \
       python3-dev \
-      libpython3.9 \
+      libpython3.11 \
       python3-venv \
       python3-pip \
       zlib1g-dev \
@@ -28,7 +28,7 @@ apt-get install -y --no-install-recommends \
       ca-certificates \
       libmpich-dev \
       mpich \
-      libhdf5-mpich-103 \
+      libhdf5-mpich-103-1 \
       libhdf5-mpich-dev \
       sqlite3 \
       libsqlite3-0 \
@@ -37,13 +37,14 @@ apt-get install -y --no-install-recommends \
       libtiff5-dev \
       libproj-dev \
       proj-bin \
-      proj-data
+      proj-data \
+      cmake
 ```
 
 ### Environment variables
 
 ```
-PYTHON_VERSION=3.9
+PYTHON_VERSION=3.11
 HDF5_INCDIR=/usr/include/hdf5/mpich
 HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 ```
@@ -51,7 +52,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.3-0/configure \
+$HOME/src/pylith/pylith-installer-4.0.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -62,10 +63,10 @@ $HOME/src/pylith/pylith-installer-3.0.3-0/configure \
     --disable-mpi \
     --disable-hdf5 \
     --disable-sqlite \
+    --disable-cmake \
     --disable-proj \
     --enable-catch2 \
     --enable-h5py \
-    --enable-cmake \
     --enable-netcdf \
     --enable-netcdfpy
 ```
@@ -118,7 +119,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-3.0.3-0/configure \
+$HOME/src/pylith/pylith-installer-4.0.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \

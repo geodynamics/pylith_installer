@@ -64,8 +64,14 @@ endif
 		../pythia-$(PYTHIA_VER)/configure --enable-testing \
 			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
 		$(MAKE) && \
-		$(MAKE) install && \
+		$(MAKE) install
+if WITH_TESTING
+	cd pythia-build && \
+		$(MAKE) -j$(make_threads) check && \
 		touch $(abs_builddir)/installed_pythia
+else
+	touch $(abs_builddir)/installed_spatialdata
+endif
 
 else
 	@echo "$@ already installed. Skipping installation."
