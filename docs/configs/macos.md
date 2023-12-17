@@ -7,10 +7,11 @@ You will need to install the following tools before configuring the installer:
 2. [Python](https://www.python.org/downloads/macos/)
 :::
 
-## Monterey (12.6.x)
+## Ventura (13.6.x)
 
 We use the Apple clang/clang++ compiler.
 We use the installer to build autotools.
+We use the Python binary from Python.org.
 
 ## Environment variables
 
@@ -28,11 +29,18 @@ ${HOME}/src/pylith/pylith_installer-3.0.3-0/configure  \
     --prefix=${PREFIX} \
     --enable-force-install \
     --with-fetch=curl \
-    --with-make-threads=4 \
+    --with-make-threads=8 \
     --with-fortran=no \
     --enable-autotools \
     --enable-mpi=mpich \
-    --enable-sqlite \
+    --with-mpich-options=--with-pm=gforker \
+    --enable-catch2 \
+    --enable-proj \
+    --enable-hdf5 \
+    --enable-cmake \
+    --enable-matplotlib \
+    --enable-gmsh \
+    --enable-tiff \
     --enable-force-install \
     --enable-cmake \
     --with-petsc-options="${petsc_options}" \

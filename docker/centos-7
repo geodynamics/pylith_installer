@@ -89,7 +89,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
         --with-fortran=no --with-make-threads=`nproc` \
         --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
         --enable-cmake \
-        --disable-sqlite \
         --enable-gcc \
         --enable-autotools \
         --enable-openssl \
