@@ -1,4 +1,18 @@
-# PyLith development environment Docker image
+# PyLith development environment using Docker
+
+## What is Docker?
+
+From https://www.docker.com/what-docker:
+
+> "Docker containers wrap a piece of software in a complete filesystem that contains everything needed to run: code, runtime, system tools, system libraries – anything that can be installed on a server.
+> This guarantees that the software will always run the same, regardless of its environment.
+>
+> LIGHTWEIGHT
+>
+> Containers running on a single machine share the same operating system kernel; they start instantly and use less RAM.
+> Images are constructed from layered filesystems and share common files, making disk usage and image downloads much more efficient."
+
+# PyLith development Docker image
 
 The `pylith-devenv` Docker image provides all of the dependencies and defines the environment for PyLith development.
 It is built using the Ubuntu 22.04 Linux distribution.

@@ -1,119 +1,38 @@
-What is Docker?
+# Building Docker containers
 
-  From https://www.docker.com/what-docker:
+This directory holds Docker container build instructions, aka Dockerfiles.
+The images are stored in the geodynamics GitHub container registry with the URL `ghcr.io/geodynamics/pylith_installer`.
 
-    "Docker containers wrap a piece of software in a complete
-    filesystem that contains everything needed to run: code, runtime,
-    system tools, system libraries – anything that can be installed on
-    a server. This guarantees that the software will always run the
-    same, regardless of its environment.
+To set the visibility of container images, go to `github.com/geodynamics` -> `packages` (tab) -> `settings` (right side); the visibility setting is near the bottom.
 
-    LIGHTWEIGHT
+## Containers
 
-    Containers running on a single machine share the same operating
-    system kernel; they start instantly and use less RAM. Images are
-    constructed from layered filesystems and share common files,
-    making disk usage and image downloads much more efficient."
+- **pylith-devenv**: Linux developer environment for PyLith (contains only dependencies)
+- **pylith-binaryenv**: Linux environment for creating Linux binary package
+- **Test environments**:
+  - **centos-7**: EOL June 2024
+  - **debian-stable**:
+  - **debian-testing**:
+  - **fedora-38**:
+  - **fedora-39**:
+  - **rockylinux-8**:
+  - **rockylinux-9**:
+  - **ubuntu-20.04**: LTS
+  - **ubuntu-22.04**: LTS
+  - **ubuntu-23.04**:
+  - **ubuntu-23.10**:
 
-======================================================================
-Setup (first time only)
-======================================================================
+## Building images
 
-Install Docker: https://www.docker.com/products/docker
+```bash
+cd $SRC
+docker/build.py --dockerfile=docker/ubuntu-22.04 --build --build-env=certs-doi
+```
 
-Create container to store persistent user data
+## Push images
 
-  This container will hold a directory where all your user data can be
-  stored for use with PyLith within Docker. This directory is not
-  directly accessible from your host computer. However, you can copy
-  files to/from your host filesystem using "docker cp" (see below).
-
-  $ docker create --name pylith-data geodynamics/pylith-data
-
-
-======================================================================
-Run Unix shell within Docker to use PyLith.
-======================================================================
-
-  $ docker run -ti --volumes-from pylith-data geodynamics/pylith
-
-  To enable use of GUI applications, like iceweasel (Firefox), use
-
-  Linux:
-    $ xhost +local:root
-  Darwin (using Terminal application):
-    $ xhost +YOUR_IP_ADDRESS; DISPLAY=YOUR_IP_ADDRESS:0
-  For Linux and Darwin, then continue with
-    $ XSOCK=/tmp/.X11-unix
-    $ docker run -ti --volumes-from pylith-data -e DISPLAY=$DISPLAY -v $XSOCK:$XSOCK geodynamics/pylith
-
-  The container includes the following useful utilities:
-    * iceweasel (Firefox) web-browser for use with pylith_paramviewer
-    * vim text editor
-    * matplotlib Python plotting package
-
-  We do not yet include ParaView due to difficulties associated with
-  rendering on the host display outside the container. 
-
-HINT: You will probably want to copy the examples from the
-  pylith-VERSION directory to the data directory, which is the
-  persistent storage.
-
-    $ cp -R ~/pylith-VERSION/examples ~/data
-
-  To "pause" the container.
-    Control-p Control-q
-
-  To attach to "paused" or "running" container.
-    # Find the container id
-    $ docker ps
-    # Attach to the container
-    $ docker attach CONTAINER_ID
-
-  To restart an existing container after it exited.
-    # Get the container id
-    $ docker ps -a
-    # Start and then attach to the container.
-    $ docker start CONTAINER_ID
-    $ docker attach CONTAINER_ID
-
-
-======================================================================
-Copy data to/from persistent storage volume.
-=====================================================================
-
-Copy data FROM persistent storage volume TO local host
-  $ docker cp pylith-data:/data/pylith-user/PATH/FILENAME LOCAL_PATH
-
-Copy data FROM local host TO persistent storage volume
-  $ docker cp LOCAL_PATH pylith-data:/data/pylith-user/PATH/
-
-
-======================================================================
-Docker Quick Reference
-======================================================================
-
-  List local docker images 
-    $ docker images
-
-  List all docker containers
-    $ docker ps -a
-
-  List running docker containers
-    $ docker ps
-
-  Remove docker container
-    $ docker rm CONTAINER_ID
-
-  Remove docker image
-    $ docker rmi CONTAINER_ID
-
-  Attach to stopped container with a different command
-    $ docker ps -a
-    $ docker commit CONTAINERID debug_container
-    $ docker run -ti --entrypoint=bash $IMAGE -s
-
-======================================================================
-Running GUI
-======================================================================
-
+```bash
+# Linux
+pass -c PATH_TO_TOKEN
+docker push IMAGE_URL
+```

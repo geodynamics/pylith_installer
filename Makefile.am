@@ -24,25 +24,24 @@ EXTRA_DIST = \
 	NEWS.md \
 	README.md \
 	configure.ac \
-	docker/README \
-	docker/README-developer \
+	docker/README.md \
 	docker/builder.py \
 	docker/centos-7 \
 	docker/rockylinux-8 \
 	docker/debian-stable \
 	docker/debian-testing \
-	docker/fedora-35 \
-	docker/fedora-36 \
-	docker/fedora-37 \
-	docker/ubuntu-18.04 \
+	docker/fedora-38 \
+	docker/fedora-39 \
 	docker/ubuntu-20.04 \
 	docker/ubuntu-22.04 \
-	docker/ubuntu-22.10 \
+	docker/ubuntu-23.04 \
+	docker/ubuntu-23.10 \
 	packager/build.py \
 	packager/setup_macos.sh \
 	packager/setup_linux.sh \
 	packager/build.py \
-	packager/make_petscdist.sh
+	packager/make_petscdist.sh \
+	packager/README.md
 
 
 dist_noinst_SCRIPTS = \
