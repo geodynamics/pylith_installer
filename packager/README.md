@@ -17,9 +17,9 @@ the build.py script.
 
 ## macOS
 
-`export PYLITH_INSTALLER_PATH=/Users/baagaard/software/unix/autotools/clang-14.0/bin`
+`export PYLITH_INSTALLER_PATH=${SW_DIR}/autotools/${COMPILER_VERSION}/bin`
 
 1. `cd ~/scratch/build/pylith-binary`
-2. `mkdir src && pushd src && ln -s $HOME/src/pylith_installer && popd`
+2. `mkdir src && pushd src && ln -s $HOME/src/cig/pylith_installer && popd`
 3. x86_64: `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=8 --macos-target=10.15 --setup`
 4. arm64: `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=32 --macos-target=11.0 --setup`

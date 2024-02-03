@@ -311,24 +311,24 @@ endif
 
 python_postinstall:
 	python3 -m venv $(prefix)
-	$(env_cert) $(PYTHON) -m pip install --upgrade pip setuptools certifi
-	$(env_cert) $(PYTHON) -m pip install numpy
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools certifi
+	$(env_cert) $(PYTHON) -m pip install numpy --no-cache-dir 
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
-	$(env_cert) $(PYTHON) -m pip install cftime
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir cftime
 endif
 if INSTALL_DEVELOPER
-	$(env_cert) $(PYTHON) -m pip install coverage autopep8
-	$(env_cert) $(PYTHON) -m pip install sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
 endif
 if INSTALL_PYQT
-	$(env_cert) $(PYTHON) -m pip install PyQt6
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir PyQt6
 endif
 if INSTALL_MATPLOTLIB
-	$(env_cert) $(PYTHON) -m pip install matplotlib
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir matplotlib
 endif
 if INSTALL_GMSH
-	$(env_cert) $(PYTHON) -m pip install gmsh
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir gmsh
 endif
 
 installed_python:
@@ -580,7 +580,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-binary=h5py h5py && \
+	CFLAGS=$(CFLAGS) CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-cache-dir --no-binary=h5py h5py && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."
