@@ -157,7 +157,6 @@ class Packager:
                     line = fin.readline()
                 except UnicodeDecodeError:
                     continue
-                import pdb; pdb.set_trace()
                 if line.startswith(f"#!{old_path}") or line.endswith("python\n") or line.endswith("python3\n"):
                     _rewrite(filename)
 
@@ -283,7 +282,7 @@ class MakeBinaryApp:
                           "--enable-libffi", 
                           "--enable-curl",
                           "--enable-sqlite",
-                          "--enable-atch2",
+                          "--enable-catch2",
                           "--enable-python", 
                           "--enable-swig",
                           "--enable-pcre",
@@ -404,7 +403,11 @@ class MakeBinaryApp:
                 ldpath += (os.path.join(self.dist_dir, "lib64"),)
             env["LD_LIBRARY_PATH"] = ":".join(ldpath)
         elif self.os == "Darwin" and self.macos_target:
-            env["OSX_DEPLOYMENT_TARGET"] = self.macos_target
+            env["MACOSX_DEPLOYMENT_TARGET"] = self.macos_target
+            MINOS_FLAGS = f"-mmacos-version-min={self.macos_target}"
+            env["CFLAGS"] = MINOS_FLAGS
+            env["CXXFLAGS"] = MINOS_FLAGS
+            env["LDFLAGS"] = MINOS_FLAGS
         self.env = env
 
     def _run_cmd(self, cmd):
