@@ -12,7 +12,6 @@
 """Application for building and pushing docker images.
 """
 
-import os
 import argparse
 import subprocess
 import pathlib
