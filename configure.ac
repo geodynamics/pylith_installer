@@ -144,7 +144,15 @@ AC_ARG_ENABLE([curl],
 	[install_curl=no])
 AM_CONDITIONAL([INSTALL_CURL], [test "$install_curl" = yes])
 
-# libFFI
+# LIBXCRYPT
+AC_ARG_ENABLE([libxcrypt],
+    [AC_HELP_STRING([--enable-libxcrypt],
+        [install libxcrypt @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_libxcrypt=yes; else install_libxcrypt=no; fi],
+	[install_libxcrypt=no])
+AM_CONDITIONAL([INSTALL_LIBXCRYPT], [test "$install_libxcrypt" = yes])
+
+# LIBFFI
 AC_ARG_ENABLE([libffi],
     [AC_HELP_STRING([--enable-libffi],
         [install libffi @<:@default=no@:>@])],
@@ -1037,6 +1045,7 @@ printf "  swig: $install_swig\n"
 printf "  catch2: $install_catch2\n"
 printf "  openssl: $install_openssl\n"
 printf "  curl: $install_curl\n"
+printf "  libxcrypt: $install_libxcrypt\n"
 printf "  libffi: $install_libffi\n"
 printf "  Python: $install_python\n"
 printf "  Python packages\n"
