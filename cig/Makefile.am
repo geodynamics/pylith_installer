@@ -62,7 +62,7 @@ endif
 	$(MKDIR_P) pythia-build
 	cd pythia-build && \
 		../pythia-$(PYTHIA_VER)/configure --enable-testing \
-			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers); \
+			--prefix=$(prefix) $(env_flags_cig) $(env_mpicompilers) $(env_cert); \
 		$(MAKE) && \
 		$(MAKE) install
 if WITH_TESTING
@@ -104,7 +104,7 @@ endif
 	$(MKDIR_P) spatialdata-build
 	cd spatialdata-build && \
 		../spatialdata-$(SPATIALDATA_VER)/configure \
-			--prefix=$(prefix) $(env_flags_cig) $(env_compilers) \
+			--prefix=$(prefix) $(env_flags_cig) $(env_compilers) $(env_cert) \
 			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS)" \
 			$(spatialdata_options) ; \
@@ -203,7 +203,7 @@ endif
 	cd pylith-build && \
 		../pylith-$(PYLITH_VER)/configure \
 			--prefix=$(prefix) $(pylith_options) \
-                        $(env_flags_cig) $(env_mpicompilers) \
+                        $(env_flags_cig) $(env_mpicompilers) $(env_cert) \
 			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES) $(PROJ_INCLUDES) $(HDF5_INCLUDES) $(NETCDF_INCLUDES)" \
 			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS) $(PROJ_LDFLAGS) $(HDF5_LDFLAGS) $(NETCDF_LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR) PETSC_ARCH=$(PETSC_ARCH) ; \
