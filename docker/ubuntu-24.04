@@ -15,7 +15,6 @@ RUN apt-get update \
       libtool \
       curl \
       python3-dev \
-      libpython3.12 \
       python3-venv \
       python3-pip \
       zlib1g-dev \
@@ -24,7 +23,6 @@ RUN apt-get update \
       ca-certificates \
       libmpich-dev \
       mpich \
-      libhdf5-mpich-103-1 \
       libhdf5-mpich-dev \
       sqlite3 \
       libsqlite3-0 \
@@ -40,6 +38,9 @@ RUN apt-get update \
       vim-common \
       vim-runtime \
       vim-nox
+
+#      libpython3.12 \
+#      libhdf5-mpich-103-1 \
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
