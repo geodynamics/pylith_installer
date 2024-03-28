@@ -324,7 +324,7 @@ class MakeBinaryApp:
             cert_file = os.environ["CERT_FILE"]
             config_args += (f"--with-cert-path={cert_path}", f"--with-cert-file={cert_file}")
 
-        petscOptions = ("--download-chaco=1",
+        petscOptions = ("--download-parmetis=1",
                         "--download-f2cblaslapack=1",
                         "--download-ml",
                         "--with-fc=0",
