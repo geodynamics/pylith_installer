@@ -1,0 +1,116 @@
+ARG BUILD_ENV=nocerts
+FROM ubuntu:23.10 as os-update
+LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
+
+ENV BUILD_ENV=${BUILD_ENV}
+
+
+RUN apt-get update \
+    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+      g++ \
+      make \
+      file \
+      automake \
+      autoconf \
+      libtool \
+      curl \
+      python3-dev \
+      libpython3.12 \
+      python3-venv \
+      python3-pip \
+      zlib1g-dev \
+      unzip \
+      git \
+      ca-certificates \
+      libmpich-dev \
+      mpich \
+      libhdf5-mpich-103-1t64 \
+      libhdf5-mpich-dev \
+      sqlite3 \
+      libsqlite3-0 \
+      libsqlite3-dev \
+      proj-bin \
+      proj-data \
+      libproj-dev \
+      cmake \
+      swig \
+      lcov \
+      gdb \
+      valgrind \
+      vim-common \
+      vim-runtime \
+      vim-nox
+
+# ------------------------------------------------------------------------------
+from os-update as build-certs-doi
+
+ONBUILD COPY docker/certs/ /usr/local/share/ca-certificates
+ONBUILD RUN update-ca-certificates
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=DOIRootCA2.pem
+
+from os-update as build-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+
+# ------------------------------------------------------------------------------
+from build-${BUILD_ENV} as build-env
+
+ENV TEST_USER=pylith-tester \
+    INSTALL_DIR=/opt/pylith \
+    PYTHON_VERSION=3.12 \
+    HDF5_INCDIR=/usr/include/hdf5/mpich \
+    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
+
+# Create 'pylith-tester' user
+RUN useradd --create-home --shell /bin/bash $TEST_USER
+ENV  HOME=/home/$TEST_USER
+ENV  TOPSRC_DIR=${HOME}/src \
+     TOPBUILD_DIR=${HOME}/build \
+     PATH=${INSTALL_DIR}/bin:$PATH \
+     LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
+     PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+RUN mkdir ${INSTALL_DIR} \
+  && chown ${TEST_USER} ${INSTALL_DIR} \
+  && chgrp ${TEST_USER} ${INSTALL_DIR}
+RUN projsync --system-directory --all
+
+
+USER ${TEST_USER}
+ENV  src_dir=${TOPSRC_DIR}/pylith-installer  build_dir=${TOPBUILD_DIR}/pylith-installer
+RUN mkdir -p ${TOPSRC_DIR} && \
+    mkdir -p ${TOPBUILD_DIR} && \
+    mkdir -p ${build_dir}
+    
+COPY --chown=pylith-tester:pylith-tester . ${src_dir}
+
+WORKDIR ${src_dir}
+RUN autoreconf --install --verbose --force
+
+# ------------------------------------------------------------------------------
+from build-env as build-deps
+
+WORKDIR ${build_dir}
+RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
+    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
+    --with-hdf5-incdir=${HDF5_INCDIR} --with-hdf5-libdir=${HDF5_LIBDIR} \
+    --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
+    --disable-mpi \
+    --disable-cmake \
+    --disable-sqlite \
+    --disable-hdf5 \
+    --disable-proj \
+    --enable-catch2 \
+    --enable-h5py \
+    --enable-netcdf \
+    --disable-netcdfpy \
+    && . ./setup.sh \
+    && make -C dependencies \
+    && rm -r ${build_dir}
+
+
+WORKDIR $HOME
+
+LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
+LABEL org.opencontainers.image.description="Ubuntu 23.10 CI test environment"
+LABEL org.opencontainers.image.licenses=MIT
+
+CMD /bin/bash
