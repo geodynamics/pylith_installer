@@ -19,6 +19,7 @@ noinst_tmp = \
 	installed_compilers \
 	installed_openssl \
 	installed_curl \
+	installed_libxcrypt \
 	installed_libffi \
 	installed_python \
 	installed_mpi \
@@ -43,6 +44,7 @@ noinst_builddirs = \
 	libtool-build \
 	openssl-build \
 	curl-build \
+	libxcrypt-build \
 	libffi-build \
 	python-build \
 	openmpi-build \
@@ -65,6 +67,7 @@ noinst_srcdirs = \
 	Python-$(PYTHON_VER) \
 	openssl-$(OPENSSL_VER) \
 	curl-$(CURL_VER) \
+	libxcrupt-$(LIBXCRYPT_VER) \
 	libffi-$(LIBFFI_VER) \
 	openmpi-$(OPENMPI_VER) \
 	mpich-$(MPICH_VER) \
@@ -259,6 +262,32 @@ installed_curl:
 
 
 # ----------------------------------------------------------------------
+# libxcrypt
+# ----------------------------------------------------------------------
+libxcrypt: installed_compilers installed_openssl
+if INSTALL_LIBXCRYPT
+	$(FETCH_SCRIPT) "$(downloader)" libxcrypt-$(LIBXCRYPT_VER).tar.xz $(DEPS_URL)
+	$(TAR) -xf libxcrypt-$(LIBXCRYPT_VER).tar.xz
+	$(MKDIR_P) libxcrypt-build
+	cd libxcrypt-build && \
+		../libxcrypt-$(LIBXCRYPT_VER)/configure --prefix=$(prefix) \
+			--enable-shared --disable-obsolete-api --enable-hashes=all \
+			$(env_flags_deps) $(env_compilers) \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
+		$(MAKE) -j $(make_threads) && \
+		$(MAKE) install && \
+		touch $(abs_builddir)/installed_libxcrypt
+
+else
+	@echo "$@ already installed. Skipping installation."
+	touch $(abs_builddir)/installed_libxcrypt
+endif
+
+installed_libxcrypt:
+	$(MAKE) $(AM_MAKEFLAGS) libxcrypt
+
+
+# ----------------------------------------------------------------------
 # libffi
 # ----------------------------------------------------------------------
 libffi: installed_compilers installed_openssl
@@ -287,7 +316,7 @@ installed_libffi:
 # ----------------------------------------------------------------------
 # python
 # ----------------------------------------------------------------------
-python: installed_compilers installed_openssl installed_sqlite installed_curl installed_libffi
+python: installed_compilers installed_openssl installed_sqlite installed_curl installed_libxcrypt installed_libffi
 if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)
@@ -580,7 +609,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 h5py: installed_hdf5 installed_python
 if INSTALL_H5PY
-	CFLAGS=$(CFLAGS) CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-cache-dir --no-binary=h5py h5py && \
+	CFLAGS="$(CFLAGS)" CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-cache-dir --no-binary=h5py h5py && \
 		touch $(abs_builddir)/installed_h5py
 else
 	@echo "$@ already installed. Skipping installation."

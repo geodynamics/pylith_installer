@@ -279,6 +279,7 @@ class MakeBinaryApp:
                           "--enable-mpi=mpich",
                           "--with-mpich-options=--with-device=ch4:ofi --with-pm=gforker",
                           "--enable-openssl",
+                          "--enable-libxcrypt", 
                           "--enable-libffi", 
                           "--enable-curl",
                           "--enable-sqlite",
