@@ -192,6 +192,14 @@ AC_ARG_ENABLE([matplotlib],
 	[install_matplotlib=no])
 AM_CONDITIONAL([INSTALL_MATPLOTLIB], [test "$install_matplotlib" = yes])
 
+# PYVISTA
+AC_ARG_ENABLE([pyvista],
+    [AC_HELP_STRING([--enable-pyvista],
+        [install pyvista Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_pyvista=yes; else install_pyvista=no; fi],
+	[install_pyvista=no])
+AM_CONDITIONAL([INSTALL_PYVISTA], [test "$install_pyvista" = yes])
+
 # GMSH
 AC_ARG_ENABLE([gmsh],
     [AC_HELP_STRING([--enable-gmsh],

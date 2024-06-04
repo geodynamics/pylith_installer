@@ -356,6 +356,9 @@ endif
 if INSTALL_MATPLOTLIB
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir matplotlib
 endif
+if INSTALL_PYVISTA
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir pyvista
+endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir gmsh
 endif
