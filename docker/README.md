@@ -19,8 +19,7 @@ To set the visibility of container images, go to `github.com/geodynamics` -> `pa
   - **rockylinux-9**:
   - **ubuntu-20.04**: LTS
   - **ubuntu-22.04**: LTS
-  - **ubuntu-23.04**:
-  - **ubuntu-23.10**:
+  - **ubuntu-24.04**:
 
 ## Building images
 
