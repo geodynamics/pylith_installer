@@ -35,11 +35,13 @@ class Darwin:
             Darwin.update_deplibs(filepath)
         for filepath in dist_dir.glob("*/*.dylib"):
             Darwin.update_deplibs(filepath)
+        for filepath in dist_dir.glob("**/vtkmodules/*.so"):
+            Darwin.update_deplibs(filepath, newPath="@loader_path/.dylibs")
         for filepath in dist_dir.glob("**/*.so"):
             Darwin.update_deplibs(filepath)
 
     @staticmethod
-    def update_deplibs(filename):
+    def update_deplibs(filename, newPath="@executable_path/../lib"):
         if filename.is_symlink() or filename.is_dir():
             return
 
@@ -54,7 +56,7 @@ class Darwin:
             if libPathAbs.startswith("@loader_path"):
                 continue
             libName = os.path.split(libPathAbs)[1]
-            libPathNew = f"@executable_path/../lib/{libName}"
+            libPathNew = f"{newPath}/{libName}"
             cmd = ["install_name_tool", "-change", libPathAbs, libPathNew, str(filename)]
             subprocess.run(cmd, check=True)
 
