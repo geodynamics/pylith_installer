@@ -3,9 +3,9 @@
 Binary version is distributed via tarballs that are generated using
 the build.py script.
 
-`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
-
 ## Linux
+
+`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
 
 1. `docker volume create pylith-binary`
 2. `docker build -t pylith_installer/pylith-binaryenv -f docker/pylith-binaryenv  --build-arg BUILD_ENV=certs-doi .`
@@ -17,7 +17,9 @@ the build.py script.
 
 ## macOS
 
+`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
 `export PYLITH_INSTALLER_PATH=${SW_DIR}/autotools/${COMPILER_VERSION}/bin`
+`module purge`
 
 1. `cd ~/scratch/build/pylith-binary`
 2. `mkdir src && pushd src && ln -s $HOME/src/cig/pylith_installer && popd`
