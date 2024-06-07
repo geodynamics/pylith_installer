@@ -35,11 +35,13 @@ class Darwin:
             Darwin.update_deplibs(filepath)
         for filepath in dist_dir.glob("*/*.dylib"):
             Darwin.update_deplibs(filepath)
+        for filepath in dist_dir.glob("**/vtkmodules/*.so"):
+            Darwin.update_deplibs(filepath, newPath="@loader_path/.dylibs")
         for filepath in dist_dir.glob("**/*.so"):
             Darwin.update_deplibs(filepath)
 
     @staticmethod
-    def update_deplibs(filename):
+    def update_deplibs(filename, newPath="@executable_path/../lib"):
         if filename.is_symlink() or filename.is_dir():
             return
 
@@ -54,7 +56,7 @@ class Darwin:
             if libPathAbs.startswith("@loader_path"):
                 continue
             libName = os.path.split(libPathAbs)[1]
-            libPathNew = f"@executable_path/../lib/{libName}"
+            libPathNew = f"{newPath}/{libName}"
             cmd = ["install_name_tool", "-change", libPathAbs, libPathNew, str(filename)]
             subprocess.run(cmd, check=True)
 
@@ -291,6 +293,7 @@ class MakeBinaryApp:
                           "--enable-hdf5",
                           "--enable-cmake",
                           "--enable-matplotlib",
+                          "--enable-pyvista",
                           "--enable-gmsh",
                           "--enable-tiff",
                           "--with-fortran=no",
@@ -311,6 +314,7 @@ class MakeBinaryApp:
                           "--enable-hdf5",
                           "--enable-cmake",
                           "--enable-matplotlib",
+                          "--enable-pyvista",
                           "--enable-gmsh",
                           "--enable-tiff",
                           "--with-fortran=no",
@@ -324,7 +328,8 @@ class MakeBinaryApp:
             cert_file = os.environ["CERT_FILE"]
             config_args += (f"--with-cert-path={cert_path}", f"--with-cert-file={cert_file}")
 
-        petscOptions = ("--download-chaco=1",
+        petscOptions = ("--download-parmetis=1",
+                        "--download-metis=1",
                         "--download-f2cblaslapack=1",
                         "--download-ml",
                         "--with-fc=0",

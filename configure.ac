@@ -10,7 +10,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [4.1.0-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [4.1.1-0], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -191,6 +191,14 @@ AC_ARG_ENABLE([matplotlib],
 	[if test "$enableval" != no ; then install_matplotlib=yes; else install_matplotlib=no; fi],
 	[install_matplotlib=no])
 AM_CONDITIONAL([INSTALL_MATPLOTLIB], [test "$install_matplotlib" = yes])
+
+# PYVISTA
+AC_ARG_ENABLE([pyvista],
+    [AC_HELP_STRING([--enable-pyvista],
+        [install pyvista Python package @<:@default=no@:>@])],
+	[if test "$enableval" != no ; then install_pyvista=yes; else install_pyvista=no; fi],
+	[install_pyvista=no])
+AM_CONDITIONAL([INSTALL_PYVISTA], [test "$install_pyvista" = yes])
 
 # GMSH
 AC_ARG_ENABLE([gmsh],

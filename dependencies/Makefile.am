@@ -344,7 +344,7 @@ python_postinstall:
 	$(env_cert) $(PYTHON) -m pip install numpy --no-cache-dir 
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_NETCDFPY
-	$(env_cert) $(PYTHON) -m pip install --no-cache-dir cftime
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir cftime netCDF4
 endif
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
@@ -355,6 +355,9 @@ if INSTALL_PYQT
 endif
 if INSTALL_MATPLOTLIB
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir matplotlib
+endif
+if INSTALL_PYVISTA
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir pyvista
 endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir gmsh
@@ -651,16 +654,18 @@ installed_netcdf:
 # netcdfpy
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
-if INSTALL_NETCDFPY
-	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
-	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
-	cd netCDF4-$(NETCDFPY_VER) && \
-		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) setup.py install && \
-		touch $(abs_builddir)/installed_netcdfpy
-else
-	@echo "$@ already installed. Skipping installation."
+	@echo "$@ installed using pip."
 	touch $(abs_builddir)/installed_netcdfpy
-endif
+#if INSTALL_NETCDFPY
+#	$(FETCH_SCRIPT) "$(downloader)" netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
+#	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
+#	cd netCDF4-$(NETCDFPY_VER) && \
+#		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) setup.py install && \
+#		touch $(abs_builddir)/installed_netcdfpy
+#else
+#	@echo "$@ already installed. Skipping installation."
+#	touch $(abs_builddir)/installed_netcdfpy
+#endif
 
 installed_netcdfpy:
 	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
