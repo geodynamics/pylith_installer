@@ -34,8 +34,7 @@ EXTRA_DIST = \
 	docker/fedora-39 \
 	docker/ubuntu-20.04 \
 	docker/ubuntu-22.04 \
-	docker/ubuntu-23.04 \
-	docker/ubuntu-23.10 \
+	docker/ubuntu-24.04 \
 	packager/build.py \
 	packager/setup_macos.sh \
 	packager/setup_linux.sh \
