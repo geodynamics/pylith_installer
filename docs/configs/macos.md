@@ -25,7 +25,7 @@ PREFIX=$HOME/pylith
 # Define PETSc options
 petsc_options="--download-chaco=1 --download-ml --download-f2cblaslapack --with-fc=0 --with-hwloc=0 --with-ssl=0 --with-x=0 --with-c2html=0 --with-lgrind=0"
 #
-${HOME}/src/pylith/pylith_installer-4.0.0-0/configure  \
+${HOME}/src/pylith/pylith_installer-4.1.0-0/configure  \
     --prefix=${PREFIX} \
     --enable-force-install \
     --with-fetch=curl \

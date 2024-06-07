@@ -2,7 +2,7 @@
 # This code is part of PyLith, developed through the Computational Infrastructure
 # for Geodynamics (https://geodynamics.org).
 #
-# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
 # See https://mit-license.org/ and LICENSE.md and for license information. 
@@ -59,13 +59,13 @@ PYTHIA_VER=main
 SPATIALDATA_VER=main
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=4.0.0
+PETSC_VER=4.1.0
 endif
 else
 PYTHIA_VER=1.1.0
 SPATIALDATA_VER=3.1.0
-PYLITH_VER=4.0.0
-PETSC_VER=4.0.0
+PYLITH_VER=4.1.0
+PETSC_VER=4.1.0
 endif
 
 PARAMETERSGUI_VER=2.0.1

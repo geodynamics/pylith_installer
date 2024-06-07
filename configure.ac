@@ -2,7 +2,7 @@
 # This code is part of PyLith, developed through the Computational Infrastructure
 # for Geodynamics (https://geodynamics.org).
 #
-# Copyright (c) 2010-2023, University of California, Davis and the PyLith Development Team.
+# Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
 # See https://mit-license.org/ and LICENSE.md and for license information. 
@@ -10,7 +10,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [4.0.0-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [4.1.0-0], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])

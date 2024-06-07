@@ -18,5 +18,5 @@ We assume that Python was not built with the same compiler suite as MPI. The `--
 If Python was built with the same compilers used to build MPI, then then you do not need the `--enable-python` option.
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.0.0-0/configure --enable-python --with-make-threads=8 --prefix=$HOME/pylith
+$HOME/src/pylith/pylith-installer-4.1.0-0/configure --enable-python --with-make-threads=8 --prefix=$HOME/pylith
 ```

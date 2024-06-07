@@ -17,11 +17,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PyLith Installer'
-copyright = '2010-2023, University of California, Davis'
+copyright = '2010-2024, University of California, Davis'
 author = 'Brad T. Aagaard'
 
 # The full version, including alpha/beta/rc tags
-release = 'v4.0.0-0'
+release = 'v4.1.0-0'
 
 
 # -- General configuration ---------------------------------------------------
