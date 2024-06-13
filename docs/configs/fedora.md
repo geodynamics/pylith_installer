@@ -59,7 +59,7 @@ PATH=$PATH:/usr/lib64/mpich/bin
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.1-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -136,7 +136,7 @@ PATH=$PATH:/usr/lib64/openmpi/bin
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.1-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
