@@ -52,7 +52,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/mpich
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.1-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -119,7 +119,7 @@ HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.1-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
