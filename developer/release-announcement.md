@@ -1,4 +1,4 @@
-We are pleased to announce release of PyLith Installer version 4.1.2-0.
+We are pleased to announce release of PyLith Installer version 4.1.3-0.
 
 Please submit bug reports via GitHub issues:
     https://github.com/geodynamics/pylith_installer/issues
@@ -10,4 +10,4 @@ from source on Unix flavored operating systems.
 
 You can download the installer from https://geodynamics.org/resources/pylith.
 
-Instructions are online at https://pylith-installer.readthedocs.io/en/v4.1.2-0.
+Instructions are online at https://pylith-installer.readthedocs.io/en/v4.1.3-0.
