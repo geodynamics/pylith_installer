@@ -15,4 +15,4 @@ Pulling the PyLith development environment Docker image does not update Pythia, 
 
 ## Updating PETSc or PyLith
 
-See [Rebuilding PETSc and PyLith in the PyLith Developer Guide](https://pylith.readthedocs.io/en/v4.1.2/developer/contributing/rebuilding.html) for how to update PETSc and PyLith.
+See [Rebuilding PETSc and PyLith in the PyLith Developer Guide](https://pylith.readthedocs.io/en/v4.1.3/developer/contributing/rebuilding.html) for how to update PETSc and PyLith.

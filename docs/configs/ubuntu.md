@@ -52,7 +52,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -119,7 +119,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -187,7 +187,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -255,7 +255,7 @@ PREFIX_DIR=$HOME/pylith
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.2-0/configure \
+$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \

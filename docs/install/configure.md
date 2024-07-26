@@ -22,7 +22,7 @@ The default configure options assume you have:
 In this case, you simply specify the number of threads and the destination directory:
 ```bash
 mkdir -p $HOME/build/pylith
-$HOME/src/pylith/pylith-installer-4.1.2-0/configure --with-make-threads=2 --prefix=$HOME/pylith
+$HOME/src/pylith/pylith-installer-4.1.3-0/configure --with-make-threads=2 --prefix=$HOME/pylith
 ```
 
 ## Configure options
