@@ -62,7 +62,9 @@ endif
 	$(MKDIR_P) pythia-build
 	cd pythia-build && \
 		$(env_cert) $(env_flags_cig) $(env_mpicompilers) ../pythia-$(PYTHIA_VER)/configure --enable-testing \
-			--prefix=$(prefix) ; \
+			--prefix=$(prefix) \
+			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS)"; \
 		$(MAKE) && \
 		$(MAKE) install
 if WITH_TESTING
