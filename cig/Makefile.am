@@ -59,13 +59,17 @@ else
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
 endif
+if WITH_TESTING
+pythia_options += --enable-testing
+endif
 	$(MKDIR_P) pythia-build
 	cd pythia-build && \
-		$(env_cert) $(env_flags_cig) $(env_mpicompilers) ../pythia-$(PYTHIA_VER)/configure --enable-testing \
+		$(env_cert) $(env_flags_cig) $(env_mpicompilers) ../pythia-$(PYTHIA_VER)/configure \
 			--prefix=$(prefix) \
 			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES)" \
-			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS)"; \
-		$(MAKE) && \
+			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS)" \
+			$(pythia_options); \
+		$(MAKE) -j$(make_threads) && \
 		$(MAKE) install
 if WITH_TESTING
 	cd pythia-build && \
