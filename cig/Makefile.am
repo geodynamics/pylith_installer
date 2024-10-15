@@ -52,6 +52,7 @@ all: installed_pythia installed_spatialdata installed_petsc installed_pylith ins
 # ----------------------------------------------------------------------
 pythia:
 if INSTALL_PYTHIA
+pythia_options = 
 if USE_PYLITH_GIT
 	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
 	cd pythia-$(PYTHIA_VER) && $(AUTORECONF) -if
@@ -76,7 +77,7 @@ if WITH_TESTING
 		$(MAKE) -j$(make_threads) check && \
 		touch $(abs_builddir)/installed_pythia
 else
-	touch $(abs_builddir)/installed_spatialdata
+	touch $(abs_builddir)/installed_pythia
 endif
 
 else
