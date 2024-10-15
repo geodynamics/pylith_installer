@@ -10,7 +10,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([PyLith Installer], [4.1.3-0], [https://community.geodynamics.org/c/pylith/])
+AC_INIT([PyLith Installer], [4.1.3-1], [https://community.geodynamics.org/c/pylith/])
 AC_CONFIG_AUX_DIR([./aux-config])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-pax])
@@ -397,9 +397,9 @@ AC_ARG_ENABLE([petsc],
 AM_CONDITIONAL([INSTALL_PETSC], [test "$install_petsc" = yes])
 AC_ARG_WITH([petsc-options],
     [AC_HELP_STRING([--with-petsc-options],
-        [set optional PETSc configure options @<:@default=--download-chaco=1 --download-f2cblaslapack=1@:>@])],
+        [set optional PETSc configure options @<:@default=--download-metis --download-parmetis=1 --download-f2cblaslapack=1@:>@])],
 	[petsc_options=$withval],
-	[petsc_options="--download-chaco=1 --download-f2cblaslapack=1 --download-ml=1"])
+	[petsc_options="--download-metis --download-parmetis=1 --download-f2cblaslapack=1 --download-ml=1"])
 AC_SUBST(petsc_options)
 AC_ARG_WITH([petsc-tarball],
     [AC_HELP_STRING([--with-petsc-tarball],
