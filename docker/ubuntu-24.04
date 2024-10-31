@@ -5,8 +5,8 @@ LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 ENV BUILD_ENV=${BUILD_ENV}
 
 
-RUN apt-get update \
-    && DEBIAN_FRONTEND="noninteractive" apt-get install -y --no-install-recommends \
+RUN apt update \
+    && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends \
       g++ \
       make \
       file \
@@ -24,7 +24,6 @@ RUN apt-get update \
       ca-certificates \
       libmpich-dev \
       mpich \
-      libhdf5-mpich-103-1 \
       libhdf5-mpich-dev \
       sqlite3 \
       libsqlite3-0 \
