@@ -52,6 +52,7 @@ all: installed_pythia installed_spatialdata installed_petsc installed_pylith ins
 # ----------------------------------------------------------------------
 pythia:
 if INSTALL_PYTHIA
+pythia_options = 
 if USE_PYLITH_GIT
 	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
 	cd pythia-$(PYTHIA_VER) && $(AUTORECONF) -if
@@ -59,18 +60,24 @@ else
 	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
 endif
+if WITH_TESTING
+pythia_options += --enable-testing
+endif
 	$(MKDIR_P) pythia-build
 	cd pythia-build && \
-		$(env_cert) $(env_flags_cig) $(env_mpicompilers) ../pythia-$(PYTHIA_VER)/configure --enable-testing \
-			--prefix=$(prefix) ; \
-		$(MAKE) && \
+		$(env_cert) $(env_flags_cig) $(env_mpicompilers) ../pythia-$(PYTHIA_VER)/configure \
+			--prefix=$(prefix) \
+			CPPFLAGS="$(CPPFLAGS) $(CATCH2_INCLUDES)" \
+			LDFLAGS="$(LDFLAGS) $(CATCH2_LDFLAGS)" \
+			$(pythia_options); \
+		$(MAKE) -j$(make_threads) && \
 		$(MAKE) install
 if WITH_TESTING
 	cd pythia-build && \
 		$(MAKE) -j$(make_threads) check && \
 		touch $(abs_builddir)/installed_pythia
 else
-	touch $(abs_builddir)/installed_spatialdata
+	touch $(abs_builddir)/installed_pythia
 endif
 
 else
