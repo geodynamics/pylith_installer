@@ -10,16 +10,18 @@ To set the visibility of container images, go to `github.com/geodynamics` -> `pa
 - **pylith-devenv**: Linux developer environment for PyLith (contains only dependencies)
 - **pylith-binaryenv**: Linux environment for creating Linux binary package
 - **Test environments**:
-  - **centos-7**: EOL June 2024
-  - **debian-stable**:
-  - **debian-testing**:
-  - **fedora-38**:
-  - **fedora-39**:
-  - **rockylinux-8**:
-  - **rockylinux-9**:
-  - **ubuntu-20.04**: LTS
-  - **ubuntu-22.04**: LTS
-  - **ubuntu-24.04**:
+  - **debian-stable**: Python 3.11, gcc 12.2
+  - **debian-testing**: Python 3.12, gcc 14.2
+  - **debian-12**: EOL Jun 2028, Python 3.11, gcc 12.2
+  - **debian-11**: EOL Aug 2026, Python 3.9, gcc 10.2
+  - **fedora-39**: EOL Nov 2024, Python 3.12, gcc 13.3 
+  - **fedora-40**: EOL May 2025, Python 3.12, gcc 14.2
+  - **rockylinux-8**: EOL May 2029, Python 3.8, gcc 8.5
+  - **rockylinux-9**: EOL May 2032, Python 3.9, gcc 11.4
+  - **ubuntu-20.04**: LTS EOL April 2025, Python 3.8, gcc 9.4
+  - **ubuntu-22.04**: LTS EOL April 2027, Python 3.10, gcc 11.4
+  - **ubuntu-24.04**: LTS EOL April 2029, Python 3.12, gcc 13.2
+  - **ubuntu-24.10**: EOL July 2025, Python 3.12, gcc 14.2
 
 ## Building images
 
@@ -29,6 +31,23 @@ docker/build.py --dockerfile=docker/ubuntu-22.04 --build --build-env=certs-doi
 ```
 
 ## Push images
+
+:::{admonition} Prerequisites
+1. Install `pass`
+2. Install `docker-credential-helper` from GitHub
+3. Edit `~/.docker/config.json`
+  ```
+  {
+	"auths": {
+		"ghcr.io": {}
+	},
+	"credsStore": "pass"
+  }
+  ```
+4. Login to container repository `docker login ghcr.io -u USERNAME`.
+  This will place the credentials in the password store.
+  Run `pass` to view the credentials.
+:::
 
 ```bash
 # Linux

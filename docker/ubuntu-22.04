@@ -24,7 +24,6 @@ RUN apt-get update \
       ca-certificates \
       libmpich-dev \
       mpich \
-      libhdf5-mpich-103-1 \
       libhdf5-mpich-dev \
       sqlite3 \
       libsqlite3-0 \

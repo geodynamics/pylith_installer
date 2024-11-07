@@ -1,56 +1,61 @@
 ARG BUILD_ENV=nocerts
-FROM ubuntu:24.04 as os-update
+FROM fedora:40 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
 
-# We cannot use the mpich package, because it uses ch4:ucx as the device and does not
-# seem to work in a Docker container.
-RUN apt update \
-    && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends \
-    g++ \
+RUN dnf install -y \
+    gcc \
+    gcc-c++ \
     make \
     file \
+    diffutils \
     automake \
     autoconf \
     libtool \
     curl \
-    python3-dev \
-    libpython3.12 \
-    python3-venv \
+    libcurl-devel \
+    openssh \
+    python3 \
+    python3-devel \
     python3-pip \
-    zlib1g-dev \
+    python3-setuptools \
+    zlib \
+    zlib-devel \
+    blas \
+    blas-devel \
+    lapack \
+    lapack-devel \
+    atlas \
+    atlas-devel \
+    openssl \
+    openssl-libs \
     unzip \
     git \
     ca-certificates \
-    libmpich-dev \
-    libopenmpi-dev \
-    libopenmpi3 \
-    openmpi-bin \
-    openmpi-common \
-    libhdf5-openmpi-dev \
-    sqlite3 \
-    libsqlite3-0 \
-    libsqlite3-dev \
-    proj-bin \
-    proj-data \
-    libproj-dev \
+    mpich-devel \
+    hdf5-mpich \
+    hdf5-mpich-devel \
+    sqlite \
+    sqlite-libs \
+    sqlite-devel \
+    proj \
+    proj-devel \
     cmake \
     swig \
     lcov \
     gdb \
     valgrind \
-    vim-common \
-    vim-runtime \
-    vim-nox
+    vim \
+    vim-common
 
 # ------------------------------------------------------------------------------
 from os-update as build-certs-doi
 
-ONBUILD COPY docker/certs/ /usr/local/share/ca-certificates
-ONBUILD RUN update-ca-certificates
-ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=DOIRootCA2.pem
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt 
 
 from os-update as build-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
@@ -61,22 +66,21 @@ from build-${BUILD_ENV} as build-env
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
     PYTHON_VERSION=3.12 \
-    HDF5_INCDIR=/usr/include/hdf5/openmpi \
-    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-    OMPI_MCA_btl_vader_single_copy_mechanism=none
+    HDF5_INCDIR=/usr/include/mpich-x86_64 \
+    HDF5_LIBDIR=/usr/lib64/mpich/lib \
+    FI_PROVIDER=^psm3
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
 ENV  HOME=/home/$TEST_USER
 ENV  TOPSRC_DIR=${HOME}/src \
     TOPBUILD_DIR=${HOME}/build \
-    PATH=${INSTALL_DIR}/bin:$PATH \
-    LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
-    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+    PATH=${INSTALL_DIR}/bin:/usr/lib64/mpich/bin:$PATH \
+    LD_LIBRARY_PATH=$INSTALL_DIR/lib:$INSTALL_DIR/lib64:$LD_LIBRARY_PATH \
+    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${INSTALL_DIR}/lib64/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
 RUN mkdir ${INSTALL_DIR} \
     && chown ${TEST_USER} ${INSTALL_DIR} \
     && chgrp ${TEST_USER} ${INSTALL_DIR}
-RUN projsync --system-directory --all
 
 
 USER ${TEST_USER}
@@ -95,8 +99,8 @@ from build-env as build-deps
 
 WORKDIR ${build_dir}
 RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
-    --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
-    --with-hdf5-incdir=${HDF5_INCDIR} --with-hdf5-libdir=${HDF5_LIBDIR} \
+    --with-fortran=no --with-make-threads=`nproc` \
+    --with-hdf5-incdir=$HDF5_INCDIR --with-hdf5-libdir=$HDF5_LIBDIR \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
     --disable-mpi \
     --disable-cmake \
@@ -107,7 +111,6 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --enable-h5py \
     --enable-netcdf \
     --disable-netcdfpy \
-    && . ./setup.sh \
     && make -C dependencies \
     && rm -r ${build_dir}
 
@@ -115,7 +118,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
 WORKDIR $HOME
 
 LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
-LABEL org.opencontainers.image.description="Ubuntu 24.04 CI test environment"
+LABEL org.opencontainers.image.description="Fedora 40 CI test environment"
 LABEL org.opencontainers.image.licenses=MIT
 
 CMD /bin/bash

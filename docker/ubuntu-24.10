@@ -1,12 +1,11 @@
 ARG BUILD_ENV=nocerts
-FROM ubuntu:24.04 as os-update
+FROM ubuntu:24.10 as os-update
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
-
-# We cannot use the mpich package, because it uses ch4:ucx as the device and does not
-# seem to work in a Docker container.
+# We cannot use the Ubuntu mpich package, because it uses the ch4:ucx device.
+# The ch4:ucx device does not seem to work in a Docker container.
 RUN apt update \
     && DEBIAN_FRONTEND="noninteractive" apt install -y --no-install-recommends \
     g++ \
@@ -20,16 +19,11 @@ RUN apt update \
     libpython3.12 \
     python3-venv \
     python3-pip \
+    python3-setuptools \
     zlib1g-dev \
     unzip \
     git \
     ca-certificates \
-    libmpich-dev \
-    libopenmpi-dev \
-    libopenmpi3 \
-    openmpi-bin \
-    openmpi-common \
-    libhdf5-openmpi-dev \
     sqlite3 \
     libsqlite3-0 \
     libsqlite3-dev \
@@ -60,10 +54,7 @@ from build-${BUILD_ENV} as build-env
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.12 \
-    HDF5_INCDIR=/usr/include/hdf5/openmpi \
-    HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-    OMPI_MCA_btl_vader_single_copy_mechanism=none
+    PYTHON_VERSION=3.12
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
@@ -72,7 +63,9 @@ ENV  TOPSRC_DIR=${HOME}/src \
     TOPBUILD_DIR=${HOME}/build \
     PATH=${INSTALL_DIR}/bin:$PATH \
     LD_LIBRARY_PATH=${INSTALL_DIR}/lib:${LD_LIBRARY_PATH} \
-    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH}
+    PYTHONPATH=${INSTALL_DIR}/lib/python${PYTHON_VERSION}/site-packages:${PYTHONPATH} \
+    HDF5_LIBDIR=${INSTALL_DIR}/lib \
+    HDF5_INCDIR=${INSTALL_DIR}/include    
 RUN mkdir ${INSTALL_DIR} \
     && chown ${TEST_USER} ${INSTALL_DIR} \
     && chgrp ${TEST_USER} ${INSTALL_DIR}
@@ -98,10 +91,10 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
     --with-fortran=no --enable-force-install --with-make-threads=`nproc` \
     --with-hdf5-incdir=${HDF5_INCDIR} --with-hdf5-libdir=${HDF5_LIBDIR} \
     --with-cert-path=${CERT_PATH} --with-cert-file=${CERT_FILE} \
-    --disable-mpi \
+    --enable-mpi=mpich \
     --disable-cmake \
     --disable-sqlite \
-    --disable-hdf5 \
+    --enable-hdf5 \
     --disable-proj \
     --enable-catch2 \
     --enable-h5py \
@@ -115,7 +108,7 @@ RUN ${src_dir}/configure --prefix=${INSTALL_DIR} --with-fetch=curl \
 WORKDIR $HOME
 
 LABEL org.opencontainers.image.source=https://github.com/geodynamics/pylith_installer
-LABEL org.opencontainers.image.description="Ubuntu 24.04 CI test environment"
+LABEL org.opencontainers.image.description="Ubuntu 24.10 CI test environment"
 LABEL org.opencontainers.image.licenses=MIT
 
 CMD /bin/bash

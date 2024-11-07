@@ -5,8 +5,8 @@ LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 ENV BUILD_ENV=${BUILD_ENV}
 
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt update \
+    && apt install -y --no-install-recommends \
     g++ \
     make \
     file \
@@ -16,9 +16,10 @@ RUN apt-get update \
     curl \
     ssh \
     python3-dev \
-    libpython3.11 \
+    libpython3.12 \
     python3-venv \
     python3-pip \
+    python3-setuptools \
     zlib1g-dev \
     unzip \
     git \
@@ -27,7 +28,6 @@ RUN apt-get update \
     libopenmpi3 \
     openmpi-bin \
     openmpi-common \
-    libhdf5-openmpi-103-1 \
     libhdf5-openmpi-dev \
     sqlite3 \
     libsqlite3-0 \
@@ -58,7 +58,7 @@ from build-${BUILD_ENV} as build-env
 
 ENV TEST_USER=pylith-tester \
     INSTALL_DIR=/opt/pylith \
-    PYTHON_VERSION=3.11 \
+    PYTHON_VERSION=3.12 \
     HDF5_INCDIR=/usr/include/hdf5/openmpi \
     HDF5_LIBDIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
     OMPI_MCA_btl_vader_single_copy_mechanism=none

@@ -36,9 +36,9 @@ RUN dnf install -y \
         unzip \
         git \
         ca-certificates \
-        python38 \
-        python38-devel \
-        python38-pip \
+        python3.11 \
+        python3.11-devel \
+        python3.11-pip \
         mpich \
         mpich-devel \
         cmake \
@@ -52,14 +52,14 @@ RUN dnf install -y \
         vim-minimal \
         dnf-plugins-core
 
-RUN alternatives --set python3 /usr/bin/python3.8
+RUN alternatives --set python3 /usr/bin/python3.11
 
 # ------------------------------------------------------------------------------
 from os-update as build-env
 
 ENV TEST_USER=pylith-tester \
         INSTALL_DIR=/opt/pylith \
-        PYTHON_VERSION=3.8
+        PYTHON_VERSION=3.11
 
 # Create 'pylith-tester' user
 RUN useradd --create-home --shell /bin/bash $TEST_USER
