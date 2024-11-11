@@ -25,7 +25,7 @@ import pathlib
 import tarfile
 import platform
 
-PYTHON_VERSION = "3.10" # :KLUDGE:
+PYTHON_VERSION = "3.12" # :KLUDGE:
 
 class Darwin:
 

@@ -178,11 +178,11 @@ compilers: finished_mkdest
 if INSTALL_GCC
 	$(FETCH_SCRIPT) "$(downloader)" gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpc-$(MPC_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.bz2 $(DEPS_URL)
+	$(FETCH_SCRIPT) "$(downloader)" gmp-$(GMP_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) "$(downloader)" mpfr-$(MPFR_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
-		$(TAR) -xf ../gmp-$(GMP_VER).tar.bz2; \
+		$(TAR) -xf ../gmp-$(GMP_VER).tar.gz; \
 		ln -sf gmp-$(GMP_VER)/ gmp; \
 		$(TAR) -xf ../mpc-$(MPC_VER).tar.gz; \
 		ln -sf mpc-$(MPC_VER)/ mpc; \
@@ -245,7 +245,7 @@ if INSTALL_CURL
 	$(MKDIR_P) curl-build
 	cd curl-build && \
 		../curl-$(CURL_VER)/configure --prefix=$(prefix) \
-			--enable-shared --with-openssl --disable-ldap \
+			--enable-shared --with-openssl --disable-ldap --without-libpsl \
 			$(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" && \
 		$(MAKE) -j $(make_threads) && \
