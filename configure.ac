@@ -448,13 +448,6 @@ AC_ARG_WITH([fortran],
 	[with_fortran=no])
 AM_CONDITIONAL([WITH_FORTRAN], [test "$with_fortran" = yes])
 
-# fetch tool
-AC_ARG_WITH([fetch],
-    [AC_HELP_STRING([--with-fetch],
-        [set tool for downloading tarballs @<:@default=wget@:>@])],
-	[with_fetch=$withval],
-	[with_fetch=wget])
-
 # parallel builds
 AC_ARG_WITH([make-threads],
     [AC_HELP_STRING([--with-make-threads],
@@ -484,26 +477,12 @@ if test -z "$TAR" ; then
   TAR=`echo "Error: tar is not installed." ; false`
 fi
 
-# wget/curl
-downloader=none
-if test "$with_fetch" = "wget" ; then
-  AC_PATH_PROG(WGET, wget)
-  if test -z "$WGET" ; then
-    AC_MSG_FAILURE([cannot find 'wget' program.])
-  else
-    downloader="$WGET -nd -r -O"
-  fi
-elif test "$with_fetch" = "curl" ; then
-  AC_PATH_PROG(CURL, curl)
-  if test -z "$CURL" ; then
-    AC_MSG_FAILURE([cannot find 'curl' program.])
-  else
-    downloader="$CURL -L -O -o"
-  fi
-else
-  AC_MSG_FAILURE([Error in configure logic for downloader.])
+# curl
+AC_PATH_PROG(CURL, curl)
+if test -z "$CURL" ; then
+  AC_MSG_FAILURE([cannot find 'curl' program.])
+  TAR=`echo "Error: curl is not installed." ; false`
 fi
-AC_SUBST(downloader)
 
 # autoreconf/git
 petsc_git=no
@@ -1023,7 +1002,6 @@ AC_OUTPUT
 # Write summary.
 printf "\n"
 printf "Build info:\n"
-printf "  Using $downloader to download tarballs.\n"
 printf "  Using $make_threads thread(s) when running make in parallel.\n"
 printf "  Languages enabled: "
 if test "$with_fortran" = yes ; then
