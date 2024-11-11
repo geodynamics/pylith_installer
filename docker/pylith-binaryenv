@@ -1,8 +1,21 @@
 ARG BUILD_ENV=nocerts
-FROM centos:7 as os-update
+FROM rockylinux:8 as os-init
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
+
+# ------------------------------------------------------------------------------
+from os-init as os-certs-doi
+
+ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
+ONBUILD RUN update-ca-trust enable
+ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
+
+from os-init as os-nocerts
+ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+
+# ------------------------------------------------------------------------------
+from os-${BUILD_ENV} as os-update
 
 RUN yum install -y \
         gcc \
@@ -17,31 +30,25 @@ RUN yum install -y \
         libtool \
         curl \
         openssh \
-        perl-IPC-Cmd \
         zlib-devel \
-        libffi-devel \
         unzip \
         bzip2 \
+        xz \
         git \
         ca-certificates \
-        python3 \
+        python3.11 \
         gdb \
+        valgrind \
         vim-common \
-        vim-runtime
+        vim-minimal \
+        dnf-plugins-core \
+        perl-IPC-Cmd \
+        perl-open
 
-
-# ------------------------------------------------------------------------------
-from os-update as build-certs-doi
-
-ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
-ONBUILD RUN update-ca-trust enable
-ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
-
-from os-update as build-nocerts
-ONBUILD ENV CERT_PATH=no  CERT_FILE=no
+RUN alternatives --set python3 /usr/bin/python3.11
 
 # ------------------------------------------------------------------------------
-from build-${BUILD_ENV} as build-deps
+from os-update as build-env
 
 ENV PYLITH_USER=pylith-user \
         BASE_DIR=/opt/pylith
