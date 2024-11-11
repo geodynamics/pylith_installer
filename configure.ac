@@ -960,7 +960,7 @@ AC_SUBST(LDFLAGS)
 # Create setup.sh
 echo "#!/bin/bash" > setup.sh
 TEMP_BINDIR="$prefix/bin"
-echo "if [[ -d $TEMP_BINDIR ]]; then" >> setup.sh
+echo "if [[ -f $TEMP_BINDIR/activate ]]; then" >> setup.sh
 echo "  source ${TEMP_BINDIR}/activate" >> setup.sh
 echo "else" >> setup.sh
 if test "X${PATH}" = X ; then
