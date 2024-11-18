@@ -8,6 +8,6 @@ The installer requires having the following tools already installed on your syst
 * Make,
 * Tar archiving utility,
 * Zip archiving utility, and
-* `wget` or `curl` networking tools.
+* `curl` networking tools.
 
 Most modern UN*X systems have these tools already installed.

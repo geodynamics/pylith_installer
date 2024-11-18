@@ -10,7 +10,7 @@
 # =================================================================================================
 
 if [ $# != 3 ] ; then
-    echo "usage: FETCH_PROGRAM FILE URL"
+    echo "usage: CURL FILE URL"
     exit -1
 fi
 fetch=$1
@@ -19,11 +19,11 @@ url=$3
 
 if [ ! -f $file ]; then
   if [ "$fetch" == "none" ]; then
-    echo "No local copy of $file found and no downloader specified."
+    echo "No local copy of $file found and no path to curl executable specified."
     exit -1
   else
     echo "Downloading $file from $url."
-    $fetch $file $url/$file
+    curl -L -O $url/$file
   fi
 else
     echo "Found local copy of $file."

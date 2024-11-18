@@ -57,7 +57,7 @@ if USE_PYLITH_GIT
 	$(GIT) clone --single-branch --recursive $(pythia_repo) pythia-$(PYTHIA_VER)
 	cd pythia-$(PYTHIA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" pythia-$(PYTHIA_VER).tar.gz $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)
+	$(FETCH_SCRIPT) $(CURL) pythia-$(PYTHIA_VER).tar.gz $(GITHUB_URL)/pythia/releases/download/v$(PYTHIA_VER)
 	$(TAR) -xf pythia-$(PYTHIA_VER).tar.gz
 endif
 if WITH_TESTING
@@ -105,7 +105,7 @@ spatialdata_options += --enable-swig
 	$(GIT) clone --single-branch --recursive $(spatialdata_repo) spatialdata-$(SPATIALDATA_VER)
 	cd spatialdata-$(SPATIALDATA_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" spatialdata-$(SPATIALDATA_VER).tar.gz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
+	$(FETCH_SCRIPT) $(CURL) spatialdata-$(SPATIALDATA_VER).tar.gz $(GITHUB_URL)/spatialdata/releases/download/v$(SPATIALDATA_VER)
 	$(TAR) -xf spatialdata-$(SPATIALDATA_VER).tar.gz
 endif
 	$(MKDIR_P) spatialdata-build
@@ -153,7 +153,7 @@ else
 petsc_options += --with-fc=0
 endif
 if PETSC_TARBALL
-	$(FETCH_SCRIPT) "$(downloader)" petsc-pylith-$(PETSC_VER).tar.gz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
+	$(FETCH_SCRIPT) $(CURL) petsc-pylith-$(PETSC_VER).tar.gz $(GITHUB_URL)/pylith/releases/download/v$(PETSC_VER)
 	$(TAR) -xf petsc-pylith-$(PETSC_VER).tar.gz
 else
 	git clone --branch knepley/pylith --single-branch $(petsc_repo) petsc-pylith
@@ -203,7 +203,7 @@ pylith_options += --enable-swig
 	$(GIT) clone --branch $(pylith_git) --single-branch --recursive $(pylith_repo) pylith-$(PYLITH_VER)
 	cd pylith-$(PYLITH_VER) && $(AUTORECONF) -if
 else
-	$(FETCH_SCRIPT) "$(downloader)" pylith-$(PYLITH_VER).tar.gz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
+	$(FETCH_SCRIPT) $(CURL) pylith-$(PYLITH_VER).tar.gz https://github.com/geodynamics/pylith/releases/download/v$(PYLITH_VER)
 	$(TAR) -xf pylith-$(PYLITH_VER).tar.gz
 endif
 	$(MKDIR_P) pylith-build
@@ -233,7 +233,7 @@ installed_pylith:
 # ----------------------------------------------------------------------
 parametersgui: 
 if INSTALL_PARAMETERSGUI
-	$(FETCH_SCRIPT) "$(downloader)" pylith_parameters-$(PARAMETERSGUI_VER).tar.gz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
+	$(FETCH_SCRIPT) $(CURL) pylith_parameters-$(PARAMETERSGUI_VER).tar.gz https://github.com/geodynamics/pylith_parameters/releases/download/v$(PARAMETERSGUI_VER)
 	cd $(prefix) && $(TAR) -xf $(abs_builddir)/pylith_parameters-$(PARAMETERSGUI_VER).tar.gz && \
 		cd $(abs_builddir) && \
 		touch $(abs_builddir)/installed_parametersgui
