@@ -343,9 +343,6 @@ python_postinstall:
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools certifi
 	$(env_cert) $(PYTHON) -m pip install numpy --no-cache-dir 
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
-if INSTALL_NETCDFPY
-	$(env_cert) $(PYTHON) -m pip install --no-cache-dir cftime netCDF4
-endif
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
@@ -654,18 +651,10 @@ installed_netcdf:
 # netcdfpy
 # ----------------------------------------------------------------------
 netcdfpy: installed_netcdf installed_python
-	@echo "$@ installed using pip."
+if INSTALL_NETCDFPY
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --prefer-binary cftime netCDF4
+endif
 	touch $(abs_builddir)/installed_netcdfpy
-#if INSTALL_NETCDFPY
-#	$(FETCH_SCRIPT) $(CURL) netCDF4-$(NETCDFPY_VER).tar.gz $(DEPS_URL)
-#	$(TAR) -xf netCDF4-$(NETCDFPY_VER).tar.gz
-#	cd netCDF4-$(NETCDFPY_VER) && \
-#		HDF5_INCDIR=$(HDF5_INCDIR) HDF5_LIBDIR=$(HDF5_LIBDIR) NETCDF4_INCDIR=$(NETCDF_INCDIR) NETCDF_LIBDIR=$(NETCDF_LIBDIR) $(env_flags_deps) CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" CC=mpicc $(env_cert) $(PYTHON) setup.py install && \
-#		touch $(abs_builddir)/installed_netcdfpy
-#else
-#	@echo "$@ already installed. Skipping installation."
-#	touch $(abs_builddir)/installed_netcdfpy
-#endif
 
 installed_netcdfpy:
 	$(MAKE) $(AM_MAKEFLAGS) netcdfpy
