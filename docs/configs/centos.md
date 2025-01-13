@@ -44,7 +44,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
+$HOME/src/pylith/pylith-installer-4.2.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -117,7 +117,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
+$HOME/src/pylith/pylith-installer-4.2.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
@@ -183,7 +183,7 @@ export HDF5_INCDIR=${PREFIX_DIR}/dependencies/include
 ### Configure
 
 ```bash
-$HOME/src/pylith/pylith-installer-4.1.3-0/configure \
+$HOME/src/pylith/pylith-installer-4.2.0-0/configure \
     --prefix=$PREFIX_DIR \
     --with-fetch=curl \
     --with-fortran=no \
