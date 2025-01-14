@@ -17,4 +17,4 @@ This installer builds the current PyLith release and its dependencies from sourc
 
 ## Author
 
-* Brad Aagaard, Geologic Hazards Science Center, USGS, USA
+* Brad Aagaard, Geologic Hazards Science Center, U.S. Geological Survey, USA

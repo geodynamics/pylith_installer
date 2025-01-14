@@ -341,7 +341,7 @@ endif
 python_postinstall:
 	python3 -m venv $(prefix)
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools certifi
-	$(env_cert) $(PYTHON) -m pip install numpy --no-cache-dir 
+	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir 
 	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
