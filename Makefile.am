@@ -26,15 +26,16 @@ EXTRA_DIST = \
 	configure.ac \
 	docker/README.md \
 	docker/builder.py \
-	docker/centos-7 \
 	docker/rockylinux-8 \
+	docker/rockylinux-9 \
 	docker/debian-stable \
 	docker/debian-testing \
-	docker/fedora-38 \
 	docker/fedora-39 \
+	docker/fedora-40 \
 	docker/ubuntu-20.04 \
 	docker/ubuntu-22.04 \
 	docker/ubuntu-24.04 \
+	docker/ubuntu-24.10 \
 	packager/build.py \
 	packager/setup_macos.sh \
 	packager/setup_linux.sh \
