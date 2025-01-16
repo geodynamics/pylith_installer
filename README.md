@@ -12,9 +12,9 @@ This installer builds the current PyLith release and its dependencies from sourc
 ## Documentation
 
 * [Development version](https://pylith-installer.readthedocs.io/en/latest/)
-* [Stable version](heeps://pylith-installer.readthedocs.io/en/v4.1.3-0)
+* [Stable version](heeps://pylith-installer.readthedocs.io/en/v4.2.0-0)
 * See the corresponding version of the PyLith manual for v2.2.2 and earlier
 
 ## Author
 
-* Brad Aagaard, Geologic Hazards Science Center, USGS, USA
+* Brad Aagaard, Geologic Hazards Science Center, U.S. Geological Survey, USA
