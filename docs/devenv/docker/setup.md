@@ -159,6 +159,8 @@ You can often find speedup with up to twice as many threads as the number of cor
 cd ${TOP_BUILDDIR}/pythia-debug
 pushd ${TOP_SRCDIR}/pythia && autoreconf -if && popd
 ${TOP_SRCDIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
+	CPPFLAGS="-I${PYLITHDEPS_DIR}/include" \
+	LDFLAGS="-L${PYLITHDEPS_DIR}/lib" \
     CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
 make install
 make check
@@ -172,8 +174,8 @@ pushd ${TOP_SRCDIR}/spatialdata && autoreconf -if && popd
 ${TOP_SRCDIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
     --enable-swig --enable-testing \
 	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
-	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
-	CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
+	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib" \
+	CXX=mpicxx CXXFLAGS="-g -Wall"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
