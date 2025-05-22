@@ -108,6 +108,7 @@ RUN useradd --create-home --shell /bin/bash $PYLITH_USER \
 ENV PATH=${PYLITHDEPS_DIR}/bin:$PATH \
      LD_LIBRARY_PATH=${PYLITHDEPS_DIR}/lib \
      PYTHONPATH=${PYLITHDEPS_DIR}/lib/python${PYTHON_VERSION}/site-packages
+RUN projsync --system-directory --all
 
 # ------------------------------------------------------------------------------
 from setup-env as build-deps
