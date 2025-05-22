@@ -24,7 +24,6 @@ RUN apt update \
     unzip \
     git \
     ca-certificates \
-    libmpich-dev \
     libopenmpi-dev \
     libopenmpi3 \
     openmpi-bin \
