@@ -96,6 +96,7 @@ all: finished_mkdest installed_autotools installed_compilers installed_openssl i
 # rather than "rm -r". As a result, we use configure ARGS ; make &&
 # make install.
 
+
 # ----------------------------------------------------------------------
 # setup
 # ----------------------------------------------------------------------
@@ -110,10 +111,22 @@ mkdest:
 finished_mkdest:
 	$(MAKE) $(AM_MAKEFLAGS) mkdest && touch $@
 
+
+# ----------------------------------------------------------------------
+# download
+# ----------------------------------------------------------------------
+download: finished_mkdest
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.0-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.0-0.tar.gz
+
+finished_download:
+	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@
+
+
 # ----------------------------------------------------------------------
 # autotools
 # ----------------------------------------------------------------------
-autotools: finished_mkdest
+autotools: finished_download
 if INSTALL_AUTOTOOLS
 	$(FETCH_SCRIPT) $(CURL) m4-$(M4_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) $(CURL) autoconf-$(AUTOCONF_VER).tar.gz $(DEPS_URL)
@@ -174,7 +187,7 @@ installed_cmake:
 # ----------------------------------------------------------------------
 # compilers
 # ----------------------------------------------------------------------
-compilers: finished_mkdest
+compilers: finished_download
 if INSTALL_GCC
 	$(FETCH_SCRIPT) $(CURL) gcc-$(GCC_VER).tar.gz $(DEPS_URL)
 	$(FETCH_SCRIPT) $(CURL) mpc-$(MPC_VER).tar.gz $(DEPS_URL)
