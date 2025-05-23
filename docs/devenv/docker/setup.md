@@ -35,11 +35,11 @@ Running the command below will:
 
 1. Start (run) the Docker container using the `pylith-devenv` Docker image and assign it the name `pylith-dev-workspace`.
 2. Mount the docker volume with persistent storage at `/opt/pylith`. 
-3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <registry.gitlab.com/cig-pylith/pylith_installer>.
+3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <ghcr.io/geodynamics/pylith_installer>.
 
 ```{code-block} bash
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
-    registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv
+    ghcr.io/geodynamics/pylith_installer/pylith-devenv
 ```
 
 :::{note}
@@ -159,6 +159,8 @@ You can often find speedup with up to twice as many threads as the number of cor
 cd ${TOP_BUILDDIR}/pythia-debug
 pushd ${TOP_SRCDIR}/pythia && autoreconf -if && popd
 ${TOP_SRCDIR}/pythia/configure --prefix=${PYLITH_DIR} --enable-testing \
+	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
+	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib" \
     CC=mpicc CXX=mpicxx CFLAGS="-g -Wall" CXXFLAGS="-g -Wall"
 make install
 make check
@@ -172,8 +174,8 @@ pushd ${TOP_SRCDIR}/spatialdata && autoreconf -if && popd
 ${TOP_SRCDIR}/spatialdata/configure --prefix=${PYLITH_DIR} \
     --enable-swig --enable-testing \
 	CPPFLAGS="-I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
-	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
-	CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
+	LDFLAGS="-L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib" \
+	CXX=mpicxx CXXFLAGS="-g -Wall"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
@@ -185,7 +187,7 @@ cd ${TOP_SRCDIR}/petsc
 python3 ./configure --with-c2html=0 --with-lgrind=0 --with-fc=0 \
     --with-x=0 --with-clanguage=C --with-mpicompilers=1 \
     --with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
-    --with-hdf5=1 --download-chaco=1 --download-ml=1 \
+    --with-hdf5=1 --download-metis=1 --download-parmetis=1 --download-ml=1 \
     --download-f2cblaslapack=1 --with-debugging=1 CFLAGS="-g -O -Wall" \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include" \
     LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib"
@@ -200,10 +202,9 @@ cd ${TOP_BUILDDIR}/pylith-debug
 pushd ${TOP_SRCDIR}/pylith && autoreconf -if && popd
 ${TOP_SRCDIR}/pylith/configure --prefix=${PYLITH_DIR} \
     --enable-cubit --enable-hdf5 --enable-swig --enable-testing \
-    --enable-test-coverage --with-python-coverage=coverage3 \
     CPPFLAGS="-I${HDF5_INCDIR} -I${PYLITHDEPS_DIR}/include -I${PYLITH_DIR}/include" \
-    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib --coverage" \
-    CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-g -Wall --coverage"
+    LDFLAGS="-L${HDF5_LIBDIR} -L${PYLITHDEPS_DIR}/lib -L${PYLITH_DIR}/lib" \
+    CC=mpicc CFLAGS="-g -Wall" CXX=mpicxx CXXFLAGS="-g -Wall"
 make install -j$(nproc)
 make check -j$(nproc)
 ```
@@ -227,7 +228,7 @@ The fix is to run the container in privileged mode as root and restart the `proc
 
 ```{code-block} bash
 # Run docker image in privileged mode as root.
-docker run -ti --privileged --rm -u root registry.gitlab.com/cig-pylith/pylith_installer/pylith-devenv /bin/bash
+docker run -ti --privileged --rm -u root ghcr.io/geodynamics/pylith_installer/pylith-devenv /bin/bash
 
 # Verify ptrace setting needs updating
 cat /proc/sys/kernel/yama/ptrace_scope
