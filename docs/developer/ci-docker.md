@@ -1,8 +1,8 @@
 # Test environment Docker containers
 
 The `docker` directory contains Dockerfiles for building containers for testing PyLith on several different Linux distributions.
-These are used in the CI testing with GitLab Pipelines.
-After building the containers, push them the GitLab registry.
+These are used in the CI testing with GitHub Actions.
+After building the containers, push them the GitHub container registry.
 
 ## Building test environment images
 
