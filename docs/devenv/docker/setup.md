@@ -34,8 +34,8 @@ docker volume create pylith-dev
 Running the command below will:
 
 1. Start (run) the Docker container using the `pylith-devenv` Docker image and assign it the name `pylith-dev-workspace`.
-2. Mount the docker volume with persistent storage at `/opt/pylith`. 
-3. The `pylith-devenv` Docker image will be downloaded from the GitLab registry <ghcr.io/geodynamics/pylith_installer>.
+2. Mount the docker volume with persistent storage at `/opt/pylith`.
+3. The `pylith-devenv` Docker image will be downloaded from the GitHub container registry <ghcr.io/geodynamics/pylith_installer>.
 
 ```{code-block} bash
 docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
