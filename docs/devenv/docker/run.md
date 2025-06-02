@@ -18,13 +18,27 @@ docker run --name pylith-dev-workspace --rm -it -v pylith-dev:/opt/pylith \
 
 :::
 
-:::{tab-item} With GUI applications
+:::{tab-item} With GUI applications on Linux
 
 ```{code-block} bash
 ---
-caption: Run development environment _with_ support for GUI applications.
+caption: Run development environment _with_ support for GUI applications on Linux.
 ---
 xhost +$(hostname).local
+docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:0 \
+    -v pylith-dev:/opt/pylith \
+    ghcr.io/geodynamics/pylith_installer/pylith-devenv
+```
+
+:::
+
+:::{tab-item} With GUI applications on Mac
+
+```{code-block} bash
+---
+caption: Run development environment _with_ support for GUI applications on Mac.
+---
+xhost +$(hostname)
 docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:0 \
     -v pylith-dev:/opt/pylith \
     ghcr.io/geodynamics/pylith_installer/pylith-devenv
