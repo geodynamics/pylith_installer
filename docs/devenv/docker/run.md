@@ -52,7 +52,7 @@ docker run --name pylith-dev-workspace --rm -it -e DISPLAY=host.docker.internal:
 Make sure Docker is running before you start the container.
 :::
 
-## Attach VS Code to the Docker container
+## Attach VS Code to a running Docker container
 
 1. Start VS Code.
 2. Click on the Docker extension in the Activity Bar on the far left hand side as illustrated in the [screenshot](docker-attach-vscode).
@@ -67,3 +67,9 @@ Make sure Docker is running before you start the container.
 
 Screenshot showing how to attach VS Code to a running Docker container.
 :::
+
+## Attach a terminal ro a running Docker container
+
+```{code-block} console
+docker exec -i -t pylith-dev-workspace /bin/bash
+```
