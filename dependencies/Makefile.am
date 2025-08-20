@@ -116,8 +116,8 @@ finished_mkdest:
 # download
 # ----------------------------------------------------------------------
 download: finished_mkdest
-	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.0-0.tar.gz $(DEPS_URL)
-	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.0-0.tar.gz
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.1-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.1-0.tar.gz
 
 finished_download:
 	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@
@@ -321,7 +321,7 @@ if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)
 endif
-	$(TAR) -xf Python-$(PYTHON_VER).tgz
+	$(TAR) -xf Python-$(PYTHON_VER).tar.gz
 	$(MKDIR_P) python-build
 	cd python-build && \
 		../Python-$(PYTHON_VER)/configure --build=x86_64 --prefix=$(prefix) \

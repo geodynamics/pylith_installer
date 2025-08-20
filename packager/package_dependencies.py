@@ -7,7 +7,7 @@ import pathlib
 import requests
 
 GNU_TEMPLATE = "https://ftp.gnu.org/pub/gnu/{name}/{name}-{version}.tar.gz"
-TAR_FILENAME = "pylith-dependencies-v4.2.1-0.tar.gz"
+TAR_FILENAME = "pylith-dependencies-4.2.1-0.tar.gz"
 
 
 @dataclass
@@ -122,7 +122,7 @@ PACKAGES = (
 
 failures = 0
 
-for package in PACKAGES:
+for package in COMPILER_PACKAGES + PACKAGES:
     url = package.url.format(name=package.name, version=package.version)
     filename = package.tarball_filename()
     if pathlib.Path(filename).exists():
