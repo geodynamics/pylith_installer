@@ -8,7 +8,7 @@ the build.py script.
 `export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
 
 1. `docker volume create pylith-binary`
-2. `docker build -t pylith_installer/pylith-binaryenv -f docker/pylith-binaryenv  --build-arg BUILD_ENV=certs-doi .`
+2. `docker build -t pylith_installer/pylith-binaryenv -f docker/pylith-binaryenv --build-arg BUILD_ENV=nocerts .`
 3. `docker run --name pylith-binary-workspace --rm -t -v pylith-binary:/opt/pylith pylith_installer/pylith-binaryenv &`
 4. `docker exec -it  pylith-binary-workspace /bin/bash`
    1. `mkdir src dist build && cd src`
