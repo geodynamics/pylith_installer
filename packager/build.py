@@ -6,7 +6,7 @@
 # Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
-# See https://mit-license.org/ and LICENSE.md and for license information. 
+# See https://mit-license.org/ and LICENSE.md and for license information.
 # =================================================================================================
 #
 # Create binary tarballs on Unix style systems.
@@ -25,7 +25,8 @@ import pathlib
 import tarfile
 import platform
 
-PYTHON_VERSION = "3.12" # :KLUDGE:
+PYTHON_VERSION = "3.12"  # :KLUDGE:
+
 
 class Darwin:
 
@@ -45,7 +46,9 @@ class Darwin:
         if filename.is_symlink() or filename.is_dir():
             return
 
-        proc = subprocess.run(["otool", "-L", filename], stdout=subprocess.PIPE, check=True)
+        proc = subprocess.run(
+            ["otool", "-L", filename], stdout=subprocess.PIPE, check=True
+        )
         output = proc.stdout.decode("utf-8")
         deplibs = []
         for line in output.split("\t")[1:]:
@@ -57,7 +60,13 @@ class Darwin:
                 continue
             libName = os.path.split(libPathAbs)[1]
             libPathNew = f"{newPath}/{libName}"
-            cmd = ["install_name_tool", "-change", libPathAbs, libPathNew, str(filename)]
+            cmd = [
+                "install_name_tool",
+                "-change",
+                libPathAbs,
+                libPathNew,
+                str(filename),
+            ]
             subprocess.run(cmd, check=True)
 
 
@@ -159,7 +168,11 @@ class Packager:
                     line = fin.readline()
                 except UnicodeDecodeError:
                     continue
-                if line.startswith(f"#!{old_path}") or line.endswith("python\n") or line.endswith("python3\n"):
+                if (
+                    line.startswith(f"#!{old_path}")
+                    or line.endswith("python\n")
+                    or line.endswith("python3\n")
+                ):
                     _rewrite(filename)
 
     def _update_linking(self, dist_name, tfilename):
@@ -178,12 +191,12 @@ class Packager:
 
     def _get_arch(self):
         op_sys = platform.system().lower()
-        if op_sys=="darwin":
+        if op_sys == "darwin":
             mac_ver = platform.mac_ver()
             target = self.macos_target or mac_ver[0]
             arch = f"macOS-{target}-{mac_ver[2]}"
         else:
-            machine = (platform.processor() or platform.machine())
+            machine = platform.processor() or platform.machine()
             arch = f"{op_sys}-{machine}"
         return arch
 
@@ -203,11 +216,11 @@ class Packager:
             "cpp",
             "cc",
             "c++",
-            "python", # use python3
+            "python",  # use python3
             "lto-dump",
             "swig",
             "TrilinosRepoVersion.txt",
-            )
+        )
         filepath = tarinfo.name
         if os.path.splitext(filepath)[1] == ".a":
             return None
@@ -216,18 +229,19 @@ class Packager:
             return None
         if filename.startswith("x86_64-pc-linux-gnu"):
             return None
-        if filename.startswith("libasan") or \
-            filename.startswith("libtsan") or \
-            filename.startswith("libubsan") or \
-            filename.startswith("liblsan"):
+        if (
+            filename.startswith("libasan")
+            or filename.startswith("libtsan")
+            or filename.startswith("libubsan")
+            or filename.startswith("liblsan")
+        ):
             return None
         if rootpath.endswith("libexec"):
             return None
         if rootpath.endswith("doc") and filename.startswith("cmake"):
             return None
         if rootpath.endswith("share"):
-            if filename.startswith("cmake") or \
-              filename.startswith("petsc"):
+            if filename.startswith("cmake") or filename.startswith("petsc"):
                 return None
         return tarinfo
 
@@ -277,68 +291,74 @@ class MakeBinaryApp:
 
     def configure(self):
         if self.os == "Linux":
-            config_args = ("--enable-gcc",
-                          "--enable-mpi=mpich",
-                          "--with-mpich-options=--with-device=ch4:ofi --with-pm=gforker",
-                          "--enable-openssl",
-                          "--enable-libxcrypt", 
-                          "--enable-libffi", 
-                          "--enable-curl",
-                          "--enable-sqlite",
-                          "--enable-catch2",
-                          "--enable-python", 
-                          "--enable-swig",
-                          "--enable-pcre",
-                          "--enable-proj",
-                          "--enable-hdf5",
-                          "--enable-cmake",
-                          "--enable-matplotlib",
-                          "--enable-pyvista",
-                          "--enable-gmsh",
-                          "--enable-tiff",
-                          "--with-fortran=no",
-                          "--with-fetch=curl",
-                      )
+            config_args = (
+                "--enable-gcc",
+                "--enable-mpi=mpich",
+                "--with-mpich-options=--with-device=ch4:ofi --with-pm=gforker",
+                "--enable-openssl",
+                "--enable-libxcrypt",
+                "--enable-libffi",
+                "--enable-curl",
+                "--enable-sqlite",
+                "--enable-catch2",
+                "--enable-python",
+                "--enable-swig",
+                "--enable-pcre",
+                "--enable-proj",
+                "--enable-hdf5",
+                "--enable-cmake",
+                "--enable-matplotlib",
+                "--enable-pyvista",
+                "--enable-gmsh",
+                "--enable-tiff",
+                "--with-fortran=no",
+                "--with-fetch=curl",
+            )
         elif self.os == "Darwin":
-            config_args = ("--enable-mpi=mpich",
-                          "--with-mpich-options=--with-pm=gforker",
-                          "--enable-openssl",
-                          "--enable-libffi", 
-                          "--enable-curl", 
-                          "--enable-sqlite",
-                          "--enable-catch2",
-                          "--enable-python",
-                          "--enable-swig",
-                          "--enable-pcre",
-                          "--enable-proj",
-                          "--enable-hdf5",
-                          "--enable-cmake",
-                          "--enable-matplotlib",
-                          "--enable-pyvista",
-                          "--enable-gmsh",
-                          "--enable-tiff",
-                          "--with-fortran=no",
-                          "--with-fetch=curl",
-                          )
+            config_args = (
+                "--enable-mpi=mpich",
+                "--with-mpich-options=--with-pm=gforker",
+                "--enable-openssl",
+                "--enable-libffi",
+                "--enable-curl",
+                "--enable-sqlite",
+                "--enable-catch2",
+                "--enable-python",
+                "--enable-swig",
+                "--enable-pcre",
+                "--enable-proj",
+                "--enable-hdf5",
+                "--enable-cmake",
+                "--enable-matplotlib",
+                "--enable-pyvista",
+                "--enable-gmsh",
+                "--enable-tiff",
+                "--with-fortran=no",
+                "--with-fetch=curl",
+            )
 
         else:
             raise ValueError(f"Unknown os '{self.os}'.")
         if "CERT_PATH" in os.environ:
             cert_path = os.environ["CERT_PATH"]
             cert_file = os.environ["CERT_FILE"]
-            config_args += (f"--with-cert-path={cert_path}", f"--with-cert-file={cert_file}")
+            config_args += (
+                f"--with-cert-path={cert_path}",
+                f"--with-cert-file={cert_file}",
+            )
 
-        petscOptions = ("--download-parmetis=1",
-                        "--download-metis=1",
-                        "--download-f2cblaslapack=1",
-                        "--download-ml",
-                        "--with-fc=0",
-                        "--with-hwloc=0",
-                        "--with-ssl=0",
-                        "--with-x=0",
-                        "--with-c2html=0",
-                        "--with-lgrind=0",
-                        )
+        petscOptions = (
+            "--download-parmetis=1",
+            "--download-metis=1",
+            "--download-f2cblaslapack=1",
+            "--download-ml",
+            "--with-fc=0",
+            "--with-hwloc=0",
+            "--with-ssl=0",
+            "--with-x=0",
+            "--with-c2html=0",
+            "--with-lgrind=0",
+        )
 
         # autoreconf
         os.chdir(self.src_dir)
@@ -348,9 +368,10 @@ class MakeBinaryApp:
 
         # configure
         os.chdir(self.build_dir)
-        cmd = (str(self.src_dir / "configure"),
-               f"--with-make-threads={self.make_threads}",
-               f"--prefix={self.dist_dir}",
+        cmd = (
+            str(self.src_dir / "configure"),
+            f"--with-make-threads={self.make_threads}",
+            f"--prefix={self.dist_dir}",
         )
         if not self.pylith_branch is None:
             cmd += (f"--with-pylith-git={self.pylith_branch}",)
@@ -364,7 +385,7 @@ class MakeBinaryApp:
     def build(self):
         os.chdir(self.build_dir)
         self._set_environ()
-        self._run_cmd( ("make",) )
+        self._run_cmd(("make",))
 
     def package(self):
         if self.os == "Darwin":
@@ -376,33 +397,49 @@ class MakeBinaryApp:
                 raise ValueError(f"Unknown architecture '{self.arch}'.")
         else:
             raise ValueError(f"Unknown os '{self.os}'.")
-        shutil.copyfile(self.src_dir / "packager" / filename, self.dist_dir / "setup.sh")
+        shutil.copyfile(
+            self.src_dir / "packager" / filename, self.dist_dir / "setup.sh"
+        )
 
         build_dir = self.build_dir / "cig" / "pylith-build"
-        packager = Packager(build_dir=build_dir, dist_dir=self.dist_dir, macos_target=self.macos_target)
+        packager = Packager(
+            build_dir=build_dir, dist_dir=self.dist_dir, macos_target=self.macos_target
+        )
         packager.make_src_tarball()
         packager.make_dist_tarball()
 
     def _set_environ(self):
         print("Setting environment...")
 
-        if "PYLITH_INSTALLER_PATH" in os.environ: # Local tools needed for building
+        if "PYLITH_INSTALLER_PATH" in os.environ:  # Local tools needed for building
             path = os.environ["PYLITH_INSTALLER_PATH"].split(":")
         else:
             path = []
-        path += (os.path.join(self.dist_dir, "bin"),
-                "/bin",
-                "/usr/bin",
-                "/sbin",
-                "/usr/sbin",
+        path += (
+            os.path.join(self.dist_dir, "bin"),
+            "/bin",
+            "/usr/bin",
+            "/sbin",
+            "/usr/sbin",
         )
-        env = {"PATH": ":".join(path) }
+        env = {"PATH": ":".join(path)}
 
-        pythonpath = (os.path.join(self.dist_dir, "lib", "python%s" % self.python_version, "site-packages"),)
+        pythonpath = (
+            os.path.join(
+                self.dist_dir, "lib", "python%s" % self.python_version, "site-packages"
+            ),
+        )
         if self.arch == "x86_64":
-            pythonpath += (os.path.join(self.dist_dir, "lib64", "python%s" % self.python_version, "site-packages"),)
+            pythonpath += (
+                os.path.join(
+                    self.dist_dir,
+                    "lib64",
+                    "python%s" % self.python_version,
+                    "site-packages",
+                ),
+            )
         env["PYTHONPATH"] = ":".join(pythonpath)
-        
+
         if self.os == "Linux":
             ldpath = (os.path.join(self.dist_dir, "lib"),)
             if self.arch == "x86_64":
@@ -429,15 +466,23 @@ class MakeBinaryApp:
         parser.add_argument("--build", action="store_true", dest="build")
         parser.add_argument("--package", action="store_true", dest="package")
         parser.add_argument("--all", action="store_true", dest="all")
-        parser.add_argument("--base-dir", action="store", dest="base_dir", default=baseDirDefault)
+        parser.add_argument(
+            "--base-dir", action="store", dest="base_dir", default=baseDirDefault
+        )
         parser.add_argument("--pylith-branch", action="store", dest="pylith_branch")
-        parser.add_argument("--make-threads", action="store", dest="make_threads", type=int, default=8)
-        parser.add_argument("--force-config", action="store_true", dest="force_config", default=False)
-        parser.add_argument("--macos-target", action="store", dest="macos_target", default="10.15")
+        parser.add_argument(
+            "--make-threads", action="store", dest="make_threads", type=int, default=8
+        )
+        parser.add_argument(
+            "--force-config", action="store_true", dest="force_config", default=False
+        )
+        parser.add_argument(
+            "--macos-target", action="store", dest="macos_target", default="10.15"
+        )
         args = parser.parse_args()
         return args
 
-    
+
 # ======================================================================
 if __name__ == "__main__":
     MakeBinaryApp().main()

@@ -2,7 +2,7 @@
 # This code is part of PyLith, developed through the Computational Infrastructure
 # for Geodynamics (https://geodynamics.org).
 #
-# Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
+# Copyright (c) 2010-2025, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
 # See https://mit-license.org/ and LICENSE.md and for license information. 
@@ -116,8 +116,8 @@ finished_mkdest:
 # download
 # ----------------------------------------------------------------------
 download: finished_mkdest
-	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.0-0.tar.gz $(DEPS_URL)
-	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.0-0.tar.gz
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.1-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.1-0.tar.gz
 
 finished_download:
 	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@
