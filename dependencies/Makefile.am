@@ -2,7 +2,7 @@
 # This code is part of PyLith, developed through the Computational Infrastructure
 # for Geodynamics (https://geodynamics.org).
 #
-# Copyright (c) 2010-2025, University of California, Davis and the PyLith Development Team.
+# Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
 # See https://mit-license.org/ and LICENSE.md and for license information. 
@@ -116,8 +116,8 @@ finished_mkdest:
 # download
 # ----------------------------------------------------------------------
 download: finished_mkdest
-	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.1-0.tar.gz $(DEPS_URL)
-	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.1-0.tar.gz
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-4.2.0-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-4.2.0-0.tar.gz
 
 finished_download:
 	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@
@@ -128,10 +128,6 @@ finished_download:
 # ----------------------------------------------------------------------
 autotools: finished_download
 if INSTALL_AUTOTOOLS
-	$(FETCH_SCRIPT) $(CURL) m4-$(M4_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) autoconf-$(AUTOCONF_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) automake-$(AUTOMAKE_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) libtool-$(LIBTOOL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf m4-$(M4_VER).tar.gz
 	mkdir -p m4-build
 	cd m4-build && \
@@ -170,7 +166,6 @@ installed_autotools:
 # ----------------------------------------------------------------------
 cmake:
 if INSTALL_CMAKE
-	$(FETCH_SCRIPT) $(CURL) cmake-$(CMAKE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf cmake-$(CMAKE_VER).tar.gz
 	cd cmake-$(CMAKE_VER) && \
 		$(env_flags_deps) ./bootstrap --verbose --prefix=$(prefix) && make -j$(make_threads) && $(MAKE) install && \
@@ -189,10 +184,6 @@ installed_cmake:
 # ----------------------------------------------------------------------
 compilers: finished_download
 if INSTALL_GCC
-	$(FETCH_SCRIPT) $(CURL) gcc-$(GCC_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) mpc-$(MPC_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) gmp-$(GMP_VER).tar.gz $(DEPS_URL)
-	$(FETCH_SCRIPT) $(CURL) mpfr-$(MPFR_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf gcc-$(GCC_VER).tar.gz
 	cd gcc-$(GCC_VER) ; \
 		$(TAR) -xf ../gmp-$(GMP_VER).tar.gz; \
@@ -226,7 +217,6 @@ installed_compilers:
 openssl: installed_compilers
 
 if INSTALL_OPENSSL
-	$(FETCH_SCRIPT) $(CURL) openssl-$(OPENSSL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf openssl-$(OPENSSL_VER).tar.gz
 	$(MKDIR_P) openssl-build
 	cd openssl-build && \
@@ -253,7 +243,6 @@ installed_openssl:
 # ----------------------------------------------------------------------
 curl: installed_compilers installed_openssl
 if INSTALL_CURL
-	$(FETCH_SCRIPT) $(CURL) curl-$(CURL_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf curl-$(CURL_VER).tar.gz
 	$(MKDIR_P) curl-build
 	cd curl-build && \
@@ -279,7 +268,6 @@ installed_curl:
 # ----------------------------------------------------------------------
 libxcrypt: installed_compilers installed_openssl
 if INSTALL_LIBXCRYPT
-	$(FETCH_SCRIPT) $(CURL) libxcrypt-$(LIBXCRYPT_VER).tar.xz $(DEPS_URL)
 	$(TAR) -xf libxcrypt-$(LIBXCRYPT_VER).tar.xz
 	$(MKDIR_P) libxcrypt-build
 	cd libxcrypt-build && \
@@ -305,7 +293,6 @@ installed_libxcrypt:
 # ----------------------------------------------------------------------
 libffi: installed_compilers installed_openssl
 if INSTALL_LIBFFI
-	$(FETCH_SCRIPT) $(CURL) libffi-$(LIBFFI_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf libffi-$(LIBFFI_VER).tar.gz
 	$(MKDIR_P) libffi-build
 	cd libffi-build && \
@@ -334,7 +321,6 @@ if INSTALL_PYTHON
 if INSTALL_OPENSSL
 OPENSSL=--with-openssl=$(prefix)
 endif
-	$(FETCH_SCRIPT) $(CURL) Python-$(PYTHON_VER).tgz $(DEPS_URL)
 	$(TAR) -xf Python-$(PYTHON_VER).tgz
 	$(MKDIR_P) python-build
 	cd python-build && \
@@ -403,7 +389,6 @@ installed_mpi:
 # openmpi
 # ----------------------------------------------------------------------
 openmpi: installed_compilers
-	$(FETCH_SCRIPT) $(CURL) openmpi-$(OPENMPI_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf openmpi-$(OPENMPI_VER).tar.gz
 	$(MKDIR_P) openmpi-build
 	cd openmpi-build && \
@@ -425,7 +410,6 @@ else
 mpich_options += --disable-fortran
 endif
 mpich: installed_compilers
-	$(FETCH_SCRIPT) $(CURL) mpich-$(MPICH_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf mpich-$(MPICH_VER).tar.gz
 	$(MKDIR_P) mpich-build
 	cd mpich-build && \
@@ -445,7 +429,6 @@ mpich: installed_compilers
 # ----------------------------------------------------------------------
 catch2: installed_compilers installed_cmake
 if INSTALL_CATCH2
-	$(FETCH_SCRIPT) $(CURL) Catch2-$(CATCH2_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf Catch2-$(CATCH2_VER).tar.gz
 	$(MKDIR_P) catch2-build
 	cd catch2-build && \
@@ -468,7 +451,6 @@ installed_catch2:
 # ----------------------------------------------------------------------
 pcre: installed_compilers
 if INSTALL_PCRE
-	$(FETCH_SCRIPT) $(CURL) pcre2-$(PCRE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf pcre2-$(PCRE_VER).tar.gz
 	$(MKDIR_P) pcre-build
 	cd pcre-build && \
@@ -492,7 +474,6 @@ installed_pcre:
 # ----------------------------------------------------------------------
 swig: installed_pcre installed_compilers installed_python
 if INSTALL_SWIG
-	$(FETCH_SCRIPT) $(CURL) swig-$(SWIG_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf swig-$(SWIG_VER).tar.gz
 	$(MKDIR_P) swig-build
 	cd swig-build && \
@@ -520,7 +501,6 @@ installed_swig:
 # ----------------------------------------------------------------------
 sqlite: installed_compilers
 if INSTALL_SQLITE
-	$(FETCH_SCRIPT) $(CURL) sqlite-autoconf-$(SQLITE_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf sqlite-autoconf-$(SQLITE_VER).tar.gz
 	$(MKDIR_P) sqlite-build
 	cd sqlite-build && \
@@ -545,7 +525,6 @@ installed_sqlite:
 # ----------------------------------------------------------------------
 tiff: installed_compilers
 if INSTALL_TIFF
-	$(FETCH_SCRIPT) $(CURL) tiff-$(TIFF_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf tiff-$(TIFF_VER).tar.gz
 	$(MKDIR_P) tiff-build
 	cd tiff-build && \
@@ -570,7 +549,6 @@ installed_tiff:
 # ----------------------------------------------------------------------
 proj: installed_compilers installed_sqlite installed_tiff installed_curl installed_cmake
 if INSTALL_PROJ
-	$(FETCH_SCRIPT) $(CURL) proj-$(PROJ_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz
 	$(MKDIR_P) proj-build
 	cd proj-build && \
@@ -596,7 +574,6 @@ if WITH_FORTRAN
 hdf5_options = --enable-fortran
 endif
 if INSTALL_HDF5
-	$(FETCH_SCRIPT) $(CURL) hdf5-$(HDF5_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf hdf5-$(HDF5_VER).tar.gz
 	$(MKDIR_P) hdf5-build
 	cd hdf5-build && \
@@ -638,7 +615,6 @@ installed_h5py:
 # ----------------------------------------------------------------------
 netcdf: installed_compilers installed_hdf5
 if INSTALL_NETCDF
-	$(FETCH_SCRIPT) $(CURL) netcdf-c-$(NETCDF_VER).tar.gz $(DEPS_URL)
 	$(TAR) -xf netcdf-c-$(NETCDF_VER).tar.gz
 	$(MKDIR_P) netcdf-build
 	cd netcdf-build && \
