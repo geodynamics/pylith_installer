@@ -145,7 +145,7 @@ for package in COMPILER_PACKAGES + PACKAGES:
 if not failures:
     print(f"Creating tarball {TAR_FILENAME}")
     tfile = tarfile.open(TAR_FILENAME, mode="w:gz")
-    for package in PACKAGES:
+    for package in COMPILER_PACKAGES + PACKAGES:
         filename = package.tarball_filename()
         tfile.add(filename)
     tfile.close()

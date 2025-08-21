@@ -51,8 +51,28 @@ class Darwin:
         )
         output = proc.stdout.decode("utf-8")
         deplibs = []
+        libId = None
         for line in output.split("\t")[1:]:
-            deplibs.append(line.split()[0])
+            objName = line.split()[0]
+            libName = os.path.split(objName)[1]
+            if str(filename).endswith(libName):
+                libId = objName
+            else:
+                deplibs.append(objName)
+
+        # Change id
+        if libId:
+            libName = os.path.split(libId)[1]
+            libNameNew = f"@rpath/{libName}"
+            cmd = [
+                "install_name_tool",
+                "-id",
+                libNameNew,
+                str(filename),
+            ]
+            subprocess.run(cmd, check=True)
+
+        # Change path to dependencies
         for libPathAbs in deplibs:
             if libPathAbs.startswith("/usr") or libPathAbs.startswith("/System"):
                 continue
@@ -119,7 +139,6 @@ class Packager:
             if len(line.split("=")) == 2 and not "$" in line:
                 key, value = line.split("=")
                 vars[key.strip()] = value.strip()
-        print(vars)
         return vars
 
     def _get_makeinfo(self):
@@ -451,6 +470,7 @@ class MakeBinaryApp:
             env["CFLAGS"] = MINOS_FLAGS
             env["CXXFLAGS"] = MINOS_FLAGS
             env["LDFLAGS"] = MINOS_FLAGS
+            env["FI_PROVIDER"] = "tcp"
         self.env = env
 
     def _run_cmd(self, cmd):

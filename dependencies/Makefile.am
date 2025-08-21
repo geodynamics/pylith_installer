@@ -268,7 +268,7 @@ installed_curl:
 # ----------------------------------------------------------------------
 libxcrypt: installed_compilers installed_openssl
 if INSTALL_LIBXCRYPT
-	$(TAR) -xf libxcrypt-$(LIBXCRYPT_VER).tar.xz
+	$(TAR) -xf libxcrypt-$(LIBXCRYPT_VER).tar.gz
 	$(MKDIR_P) libxcrypt-build
 	cd libxcrypt-build && \
 		../libxcrypt-$(LIBXCRYPT_VER)/configure --prefix=$(prefix) \

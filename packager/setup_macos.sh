@@ -13,5 +13,6 @@ else
     export PYTHONHOME="$pylith"
     export PATH="$pylith/bin:/bin:/usr/bin:/sbin/:/usr/sbin:$PATH"
     export PYTHONPATH="$pylith/lib/python3.10/site-packages"
+    export FI_PROVIDER="tcp"
     echo "Ready to run PyLith."
 fi
