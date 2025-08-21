@@ -90,7 +90,7 @@ PACKAGES = (
     ),
     PackageInfo(
         name="Catch2",
-        version="3.7.1",
+        version="3.8.1",
         url="https://github.com/catchorg/{name}/archive/refs/tags/v{version}.tar.gz",
     ),
     PackageInfo(

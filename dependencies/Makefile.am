@@ -14,6 +14,9 @@ include $(top_srcdir)/environment.am
 # ----------------------------------------------------------------------
 # Files
 # ----------------------------------------------------------------------
+EXTRA_DIST = \
+	update_certificates.py
+
 noinst_tmp = \
 	installed_autotools \
 	installed_compilers \
@@ -22,6 +25,7 @@ noinst_tmp = \
 	installed_libxcrypt \
 	installed_libffi \
 	installed_python \
+	installed_python_packages \
 	installed_mpi \
 	installed_catch2 \
 	installed_pcre \
@@ -85,7 +89,7 @@ noinst_srcdirs = \
 # ----------------------------------------------------------------------
 # Targets
 # ----------------------------------------------------------------------
-all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_mpi installed_catch2 installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
+all: finished_mkdest installed_autotools installed_compilers installed_openssl installed_curl installed_sqlite installed_python installed_python_packages installed_mpi installed_catch2 installed_swig installed_sqlite installed_proj installed_hdf5 installed_h5py installed_netcdf installed_netcdfpy installed_cmake
 
 # ----------------------------------------------------------------------
 # Note on configure invocations
@@ -337,11 +341,15 @@ else
 	touch $(abs_builddir)/installed_python
 endif
 
-python_postinstall:
+installed_python:
+	$(MAKE) $(AM_MAKEFLAGS) python
+
+
+python_postinstall: installed_python
 	python3 -m venv $(prefix)
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools certifi
-	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir 
-	rm -f $(prefix)/share/openssl/cert.pem && $(MKDIR_P) $(prefix)/share/openssl && $(LN_S) $(prefix)/lib/python3.10/site-packages/certifi/cacert.pem $(prefix)/share/openssl/cert.pem 
+	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir
+	$(abs_srcdir)/update_certificates.py
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
@@ -358,10 +366,11 @@ endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir gmsh
 endif
+	touch installed_python_packages
 
-installed_python:
-	$(MAKE) $(AM_MAKEFLAGS) python
+installed_python_packages:
 	$(MAKE) $(AM_MAKEFLAGS) python_postinstall
+
 
 # ----------------------------------------------------------------------
 # mpi
@@ -505,7 +514,7 @@ if INSTALL_SQLITE
 	$(MKDIR_P) sqlite-build
 	cd sqlite-build && \
 		../sqlite-autoconf-$(SQLITE_VER)/configure --prefix=$(prefix) \
-			--enable-shared $(env_flags_deps) $(env_compilers) \
+			--enable-shared $(SQLITE3_SONAME) $(env_flags_deps) $(env_compilers) \
 			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"; \
 		$(MAKE) -j $(make_threads) && \
 		$(MAKE) install && \
@@ -548,11 +557,29 @@ installed_tiff:
 # proj
 # ----------------------------------------------------------------------
 proj: installed_compilers installed_sqlite installed_tiff installed_curl installed_cmake
+if USE_SQLITE3_INCLUDE_PATH
+PROJ_SQLITE3_INCLUDE=-DSQLite3_INCLUDE_DIR=${SQLITE3_INCDIR}
+endif
+if USE_SQLITE3_LIBRARY_PATH
+PROJ_SQLITE3_LIBRARY=-DSQLite3_LIBRARY=${SQLITE3_LIBDIR}/libsqlite3.${LIB_SUFFIX}
+endif
+if USE_TIFF_INCLUDE_PATH
+PROJ_TIFF_INCLUDE=-DTIFF_INCLUDE_DIR=${TIFF_INCDIR}
+endif
+if USE_TIFF_LIBRARY_PATH
+PROJ_TIFF_LIBRARY=-DTIFF_LIBRARY=${TIFF_LIBDIR}/libtiff.${LIB_SUFFIX}
+endif
+if USE_CURL_INCLUDE_PATH
+PROJ_CURL_INCLUDE=-DCURL_INCLUDE_DIR=${CURL_INCDIR}
+endif
+if USE_CURL_LIBRARY_PATH
+PROJ_CURL_LIBRARY=-DCURL_LIBRARY=${CURL_LIBDIR}/libcurl.${LIB_SUFFIX}
+endif
 if INSTALL_PROJ
 	$(TAR) -xf proj-$(PROJ_VER).tar.gz
 	$(MKDIR_P) proj-build
 	cd proj-build && \
-cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_INSTALL_NAME_DIR=$(prefix)/lib TIFF_INCLUDE_DIR=${TIFF_INCDIR} TIFF_LIBRARY=${TIFF_LIBDIR} SQLITE3_INCLUDE_DIR=${SQLITE3_INCDIR} SQLITE3_LIBRARY=${SQLITE3_LIBDIR} -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release ../proj-${PROJ_VER} && \
+	cmake -DCMAKE_INSTALL_PREFIX=$(prefix) -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) -DCMAKE_INSTALL_NAME_DIR=$(prefix)/lib ${PROJ_TIFF_INCLUDE} ${PROJ_TIFF_LIBRARY} ${PROJ_SQLITE3_INCLUDE} ${PROJ_SQLITE3_LIBRARY} ${PROJ_CURL_INCLUDE} ${PROJ_CURL_LIBRARY} -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release ../proj-${PROJ_VER} && \
 		$(MAKE) -j$(make_threads) && $(MAKE) install && \
 		$(env_cert) projsync --system-directory --all && \
 		touch $(abs_builddir)/installed_proj
@@ -597,7 +624,7 @@ installed_hdf5:
 # ----------------------------------------------------------------------
 # h5py
 # ----------------------------------------------------------------------
-h5py: installed_hdf5 installed_python
+h5py: installed_hdf5 installed_python_packages
 if INSTALL_H5PY
 	CFLAGS="$(CFLAGS)" CC=mpicc HDF5_LIBDIR=$(HDF5_LIBDIR) HDF5_INCLUDEDIR=$(HDF5_INCDIR) $(env_cert) $(PYTHON) -m pip install --no-cache-dir --no-binary=h5py h5py && \
 		touch $(abs_builddir)/installed_h5py
@@ -639,7 +666,7 @@ installed_netcdf:
 # ----------------------------------------------------------------------
 # netcdfpy
 # ----------------------------------------------------------------------
-netcdfpy: installed_netcdf installed_python
+netcdfpy: installed_netcdf installed_python_packages
 if INSTALL_NETCDFPY
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --prefer-binary cftime netCDF4
 endif

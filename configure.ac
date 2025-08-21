@@ -481,7 +481,7 @@ fi
 AC_PATH_PROG(CURL, curl)
 if test -z "$CURL" ; then
   AC_MSG_FAILURE([cannot find 'curl' program.])
-  TAR=`echo "Error: curl is not installed." ; false`
+  CURL=`echo "Error: curl is not installed." ; false`
 fi
 
 # autoreconf/git
@@ -518,6 +518,18 @@ AC_SUBST(petsc_git)
 # CHECK COMPATIBILITY OF OPTIONS
 # ----------------------------------------------------------------------
 AC_CANONICAL_HOST
+case "$host_os" in
+  linux*)
+    LIB_SUFFIX="so"
+    ;;
+  darwin*)
+    LIB_SUFFIX="dylib"
+    ;;
+  *)
+    AC_MSG_ERROR([Unknown operating system: $host_os])
+esac
+AC_SUBST([LIB_SUFFIX])
+
 
 AC_PROG_CC
 AC_PROG_CPP
@@ -658,24 +670,66 @@ else
   fi
 fi
 
+# curl
+if test "$install_curl" = yes ; then
+  AC_PATH_PROG(existing_curl, curl)
+  AC_SUBST(existing_curl)
+  CURL_INCDIR="$prefix/include"
+  CURL_LIBDIR="$prefix/lib"
+  curl_include_path="yes"
+  curl_library_path="yes"
+else
+  if test "$with_curl_incdir" != no; then
+    CURL_INCDIR="$with_curl_incdir"
+    curl_include_path="yes"
+  fi
+  if test "$with_curl_libdir" != no; then
+    CURL_LIBDIR="$with_curl_libdir"
+    curl_library_path="yes"
+  fi
+  CIT_CURL_HEADER
+  CIT_CURL_LIB
+fi
+AC_SUBST(CURL_INCDIR)
+AC_SUBST(CURL_LIBDIR)
+AM_CONDITIONAL([USE_CURL_INCLUDE_PATH], [test "$curl_include_path" = yes])
+AM_CONDITIONAL([USE_CURL_LIBRARY_PATH], [test "$curl_library_path" = yes])
+
 # sqlite
 if test "$install_sqlite" = yes ; then
   AC_PATH_PROG(existing_sqlite, sqlite)
   AC_SUBST(existing_sqlite)
-  SQLITE3_INCLUDES="-I$prefix/include"
-  SQLITE3_LDFLAGS="-L$prefix/lib"
+  SQLITE3_INCDIR="$prefix/include"
+  SQLITE3_LIBDIR="$prefix/lib"
+  sqlite3_include_path="yes"
+  sqlite3_library_path="yes"
+  case "$host_os" in
+    linux*)
+      SQLITE3_SONAME="--soname=legacy"
+      ;;
+    darwin*)
+      SQLITE3_SONAME=""
+      ;;
+    *)
+      AC_MSG_ERROR([Unknown operating system: $host_os])
+  esac
+  AC_SUBST(SQLITE3_SONAME)
 else
   if test "$with_sqlite_incdir" != no; then
     SQLITE3_INCDIR="$with_sqlite_incdir"
+    sqlite3_include_path="yes"
   fi
   if test "$with_sqlite_libdir" != no; then
     SQLITE3_LIBDIR="$with_sqlite_libdir"
+    sqlite3_library_path="yes"
   fi
   CIT_SQLITE3_HEADER
   CIT_SQLITE3_LIB
 fi
 AC_SUBST(SQLITE3_INCDIR)
 AC_SUBST(SQLITE3_LIBDIR)
+AM_CONDITIONAL([USE_SQLITE3_INCLUDE_PATH], [test "$sqlite3_include_path" = yes])
+AM_CONDITIONAL([USE_SQLITE3_LIBRARY_PATH], [test "$sqlite3_library_path" = yes])
 
 # proj
 if test "$install_proj" = yes ; then
@@ -686,20 +740,26 @@ if test "$install_proj" = yes ; then
   if test "$install_tiff" = yes ; then
     AC_PATH_PROG(existing_tiff, tiff)
     AC_SUBST(existing_tiff)
-    TIFF_INCLUDES="-I$prefix/include"
-    TIFF_LDFLAGS="-L$prefix/lib"
+    TIFF_INCDIR="$prefix/include"
+    TIFF_LIBDIR="$prefix/lib"
+    tiff_include_path="yes"
+    tiff_library_path="yes"
   else
     if test "$with_tiff_incdir" != no; then
       TIFF_INCDIR="$with_tiff_incdir"
+      tiff_include_path="yes"
     fi
     if test "$with_tiff_libdir" != no; then
       TIFF_LIBDIR="$with_tiff_libdir"
+      tiff_library_path="yes"
     fi
     CIT_TIFF_HEADER
     CIT_TIFF_LIB
   fi
   AC_SUBST(TIFF_INCDIR)
   AC_SUBST(TIFF_LIBDIR)
+  AM_CONDITIONAL([USE_TIFF_INCLUDE_PATH], [test "$tiff_include_path" = yes])
+  AM_CONDITIONAL([USE_TIFF_LIBRARY_PATH], [test "$tiff_library_path" = yes])
 else
   if test "$with_proj_incdir" != no; then
     PROJ_INCLUDES="-I$with_proj_incdir"
