@@ -5,8 +5,6 @@ the build.py script.
 
 ## Linux
 
-`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
-
 1. `docker volume create pylith-binary`
 2. `docker build -t pylith_installer/pylith-binaryenv -f docker/pylith-binaryenv --build-arg BUILD_ENV=nocerts .`
 3. `docker run --name pylith-binary-workspace --rm -t -v pylith-binary:/opt/pylith pylith_installer/pylith-binaryenv &`
@@ -17,7 +15,6 @@ the build.py script.
 
 ## macOS
 
-`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
 `export PYLITH_INSTALLER_PATH=${SW_DIR}/autotools/${COMPILER_VERSION}/bin`
 `module purge`
 
@@ -25,3 +22,9 @@ the build.py script.
 2. `mkdir src && pushd src && ln -s $HOME/src/cig/pylith_installer && popd`
 3. x86_64: `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=8 --macos-target=11.0 --setup`
 4. arm64: `src/pylith_installer/packager/build.py --base-dir=`pwd` --make-threads=32 --macos-target=12.0 --setup`
+
+## Local certificates
+
+If you are behind a firewall and have a local certificate, then use these environment variables.
+
+`export SSL_CERT_FILE="$CERT_PATH/$CERT_FILE"  REQUESTS_CA_BUNDLE="$CERT_PATH/$CERT_FILE"`
