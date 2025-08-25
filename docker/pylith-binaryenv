@@ -1,21 +1,21 @@
 ARG BUILD_ENV=nocerts
-FROM rockylinux:8 as os-init
+FROM rockylinux:8 AS os-init
 LABEL maintainer="Brad Aagaard <baagaard@usgs.gov>"
 
 ENV BUILD_ENV=${BUILD_ENV}
 
 # ------------------------------------------------------------------------------
-from os-init as os-certs-doi
+FROM os-init AS os-certs-doi
 
 ONBUILD COPY docker/certs/ /usr/share/pki/ca-trust-source/anchors
 ONBUILD RUN update-ca-trust enable
 ONBUILD ENV CERT_PATH=/etc/ssl/certs CERT_FILE=ca-bundle.crt
 
-from os-init as os-nocerts
+FROM os-init AS os-nocerts
 ONBUILD ENV CERT_PATH=no  CERT_FILE=no
 
 # ------------------------------------------------------------------------------
-from os-${BUILD_ENV} as os-update
+FROM os-${BUILD_ENV} AS os-update
 
 RUN yum install -y \
         gcc \
@@ -48,7 +48,7 @@ RUN yum install -y \
 RUN alternatives --set python3 /usr/bin/python3.11
 
 # ------------------------------------------------------------------------------
-from os-update as build-env
+FROM os-update AS build-env
 
 ENV PYLITH_USER=pylith-user \
         BASE_DIR=/opt/pylith

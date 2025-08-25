@@ -2,7 +2,7 @@
 # This code is part of PyLith, developed through the Computational Infrastructure
 # for Geodynamics (https://geodynamics.org).
 #
-# Copyright (c) 2010-2024, University of California, Davis and the PyLith Development Team.
+# Copyright (c) 2010-2025, University of California, Davis and the PyLith Development Team.
 # All rights reserved.
 #
 # See https://mit-license.org/ and LICENSE.md and for license information. 
@@ -165,8 +165,9 @@ endif
 			--with-clanguage=C \
 			--with-mpicompilers=1 \
 			--with-shared-libraries=1 --with-64-bit-points=1 --with-large-file-io=1 \
+			--with-hdf5-include=$(HDF5_INCDIR) --with-hdf5-lib="$(HDF5_LDFLAGS) -lhdf5_hl -lhdf5" \
 			$(petsc_options) $(env_flags_cig) \
-			CPPFLAGS="$(CPPFLAGS) $(HDF5_INCLUDES)" LDFLAGS="$(LDFLAGS) $(HDF5_LDFLAGS)" \
+			CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)" \
 			PETSC_DIR=$(PETSC_DIR_BUILD)  PETSC_ARCH=$(PETSC_ARCH) && \
 		$(MAKE) -j$(make_threads) PETSC_DIR=$(PETSC_DIR_BUILD) PETSC_ARCH=$(PETSC_ARCH)
 
