@@ -347,7 +347,7 @@ installed_python:
 
 python_postinstall: installed_python
 	python3 -m venv $(prefix)
-	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools certifi
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools==76.1.0 certifi
 	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir
 	$(abs_srcdir)/update_certificates.py
 if INSTALL_DEVELOPER
