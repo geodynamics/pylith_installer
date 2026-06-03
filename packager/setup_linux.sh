@@ -12,7 +12,7 @@ if test ! -f bin/pylith; then
 else
     export PYTHONHOME="$pylith"
     export PATH="$pylith/bin:$PATH"
-    export PYTHONPATH="$pylith/lib/python3.10/site-packages:$pylith/lib64/python3.10/site-packages"
+    export PYTHONPATH="$pylith/lib/python3.12/site-packages:$pylith/lib64/python3.12/site-packages"
     export LD_LIBRARY_PATH="$pylith/lib:$pylith/lib64"
 
     for arg in "$@"; do
