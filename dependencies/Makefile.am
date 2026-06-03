@@ -346,6 +346,7 @@ installed_python:
 
 
 python_postinstall: installed_python
+    # Pin setuptools to 76.1.0 to avoid pkg_resources deprecation warnings.
 	python3 -m venv $(prefix)
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools==76.1.0 certifi
 	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir
@@ -361,7 +362,8 @@ if INSTALL_MATPLOTLIB
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir matplotlib
 endif
 if INSTALL_PYVISTA
-	$(env_cert) $(PYTHON) -m pip install --no-cache-dir pyvista
+    # Pin to 0.46.2 to avoid installing bz2
+	$(env_cert) $(PYTHON) -m pip install --no-cache-dir pyvista==0.46.2
 endif
 if INSTALL_GMSH
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir gmsh
