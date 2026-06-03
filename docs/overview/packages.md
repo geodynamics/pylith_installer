@@ -20,7 +20,7 @@ The dependencies will be downloaded from <http://geoweb.cse.ucdavis.edu/~buildbo
   * gcc/g++/gfortran 14.2.0
   * mpc 1.3.1
   * gmp 6.3.0
-  * mpfr 4.2.1
+  * mpfr 5.0.0
 
 * MPI (select one)
   * MPICH 4.2.3

@@ -7,7 +7,7 @@ import pathlib
 import requests
 
 GNU_TEMPLATE = "https://ftp.gnu.org/pub/gnu/{name}/{name}-{version}.tar.gz"
-TAR_FILENAME = "pylith-dependencies-4.2.1-0.tar.gz"
+TAR_FILENAME = "pylith-dependencies-5.0.0-0.tar.gz"
 
 
 @dataclass
