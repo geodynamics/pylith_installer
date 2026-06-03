@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------
 # Packages URL
 # ----------------------------------------------------------------------
-DEPS_URL=https://github.com/geodynamics/pylith_installer/releases/download/v4.2.1-0
+DEPS_URL=https://github.com/geodynamics/pylith_installer/releases/download/v5.0.0-0
 GITHUB_URL=https://github.com/geodynamics
 
 # ----------------------------------------------------------------------
@@ -58,13 +58,13 @@ PYTHIA_VER=main
 SPATIALDATA_VER=main
 PYLITH_VER=$(pylith_git)
 if PETSC_TARBALL
-PETSC_VER=4.2.1
+PETSC_VER=5.0.0
 endif
 else
-PYTHIA_VER=1.1.0
-SPATIALDATA_VER=3.1.3
-PYLITH_VER=4.2.1
-PETSC_VER=4.2.1
+PYTHIA_VER=1.2.0
+SPATIALDATA_VER=4.0.0
+PYLITH_VER=5.0.0
+PETSC_VER=5.0.0
 endif
 
 PARAMETERSGUI_VER=2.0.1
