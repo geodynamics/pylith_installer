@@ -120,8 +120,8 @@ finished_mkdest:
 # download
 # ----------------------------------------------------------------------
 download: finished_mkdest
-	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-5.0.0-0.tar.gz $(DEPS_URL)
-	$(TAR) --no-same-owner -xf pylith-dependencies-5.0.0-0.tar.gz
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-5.0.1-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-5.0.1-0.tar.gz
 
 finished_download:
 	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@

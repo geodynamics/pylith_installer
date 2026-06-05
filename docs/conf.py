@@ -21,7 +21,7 @@ copyright = "2010-2025, University of California, Davis"
 author = "Brad T. Aagaard"
 
 # The full version, including alpha/beta/rc tags
-release = "v5.0.0-0"
+release = "v5.0.1-0"
 
 
 # -- General configuration ---------------------------------------------------

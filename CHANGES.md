@@ -1,5 +1,18 @@
 See <https://github.com/geodynamics/pylith_installer/commits/main> for the complete log of changes made to PyLith Installer.
 
+## Version 5.0.1-0
+
+* Set `TERM=xterm-256color` in `setup.sh` files.
+
+## Version 5.0.0-0
+
+* Fix `PYTHON_VERSION` (3.10 -> 3.12) in `setup.sh` files.
+
+## Version 4.2.1-0
+
+* Improve support for Windows Subsystem for Linux in `setup.sh`.
+* Provide tarball of dependencies as a GitHub release asset.
+
 ## Version 3.1.0-0
 
 * Update versions of dependencies.
