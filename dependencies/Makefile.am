@@ -120,8 +120,8 @@ finished_mkdest:
 # download
 # ----------------------------------------------------------------------
 download: finished_mkdest
-	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-5.0.1-0.tar.gz $(DEPS_URL)
-	$(TAR) --no-same-owner -xf pylith-dependencies-5.0.1-0.tar.gz
+	$(FETCH_SCRIPT) $(CURL) pylith-dependencies-5.0.0-0.tar.gz $(DEPS_URL)
+	$(TAR) --no-same-owner -xf pylith-dependencies-5.0.0-0.tar.gz
 
 finished_download:
 	$(MAKE) $(AM_MAKEFLOAGS) download && touch $@
@@ -350,7 +350,10 @@ python_postinstall: installed_python
 	python3 -m venv $(prefix)
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir --upgrade pip setuptools==76.1.0 certifi
 	$(env_cert) $(PYTHON) -m pip install numpy==$(NUMPY_VER) --no-cache-dir
+if INSTALL_OPENSSL
+# Assume certificates only need updating if we installed openssl
 	$(abs_srcdir)/update_certificates.py
+endif
 if INSTALL_DEVELOPER
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir coverage autopep8
 	$(env_cert) $(PYTHON) -m pip install --no-cache-dir sphinx myst-parser pydata-sphinx-theme sphinx_design sphinx-copybutton sphinx-proof sphinxcontrib.bibtex
