@@ -1,5 +1,10 @@
 See <https://github.com/geodynamics/pylith_installer/commits/main> for the complete log of changes made to PyLith Installer.
 
+## Version 5.0.2-0
+
+* Fix dependencies location.
+* Only install OpenSSL certificates if installed OpenSSL.
+
 ## Version 5.0.1-0
 
 * Set `TERM=xterm-256color` in `setup.sh` files.
